@@ -28,5 +28,8 @@
   "workspaces": [
     "packages/*",
     "services/*"
-  ]
+  ],
+  "dependencies": {
+    "fetch-h2": "^3.0.1"
+  }
 }
