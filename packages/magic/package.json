@@ -1,0 +1,14 @@
+{
+  "name": "@packages/magic",
+  "version": "1.0.0",
+  "main": "build",
+  "module": "src",
+  "scripts": {
+    "build": "rimraf build && swc src -d build",
+    "build-watch": "swc src -d build -w"
+  },
+  "dependencies": {
+    "@packages/database": "1.0.0",
+    "node-fetch": "^3.1.0"
+  }
+}

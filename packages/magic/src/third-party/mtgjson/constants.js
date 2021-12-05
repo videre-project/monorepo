@@ -1,0 +1,1 @@
+export const API_PATH = 'https://mtgjson.com/api/v5/'

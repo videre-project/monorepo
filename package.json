@@ -1,0 +1,32 @@
+{
+  "name": "videre-project",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "https://github.com/Qonfused/videre-project.git",
+  "author": "Cory Bennett <32466081+Qonfused@users.noreply.github.com>",
+  "license": "MIT",
+  "private": true,
+  "engines": {
+    "yarn": ">=1.17.3"
+  },
+  "scripts": {
+    "build": "lerna run --parallel build",
+    "build-watch": "lerna run --parallel build-watch",
+    "api": "npm --prefix services/videre-api start",
+    "scraper": "npm --prefix services/mtgo-scraper start",
+    "test": "lerna run test --stream",
+    "publish-all": "lerna publish",
+    "format": "prettier --write \"./**/*.{ts,js,json,md}\""
+  },
+  "devDependencies": {
+    "@swc/cli": "^0.1.52",
+    "@swc/core": "^1.2.117",
+    "chokidar": "^3.5.2",
+    "lerna": "^4.0.0",
+    "prettier": "2.3.2"
+  },
+  "workspaces": [
+    "packages/*",
+    "services/*"
+  ]
+}

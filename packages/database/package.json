@@ -1,0 +1,15 @@
+{
+  "name": "@packages/database",
+  "version": "1.0.0",
+  "main": "build",
+  "module": "src",
+  "scripts": {
+    "start": "docker-compose up -d",
+    "build": "rimraf build && swc src -d build",
+    "build-watch": "swc src -d build -w"
+  },
+  "dependencies": {
+    "dotenv": "^9.0.2",
+    "postgres": "^1.0.2"
+  }
+}
