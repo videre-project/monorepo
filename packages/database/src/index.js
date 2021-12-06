@@ -1,8 +1,8 @@
-import dotenv from 'dotenv';
-dotenv.config();
-
 import postgres from 'postgres';
 
+import config from './config';
+
+export * from './events';
 export * from './sort';
 export * from './swiss';
 
@@ -13,7 +13,7 @@ export * from './swiss';
  * @example sql`INSERT INTO users ${sql(user)}`
  */
 export const sql = postgres(
-  process.env.DATABASE_URL || 'postgresql://postgres:videre@127.0.0.1:5432/postgres',
+  config.connectionString || 'postgresql://postgres:videre@127.0.0.1:5432/postgres',
   {
     max: 1,
     idle_timeout: 3,

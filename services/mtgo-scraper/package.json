@@ -10,18 +10,19 @@
   "private": true,
   "devDependencies": {
     "eslint": "^7.25.0",
+    "nodemon": "^2.0.15",
     "prettier": "^2.2.1",
     "rimraf": "^3.0.2"
   },
   "dependencies": {
-    "@packages/database": "1.0.0",
-    "@packages/magic": "1.0.0",
-    "@packages/querybuilder": "1.0.0",
     "@babel/cli": "^7.13.16",
     "@babel/core": "^7.14.2",
     "@babel/node": "^7.14.2",
     "@babel/plugin-transform-runtime": "^7.14.2",
     "@babel/preset-env": "^7.14.2",
+    "@packages/database": "1.0.0",
+    "@packages/magic": "1.0.0",
+    "@packages/querybuilder": "1.0.0",
     "chalk": "^4.1.1",
     "cron": "^1.8.2",
     "dotenv": "^9.0.2",
@@ -34,7 +35,7 @@
     "puppeteer-extra-plugin-stealth": "^2.7.8"
   },
   "scripts": {
-    "start": "babel-node src",
+    "start": "nodemon --exec babel-node src",
     "build": "rimraf build && babel src -d build",
     "serve": "node build",
     "lint": "eslint src && prettier src --check",

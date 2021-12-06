@@ -1,16 +1,13 @@
 import chalk from 'chalk';
 import { CronJob } from 'cron';
-import dotenv from 'dotenv';
 import fetch from 'node-fetch';
-
-dotenv.config();
 
 import usePuppeteerStealth from './puppeteer'
 import scrapeEvent from './scrapeEvent';
-import { sql, updateDatabase } from './database';
 
 import { writeFileSync } from 'fs';
 
+import { sql, check_integrity } from '@packages/database';
 import { MTGO, FIRST_PARTY } from '@packages/magic';
 import { eventsQuery } from '@packages/querybuilder';
 const { formatCardsCollection } = FIRST_PARTY.cards;
@@ -54,14 +51,13 @@ const run = async () => {
 
     const min_date = (new Date(new Date(dates[0]).valueOf() - day * 5));
     const max_date = (new Date(new Date(dates.slice(-1)[0]).valueOf() + day * 2));
-
-    const query = {
+    const events = await eventsQuery({
       min_date: min_date.toISOString().substring(0, 10),
       max_date: max_date.toISOString().substring(0, 10)
-    };
-    const events = await eventsQuery(query)
-      .then(({ _, data: results }) => results.map(obj => obj.uid));
-    console.log(events);
+    }).then(({ _, data: results }) => results);
+    
+    console.log(await check_integrity(events.map(obj => obj.uid)));
+
     process.exit(0);
     // const query = `min_date=${ min_date.toISOString().substring(0, 10) }&max_date=${ max_date }`;
     // const response = await fetch(`https://videreproject.com/api/metagame?${query}`)
