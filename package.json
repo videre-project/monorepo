@@ -12,6 +12,7 @@
   "scripts": {
     "build": "lerna run --parallel build",
     "build-watch": "lerna run --parallel build-watch",
+    "database": "npm --prefix packages/database start",
     "api": "npm --prefix services/videre-api start",
     "scraper": "npm --prefix services/mtgo-scraper start",
     "test": "lerna run test --stream",

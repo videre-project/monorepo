@@ -4,7 +4,7 @@
   "main": "build",
   "module": "src",
   "scripts": {
-    "start": "docker-compose up -d",
+    "start": "docker-compose -f ./bin/docker-compose.yml up -d",
     "build": "rimraf build && swc src -d build",
     "build-watch": "swc src -d build -w"
   },
