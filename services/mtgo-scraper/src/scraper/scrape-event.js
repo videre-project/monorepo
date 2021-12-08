@@ -2,6 +2,7 @@ import chalk from 'chalk';
 import fetch from 'node-fetch';
 import { JSDOM } from 'jsdom';
 
+import { CLI_CLEAR_CONSOLE } from '@packages/cli';
 import { setDelay } from '@packages/database';
 
 /**
@@ -210,7 +211,7 @@ export const scrapeGoldfishEvent = async (page, format, type, uid) => {
         // Scrape Goldfish decklist meta for each player.
         for (let i = 0; i < players?.length; i++) {
             await setDelay(1000);
-            process.stdout.write('\x1Bc');
+            CLI_CLEAR_CONSOLE();
             console.log(`>> Scraping ${uri}@${players[i].player}... (${i + 1}/${players.length})`);
 
             await page.goto(

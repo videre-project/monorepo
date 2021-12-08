@@ -1,6 +1,7 @@
 import chalk from 'chalk';
 
-import { setDelay, parseTime } from '@packages/database';
+import { parseTime, CLI_CLEAR_CONSOLE } from '@packages/cli';
+import { setDelay } from '@packages/database';
 
 import { generateEventURIs, addEventEntry, updateEventEntry, checkDatabaseEntries } from './../utils/database';
 import { getDates } from './../utils/dates';
@@ -20,7 +21,7 @@ const run = async (args) => {
     const { browser, page } = await usePuppeteerStealth();
 
     // Fetch events synchronously to avoid request timeout.
-    process.stdout.write('\x1Bc'); // Clear console.
+    CLI_CLEAR_CONSOLE();
     console.log('>> Scraping WotC Events...');
     const startTime = Date.now();
     for (let i = 0; i < queue.length; i++) {
@@ -30,7 +31,7 @@ const run = async (args) => {
       if (complete.includes(uri)) continue;
 
       // Output current progress to console.
-      process.stdout.write('\x1Bc'); // Clear console
+      CLI_CLEAR_CONSOLE();
       const progress = (((i + 1) / queue.length) * 100).toFixed(2);
       console.log(`>> Scraping '${chalk.yellow(uri)}'...`);
       console.log(`   Progress: ${progress}% (${i + 1}/${queue.length}) complete.`);
@@ -64,7 +65,7 @@ const run = async (args) => {
     await page.close();
     await browser.close();
     await setDelay(500);
-    process.stdout.write('\x1Bc'); // Clear console.
+    CLI_CLEAR_CONSOLE();
     process.exit(0);
   } catch (error) {
     console.error(chalk.red(error.stack));

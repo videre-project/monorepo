@@ -9,6 +9,7 @@
     "build-watch": "swc src -d build -w"
   },
   "dependencies": {
+    "@packages/cli": "^1.0.0",
     "dotenv": "^9.0.2",
     "postgres": "^1.0.2"
   }

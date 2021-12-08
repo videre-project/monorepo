@@ -2,7 +2,8 @@ import chalk from 'chalk';
 import { fetch } from 'fetch-h2';
 import { JSDOM } from 'jsdom';
 
-import { setDelay, parseTime } from '@packages/database';
+import { parseTime, CLI_CLEAR_CONSOLE } from '@packages/cli';
+import { setDelay } from '@packages/database';
 import { API_PATH, DOCS_PATH } from './constants.js';
 
 /*
@@ -43,8 +44,7 @@ export const getTaggedCards = async (_tags, delay = 100) => {
   for (let i = 0; i < _tags.length; i++) {
     const _tag = _tags[i];
 
-    // Clear console
-    process.stdout.write('\x1Bc');
+    CLI_CLEAR_CONSOLE();
     const _progress = (((i + 1) / _tags.length) * 100).toFixed(2);
     console.log(`Scraping '${chalk.yellow(_tag.name)}'...\n${_progress}% complete. (${i + 1}/${_tags.length})`);
 

@@ -1,63 +1,9 @@
-import readline from 'readline';
-
+import { CLI_REMOVE_LINE, CLI_CLEAR_CONSOLE, CLI_PAUSE } from '@packages/cli';
 import { eventsQuery } from '@packages/querybuilder';
 
 import { sql, setDelay } from '.';
 import { day } from './constants';
 import { delete_row_uids, delete_row_duplicates } from './functions';
-
-export const CLI_REMOVE_LINE = (times = 1) => {
-  readline.moveCursor(process.stdout, 0, -(1 + times)) // up one line
-  readline.clearLine(process.stdout, times) // from cursor to end
-}
-
-export const CLI_PAUSE = async (
-    prompt = 'Would you like to proceed?',
-    options = '[Y/n]',
-    resp_y = 'Proceeding...',
-    resp_n = 'Exiting script...'
-  ) => {
-  const rl = readline.createInterface({
-    input: process.stdin,
-    output: process.stdout,
-  });
-  rl.input.on("keypress", function (c, k) {
-    // get the number of characters entered so far:
-    var len = rl.line.length;
-    // move cursor back to the beginning of the input:
-    readline.moveCursor(rl.output, -len, 0);
-    // clear everything to the right of the cursor:
-    readline.clearLine(rl.output, 1);
-  });
-  let _answer = null;
-  await new Promise(resolve => {
-    const override_prompt = ['-y', '--yes', '--assume-yes']
-      .map(opt => process.argv.includes(opt) ? true : null)
-      .filter(Boolean);
-    if (override_prompt.length) console.log(`>> ${resp_y}`);
-    else {
-      rl.question(`>> ${prompt} ${options} `, {}, (answer) => {
-        _answer = answer;
-        if (resp_y !== null && resp_n !== null ) {
-          CLI_REMOVE_LINE();
-          console.log(`   ${prompt} ${options} ${answer}`);
-        }
-        if (['y', 'yy', 'yes'].includes(`${answer}`.toLowerCase())) {
-          if (resp_y !== null && resp_n !== null ) {
-            console.log(`>> ${resp_y}`);
-          }
-          _answer = 'yes';
-        } else if (resp_y !== null && resp_n !== null ) {
-          console.log(`>> ${resp_n}`);
-          process.exit(0);
-        }
-        resolve();
-      });
-    }
-  });
-  if (resp_y !== null || resp_n !== null) await setDelay(1000);
-  return _answer;
-}
 
 /**
  * Validates integrity of event results on results table by uid.
@@ -66,7 +12,7 @@ export const CLI_PAUSE = async (
 export const check_integrity = async ({ min_date, max_date, verbose }) => {
   if (verbose) {
     await setDelay(500);
-    if (Number(verbose) >= 2) process.stdout.write('\x1Bc');
+    if (Number(verbose) >= 2) CLI_CLEAR_CONSOLE();
     console.log('>> Running \`check_integrity\` script...');
   }
   
@@ -255,7 +201,7 @@ export const automated_db_audit = async (errors) => {
     ].map(async obj => {
       const count = (data[table][obj.labels.slice(-1)])?.length;
       if (count) {
-        process.stdout.write('\x1Bc');
+        CLI_CLEAR_CONSOLE();
         const prompt = `Remove ${ count } ${ count == 1 ? obj.labels[0] : obj.labels.slice(-1) } from table '${ table }'?`;
         const response = await CLI_PAUSE(prompt, '[Y/n]', null, null);
         // Reformat previous line.
@@ -266,7 +212,7 @@ export const automated_db_audit = async (errors) => {
           // Remove duplicate entries.
           const { count: removed } = await (obj.function);
           // Clear previous line.
-          process.stdout.write('\x1Bc');
+          CLI_CLEAR_CONSOLE();
           console.log(`   Removed ${ removed } ${ removed == 1 ? obj.labels[0] : obj.labels.slice(-1) } from table '${ table }'.`);
           console.log('>> Proceeding...');
         } else console.log('>> Skipping...');

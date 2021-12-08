@@ -1,5 +1,5 @@
 {
-  "name": "@packages/magic",
+  "name": "@packages/cli",
   "version": "1.0.0",
   "main": "build",
   "module": "src",
@@ -8,7 +8,6 @@
     "build-watch": "swc src -d build -w"
   },
   "dependencies": {
-    "@packages/cli": "1.0.0",
     "@packages/database": "1.0.0"
   }
 }
