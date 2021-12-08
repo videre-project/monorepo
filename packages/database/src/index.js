@@ -2,9 +2,13 @@ import postgres from 'postgres';
 
 import config from './config';
 
-export * from './events';
+export * as CONSTANTS from './constants';
+export * as STATISTICS from './statistics';
+
+export * from './functions';
 export * from './sort';
 export * from './swiss';
+export * from './tools';
 
 /**
  * Queries database, accepts a template string or JSON to format.
@@ -41,6 +45,18 @@ export const parseTime = (totalSeconds) => {
       .join(', ')
       // Replace last comma with ' and' for fluency
       .replace(/, ([^,]*)$/, ' and $1');
+}
+
+export const formatBytes = (bytes, decimals = 2) => {
+  if (bytes === 0) return '0 Bytes';
+
+  const k = 1024;
+  const dm = decimals < 0 ? 0 : decimals;
+  const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
 }
 
 /**

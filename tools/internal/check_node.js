@@ -1,4 +1,3 @@
-
 // Check for ES6 Support
 var supportsES6 = function() {
     try {

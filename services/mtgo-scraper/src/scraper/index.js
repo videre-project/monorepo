@@ -1,0 +1,75 @@
+import chalk from 'chalk';
+
+import { setDelay, parseTime } from '@packages/database';
+
+import { generateEventURIs, addEventEntry, updateEventEntry, checkDatabaseEntries } from './../utils/database';
+import { getDates } from './../utils/dates';
+import usePuppeteerStealth from './puppeteer';
+import { scrapeWotCEvent, scrapeGoldfishEvent } from './scrape-event';
+
+const run = async (args) => {
+  try {
+    // Create date range and daily event queue
+    const dates = getDates(args);
+    const queue = generateEventURIs(dates);
+
+    // Get incomplete and complete event results from results table.
+    const { incomplete, complete } = await checkDatabaseEntries(dates, true);
+
+    // Setup Puppeteer
+    const { browser, page } = await usePuppeteerStealth();
+
+    // Fetch events synchronously to avoid request timeout.
+    process.stdout.write('\x1Bc'); // Clear console.
+    console.log('>> Scraping WotC Events...');
+    const startTime = Date.now();
+    for (let i = 0; i < queue.length; i++) {
+      await setDelay(500);
+      const uri = queue[i];
+      // Skip if event entry already exists.
+      if (complete.includes(uri)) continue;
+
+      // Output current progress to console.
+      process.stdout.write('\x1Bc'); // Clear console
+      const progress = (((i + 1) / queue.length) * 100).toFixed(2);
+      console.log(`>> Scraping '${chalk.yellow(uri)}'...`);
+      console.log(`   Progress: ${progress}% (${i + 1}/${queue.length}) complete.`);
+      const queueRate = (Date.now() - startTime) / (1000 * (i + 1)); // in seconds
+      if (i) console.log(`   About ${parseTime((queue.length - (i + 1)) * queueRate)} remaining.\n`);
+
+      // Event exists but is missing third-party archetype labels.
+      if (incomplete.map(obj => obj.uri).includes(uri)) {
+        console.log(`   ${chalk.yellow('Note')}: This database entry already exists, but is`);
+        console.log(`         missing third-party archetype labels.\n`);
+        // Deconstruct event uri.
+        const format = uri.split('-')[0];
+        const type = uri.split('-').slice(1,-3).join('-');
+        // Find event uid.
+        const { event: uid } = incomplete.filter(obj => obj.uri == uri)[0];
+        // Update only Goldfish archetype.
+        const goldfishData = await scrapeGoldfishEvent(page, format, type, uid);
+        if (!goldfishData) continue;
+        await updateEventEntry(null, null, goldfishData);
+      } else {
+        // Scrape WotC and Goldfish page.
+        const { players, ...event } = await scrapeWotCEvent(uri) || {};
+        if (JSON.stringify(event) === '{}') continue;
+        const goldfishData = await scrapeGoldfishEvent(page, event.format, event.type, event.uid);
+        // Create new database entry.
+        await addEventEntry(players, event, goldfishData);
+      }
+    }
+
+    // Cleanup
+    await page.close();
+    await browser.close();
+    await setDelay(500);
+    process.stdout.write('\x1Bc'); // Clear console.
+    process.exit(0);
+  } catch (error) {
+    console.error(chalk.red(error.stack));
+    process.exit(1);
+  }
+};
+
+export default run;

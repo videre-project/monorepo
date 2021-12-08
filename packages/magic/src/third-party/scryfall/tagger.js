@@ -46,17 +46,11 @@ export const getTaggedCards = async (_tags, delay = 100) => {
     // Clear console
     process.stdout.write('\x1Bc');
     const _progress = (((i + 1) / _tags.length) * 100).toFixed(2);
-    console.log(
-      `Scraping '${chalk.yellow(_tag.name)}'...\n${_progress}% complete. (${i + 1}/${
-        _tags.length
-      })`
-    );
+    console.log(`Scraping '${chalk.yellow(_tag.name)}'...\n${_progress}% complete. (${i + 1}/${_tags.length})`);
 
     // Get average rate towards completion in nearest days, hours, minutes and seconds
-    const elapsedTime = (Date.now() - startTime) / 1000; // in seconds
-    const _queueRate = elapsedTime / (i + 1);
-    let timeRemaining = parseTime((_tags.length - (i + 1)) * _queueRate);
-    console.log(`${timeRemaining} remaining.\n`);
+    const queueRate = (Date.now() - startTime) / (1000 * (i + 1)); // in seconds
+    console.log(`About ${parseTime((_tags.length - (i + 1)) * queueRate)} remaining.\n`);
 
     // Ensure 100 ms delay between requests.
     await setDelay(delay);

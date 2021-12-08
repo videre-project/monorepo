@@ -1,5 +1,10 @@
 #!/usr/bin/env bash
 
+# Shell script to collect various device and dev info (dumped to ./tools/logs by default).
+
+# This script must be in the tools directory when it runs because it uses the
+# script source file path to determine directories to work in.
+
 set -u # Check for undefined variables
 
 # Command-Line Formatting
