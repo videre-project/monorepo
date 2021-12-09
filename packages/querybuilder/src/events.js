@@ -87,7 +87,7 @@ export const parseEventParams = (query, uids) => {
   const _max_date = getParams(params, ...paramAliases.max_date)[0];
   const { min_date, max_date } = parseDateRange(_min_date, _max_date, offset);
   
-  return { format, type, uids, time_interval, offset, min_date, max_date };
+  return { format, type, uids, time_interval, offset, min_date, max_date, _min_date, _max_date };
 }
 
 /**
@@ -101,7 +101,8 @@ export const eventsQuery = async (query, uids) => {
     time_interval,
     offset,
     min_date,
-    max_date
+    max_date,
+    _min_date, _max_date // original (unparsed) args
   } = parseEventParams(query, uids);
 
   const eventData = await sql.unsafe(`
@@ -149,8 +150,8 @@ export const eventsQuery = async (query, uids) => {
       [type?.length == 1 ? 'type' : 'types']: type?.length == 1 ? type[0] : type,
       time_interval: time_interval,
       offset,
-      min_date: min_date,
-      max_date: max_date,
+      min_date: _min_date,
+      max_date: _max_date,
       uids: [...new Set(uids)].filter(uid =>
         [...new Set(eventData.map(obj => obj.uid.toString()))].includes(uid.toString())
       ),
