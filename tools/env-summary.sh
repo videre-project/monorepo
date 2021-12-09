@@ -73,11 +73,11 @@ time {
     if [ "${VERBOSE}" -gt 0 ]; then echo -e "=== Python ===\nFound python3 binary at '${python_bin_path}'."; fi
 
     # Check OS info w/ Python
-    ${python_bin_path} ./internal/check_os.py 2>&1 >> "${OUTPUT_FILE}"
+    ${python_bin_path} ./internal/check-os.py 2>&1 >> "${OUTPUT_FILE}"
     if [ "${VERBOSE}" -gt 0 ]; then echo "--> OS info saved to '${OUTPUT_FILE}'."; fi
 
     # Check Python version and build info
-    ${python_bin_path} ./internal/check_python.py 2>&1 >> "${OUTPUT_FILE}"
+    ${python_bin_path} ./internal/check-python.py 2>&1 >> "${OUTPUT_FILE}"
     if [ "${VERBOSE}" -gt 0 ]; then echo "--> Python version and build info saved to '${OUTPUT_FILE}'."; fi
 
     # Cleanup: Remove all *.pyc/*.pyo and __pycache__ directories recursively.
@@ -118,7 +118,7 @@ time {
     if [ "${VERBOSE}" -gt 0 ]; then echo -e "\nFound V8 Engine.\n└── Version: ${v8_ver}."; fi
 
     # Check NodeJS version and build info
-    node ./internal/check_node.js "${v8_ver}" "${release_meta}" "${commit_sha:0:8}" 2>&1 >> "${OUTPUT_FILE}"
+    node ./internal/check-node.js "${v8_ver}" "${release_meta}" "${commit_sha:0:8}" 2>&1 >> "${OUTPUT_FILE}"
     if [ "${VERBOSE}" -gt 0 ]; then echo -e "\n--> NodeJS version and build info saved to '${OUTPUT_FILE}'.\n"; fi
 
     # # Check for environment features, etc.
