@@ -39,14 +39,14 @@ export const parseEventTypes = (query) => {
 // Format prettified dates from query string.
 export const parseDateRange = (_min_date, _max_date, offset) => {
     const min_date =
-        _min_date?.length && (_min_date?.match('///g') || []).length == 2
+        _min_date?.length && (_min_date?.split(/(?:\/|-)+/) || []).length == 3
             ? new Intl.DateTimeFormat('en-US').format(
                 new Date(new Date(_min_date?.replace(/-/g, '/'))).getTime() +
                 (offset ? parseInt(offset) : 0) * (8.64 * 10 ** 7)
             )
             : undefined;
     const max_date =
-        _max_date?.length && (_max_date?.match('///g') || []).length == 2
+        _max_date?.length && (_max_date?.split(/(?:\/|-)+/) || []).length == 3
             ? new Intl.DateTimeFormat('en-US').format(
                 new Date(new Date(_max_date?.replace(/-/g, '/'))).getTime() -
                 (offset ? parseInt(offset) : 0) * (8.64 * 10 ** 7)
