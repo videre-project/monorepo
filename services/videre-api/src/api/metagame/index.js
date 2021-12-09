@@ -179,7 +179,6 @@ const Metagame = async (req, res) => {
   });
 
   // Get event catalog and parsed parameters.
-  console.log(req.query)
   const { parameters, data: request_1 } = await eventsQuery(req.query, uids);
 
   // Handle erronous parameters.
