@@ -10,12 +10,16 @@ import { scrapeWotCEvent, scrapeGoldfishEvent } from './scrape-event';
 
 const run = async (args) => {
   try {
-    // Create date range and daily event queue
+    // Create date range.
     const dates = getDates(args);
-    const queue = generateEventURIs(dates);
 
     // Get incomplete and complete event results from results table.
     const { incomplete, complete } = await checkDatabaseEntries(dates, true);
+
+    // Create URIs for event queue.
+    const queue = generateEventURIs(dates)
+      // Skip URI if event entry already exists.
+      .filter(uri => !complete.includes(uri));
 
     // Setup Puppeteer
     const { browser, page } = await usePuppeteerStealth();
@@ -27,8 +31,6 @@ const run = async (args) => {
     for (let i = 0; i < queue.length; i++) {
       await setDelay(500);
       const uri = queue[i];
-      // Skip if event entry already exists.
-      if (complete.includes(uri)) continue;
 
       // Output current progress to console.
       CLI_CLEAR_CONSOLE();
@@ -37,6 +39,7 @@ const run = async (args) => {
       console.log(`   Progress: ${progress}% (${i + 1}/${queue.length}) complete.`);
       const queueRate = (Date.now() - startTime) / (1000 * (i + 1)); // in seconds
       if (i) console.log(`   About ${parseTime((queue.length - (i + 1)) * queueRate)} remaining.\n`);
+      else console.log('   Calculating time remaining...\n');
 
       // Event exists but is missing third-party archetype labels.
       if (incomplete.map(obj => obj.uri).includes(uri)) {
@@ -54,7 +57,10 @@ const run = async (args) => {
       } else {
         // Scrape WotC and Goldfish page.
         const { players, ...event } = await scrapeWotCEvent(uri) || {};
-        if (JSON.stringify(event) === '{}') continue;
+        if (JSON.stringify(event) === '{}')  {
+          console.log(`   This event does not exist.\n>  Skipping event...`);
+          continue;
+        }
         const goldfishData = await scrapeGoldfishEvent(page, event.format, event.type, event.uid);
         // Create new database entry.
         await addEventEntry(players, event, goldfishData);
@@ -65,6 +71,7 @@ const run = async (args) => {
     await page.close();
     await browser.close();
     await setDelay(500);
+
     CLI_CLEAR_CONSOLE();
     process.exit(0);
   } catch (error) {
