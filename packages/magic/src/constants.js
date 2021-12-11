@@ -2,10 +2,13 @@
 export const FORMATS = [
     'standard',
     'pioneer',
-    'historic',
     'modern',
     'legacy', 
     'vintage',
+    'commander',
+    'alchemy',
+    'brawl',
+    'historic',
     'pauper'
 ];
 

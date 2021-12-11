@@ -1,6 +1,10 @@
 import { FORMATS } from './constants';
 
-const excludedFormats = ['historic'];
+const excludedFormats = [
+  'alchemy',
+  'brawl',
+  'historic',
+];
 
 /**
  * Magic: The Gathering Online supported formats, sanctioned event types, colors, card types, etc.

@@ -21,7 +21,9 @@ export const generateEventURIs = (dates) => {
   return dates
       .map(date =>
         MTGO.FORMATS
-          .map(format => MTGO.EVENT_TYPES
+          .filter(format =>
+            !['commander'].includes(format)
+          ).map(format => MTGO.EVENT_TYPES
             .map(type => [
                 format,
                 type,
