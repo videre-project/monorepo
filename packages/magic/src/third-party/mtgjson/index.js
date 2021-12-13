@@ -2,6 +2,8 @@ import { fetch } from 'fetch-h2';
 
 import { API_PATH } from './constants.js';
 
+export * from './constants';
+
 /**
  * Get MTGJSON 'atomic' data
  */

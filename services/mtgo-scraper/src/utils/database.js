@@ -1,17 +1,6 @@
 import { CONSTANTS, sql, check_integrity, automated_db_audit } from '@packages/database';
-import { MTGO, FIRST_PARTY } from '@packages/magic';
-const { formatCardsCollection } = FIRST_PARTY.cards;
+import { MTGO } from '@packages/magic';
 import { eventsQuery } from '@packages/querybuilder';
-
-// if (process.argv.includes('--test')) {
-//   await new Promise(async (resolve) => {
-//     const json = JSON.stringify(await formatCardsCollection());
-//     writeFileSync('test-output.json', json);
-//     resolve();
-//   });
-//   process.exit(0);
-// }
-// return;
 
 /**
  * Generates new event uris per date / format / event-type.
