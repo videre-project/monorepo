@@ -1,13 +1,5 @@
+import { getArgs } from '@packages/cli';
 import { CONSTANTS } from '@packages/database';
-
-/**
- * Parse argv flags by arg name/aliases
- */
-const getArgs = (args, flags) => {
-  return flags.map(opt => {
-    if (process.argv.includes(opt)) return args[args.indexOf(opt)+1];
-  })?.[0];
-}
 
 // Check if Daylight Savings is in effect.
 const isDST = (date) => {

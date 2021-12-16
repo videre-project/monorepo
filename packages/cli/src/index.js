@@ -1,6 +1,15 @@
 export * as CONSTANTS from './constants';
 export * from './functions';
 
+/**
+ * Parse argv flags by arg name/aliases
+ */
+ export const getArgs = (args, flags, offset = 1) => {
+  return flags.map(opt => {
+    if (process.argv.includes(opt)) return args[args.indexOf(opt)+offset];
+  })?.[0];
+}
+
 export const parseTime = (totalSeconds) => {
   let days = Math.floor(totalSeconds / 86400).toFixed(0);
   let hours = Math.floor(totalSeconds / 3600).toFixed(0);
