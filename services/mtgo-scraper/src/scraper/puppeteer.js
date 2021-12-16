@@ -1,10 +1,10 @@
 import puppeteer from 'puppeteer-extra';
 import StealthPlugin from 'puppeteer-extra-plugin-stealth';
 
-const usePuppeteerStealth = async () => {
+const usePuppeteerStealth = async ({ headless = true, abort = ['image', 'font', 'stylesheet'] }) => {
   puppeteer.use(StealthPlugin());
   const browser = await puppeteer.launch({
-    headless: true,
+    headless: headless,
     args: ['--no-sandbox']
   });
 
@@ -13,12 +13,42 @@ const usePuppeteerStealth = async () => {
 
   await page.setRequestInterception(true);
   page.on('request', (request) => {
-    if (request.resourceType() === 'image' || request.resourceType() === 'stylesheet')
+    if ([...abort].includes(request.resourceType()))
       request.abort();
     else
       request.continue();
   });
   return { browser, page };
+}
+
+export const getApiCallHeaders = async (page, url) => {
+  return new Promise(async (resolve, reject) => {
+    let resolved = false;
+    try {
+      const devtools = await page.target().createCDPSession();
+      await devtools.send('Network.enable');
+      await devtools.send('Network.setRequestInterception', {
+        patterns: [{ urlPattern: '*' }],
+      });
+      devtools.on('Network.requestIntercepted', async (event) => {
+        if (resolved) return;
+        if (/\/graphql$/.test(event.request.url)) {
+          resolved = true;
+          resolve(event.request.headers);
+          return;
+        }
+        await devtools.send('Network.continueInterceptedRequest', {
+          interceptionId: event.interceptionId,
+        });
+      });
+      await page.goto(url, { waitUntil: 'domcontentloaded' },);
+    } catch (error) {
+      if (!resolved) {
+        resolved = true;
+        reject(error);
+      }
+    }
+  });
 }
 
 export default usePuppeteerStealth;

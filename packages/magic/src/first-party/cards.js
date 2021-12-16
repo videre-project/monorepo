@@ -81,7 +81,7 @@ export const formatCardObjects = (self, setData) => {
                 ? [...new Set(
                     card.tags
                         .sort((a, b) => (a.count < b.count ? 1 : -1))
-                        .map(obj => obj.name)
+                        .map(({ uid, name }) => uid || name)
                 )]
                 : [],
         }));
