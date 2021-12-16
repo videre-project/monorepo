@@ -33,6 +33,5 @@ export const filterCatalog = data => {
         // Remove null card object placeholders for back-halves of double-faced cards.
         !(card.layout != 'normal' && !card.oracle_text && !card.power && !card.loyalty)
       // Alphabetical sort data by cardname
-    )
-    .sort((a, b) => a.name.localeCompare(b.name));
+    ).sort((a, b) => a.name.localeCompare(b.name));
 };

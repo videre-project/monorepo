@@ -1,3 +1,4 @@
 export * from './catalog';
 export * from './constants';
-export * from './tagger';
+
+export * as TAGGER from './tagger';

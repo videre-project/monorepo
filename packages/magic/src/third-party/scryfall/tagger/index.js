@@ -4,7 +4,10 @@ import { JSDOM } from 'jsdom';
 
 import { parseTime, CLI_CLEAR_CONSOLE } from '@packages/cli';
 import { setDelay } from '@packages/database';
-import { API_PATH, DOCS_PATH } from './constants.js';
+
+import { API_PATH, DOCS_PATH } from './../constants.js';
+
+export * from './graphql';
 
 /*
  * Get list of Scryfall tags.
@@ -17,15 +20,15 @@ export const getScryfallTags = async (type = 'functional') => {
   const sections = Array.from(document.querySelectorAll('div.prose h2'));
   const tags = sections.reduce((output, section) => {
     const sectionType = section.textContent.endsWith('(functional)')
-      ? 'functional'
-      : 'artwork';
+      ? 'oracletag'
+      : 'art';
 
     const links = Array.from(section.nextElementSibling.querySelectorAll('a'));
     links.forEach(({ text, href }) => {
       output.push({
-        type: sectionType,
         name: text,
-        url: `${API_PATH}cards${href}`,
+        type: sectionType,
+        url: `${API_PATH}cards${href}`
       });
     });
 
@@ -81,48 +84,56 @@ export const getTaggedCards = async (_tags, delay = 100) => {
 /**
  * ... array of
  */
-export const getTagsCatalog = async () => {
+export const getTagsCatalog = async (_tags) => {
   // Get list of Scryfall tags.
-  const tags = [...new Set(await getScryfallTags())].filter(tag =>
-    ['burn', 'removal'].includes(tag.name)
-  );
+  const tags = [...new Set(_tags || await getScryfallTags())];
   // Get Scryfall tags data.
   const tagData = await getTaggedCards(tags, 1000);
   const _cards = [...new Set(tagData.map(obj => obj.data).flat(1))];
 
-  const uniqueCards = [...new Map(_cards.map(item => [item.id, item])).values()].map(
-    ({ object, oracle_id, name }) => ({
+  const uniqueCards = [...new Map(_cards.map(item => [item.id, item])).values()]
+    .map(({ object, oracle_id, name }) => ({
       object,
       name,
       oracle_id,
       tags: tagData
-        .map(
-          ({ data, name }) =>
-            data.filter(_obj => _obj.oracle_id === oracle_id).length && name
-        )
-        .filter(Boolean)
-        .flat(1),
-    })
-  );
+        .map(({ uid, data }) =>
+          data.filter(_obj =>
+            _obj.oracle_id === oracle_id
+          ).length && uid
+        ).filter(Boolean)
+        .flat(2),
+      })
+    );
+
   const uniqueTags = tagData
-    .map(({ name, type, url }) => ({
+    .map(({ uid, name, type, url }) => ({
       object: 'tag',
+      uid,
       name,
       type,
       url,
-      count: uniqueCards.filter(({ tags }) => tags.includes(name)).length,
-      exclusive: uniqueCards.filter(
-        ({ tags }) => tags.includes(name) && tags.length === 1
+      count: uniqueCards.filter(({ tags }) =>
+        tags.includes(uid)
       ).length,
-    }))
-    .filter(obj => obj.count > 1)
+      exclusive: uniqueCards.filter(({ tags }) =>
+        tags.includes(uid)
+        && tags.length === 1
+      ).length,
+    })).filter(obj => obj.count > 1)
     .sort((a, b) => (a.count < b.count ? 1 : -1));
 
   return {
     cards: uniqueCards.map(({ tags, ...rest }) => ({
       ...rest,
-      tags: tags.map(tag => uniqueTags.filter(_obj => _obj.name == tag)).flat(1),
-    })),
+      tags: tags
+        .flat(2)
+        .map(tag =>
+          uniqueTags
+            .filter(({ uid }) => uid == tag)
+            ?.[0]
+        ).filter(Boolean).flat(1),
+    })).filter(({ tags }) => tags?.length),
     tags: uniqueTags,
   };
 };
