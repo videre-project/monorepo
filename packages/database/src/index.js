@@ -1,14 +1,12 @@
 import postgres from 'postgres';
+import { PrismaClient } from '@prisma/client'
 
 import config from './config';
 
 export * as CONSTANTS from './constants';
-export * as STATISTICS from './statistics';
 
-export * from './functions';
-export * from './sort';
-export * from './swiss';
-export * from './tools';
+export * from './postgres';
+export * from './utils';
 
 /**
  * Queries database, accepts a template string or JSON to format.
@@ -25,12 +23,20 @@ export const sql = postgres(
   }
 );
 
+/**
+ * Creates a new prisma client instance.
+ */
+export const prisma = new PrismaClient();
+
+/**
+ * Creates a promise that resolves after a specified amount of milliseconds.
+ */
 export const setDelay = ms => new Promise(res => setTimeout(res, ms));
 
 /**
  * Converts an integer to an ordinal.
  */
- export const getNumberWithOrdinal = n => {
+export const getNumberWithOrdinal = n => {
   let s = ['th', 'st', 'nd', 'rd'],
     v = n % 100;
   return n + (s[(v - 20) % 10] || s[v] || s[0]);

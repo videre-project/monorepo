@@ -1,0 +1,42 @@
+generator client {
+  provider        = "prisma-client-js"
+  // output          = "./generated/client"
+  previewFeatures = ["dataProxy"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Events {
+  uid     BigInt    @id
+  uri     String
+  format  String
+  type    String
+  date    String
+  results Results[]
+
+  @@index([date], map: "events_date")
+  @@index([format], map: "events_format")
+  @@index([uid], map: "events_uid")
+
+  @@map("events")
+}
+
+model Results {
+  uid       String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  username  String
+  event     BigInt
+  url       String
+  deck      Json
+  stats     Json
+  archetype Json   @default("{}")
+  events    Events @relation(fields: [event], references: [uid], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([event], map: "results_event")
+  @@index([uid], map: "results_uid")
+  @@index([username], map: "results_username")
+
+  @@map("results")
+}

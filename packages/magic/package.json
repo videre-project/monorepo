@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "@packages/cli": "1.0.0",
-    "@packages/database": "1.0.0"
+    "@packages/database": "1.0.0",
+    "fetch-h2": "^3.0.1"
   }
 }

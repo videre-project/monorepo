@@ -4,13 +4,21 @@
   "main": "build",
   "module": "src",
   "scripts": {
-    "start": "docker-compose -f ./bin/docker-compose.yml up -d",
+    "start": "docker-compose -f ./bin/docker/docker-compose.yml up -d",
+    "prisma-pull": "yarn prisma db pull",
     "build": "rimraf build && swc src -d build",
     "build-watch": "swc src -d build -w"
+  },
+  "devDependencies": {
+    "prisma": "3.6.0"
   },
   "dependencies": {
     "@packages/cli": "^1.0.0",
     "dotenv": "^9.0.2",
-    "postgres": "^1.0.2"
+    "postgres": "^1.0.2",
+    "@prisma/client": "3.6.0"
+  },
+  "prisma": {
+    "schema": "bin/prisma/schema.prisma"
   }
 }
