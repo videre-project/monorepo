@@ -107,7 +107,8 @@ export const formatCardsCollection = async ({ data, page }) => {
         }));
 
     // Filter and pretty format sets/cards/tags data
-    const setData = filterSetObjects(set_catalog, card_catalog);
+    const setData = filterSetObjects(set_catalog, card_catalog)
+        .sort((a, b) => (new Date(a.date) < new Date (b.date) ? 1 : -1));
     const cardData = formatCardObjects(card_catalog, setData);
     const tagTypes = {
         categories: tags
@@ -122,7 +123,7 @@ export const formatCardsCollection = async ({ data, page }) => {
             object: 'tag',
             ...rest
           })).sort((a, b) => (a.count < b.count ? 1 : -1))
-    }
+    };
 
     return { sets: setData, cards: cardData, tags: tagTypes };
 }
