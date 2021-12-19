@@ -6,6 +6,7 @@
   "scripts": {
     "start": "docker-compose -f ./bin/docker/docker-compose.yml up -d",
     "prisma-pull": "yarn prisma db pull",
+    "prisma-generate": "PRISMA_CLIENT_ENGINE_TYPE='dataproxy' yarn prisma generate",
     "build": "rimraf build && swc src -d build",
     "build-watch": "swc src -d build -w"
   },
