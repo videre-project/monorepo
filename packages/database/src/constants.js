@@ -1,1 +1,4 @@
-export const day = 1000 * 60 * 60 * 24;
+/**
+ * Number of milliseconds in a day.
+ */
+export const day = 8.64 * 10**7;

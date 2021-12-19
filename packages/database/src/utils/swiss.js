@@ -1,3 +1,6 @@
+/**
+ * Estimates number of rounds based on player count.
+ */
 const calculateRounds = players => {
   switch (players) {
     case players > 410:
@@ -9,6 +12,9 @@ const calculateRounds = players => {
   }
 };
 
+/**
+ * Calculates Swiss Triangle based on players and rounds.
+ */
 const calculateTriangle = (players, _rounds) => {
   const rounds = _rounds ? _rounds + 1 : calculateRounds(players) + 1;
   const records = [];
@@ -38,6 +44,9 @@ const calculateTriangle = (players, _rounds) => {
   return output;
 };
 
+/**
+ * Estimates number of players by reverse engineering truncated swiss triangle.
+ */
 export const calculateEventStats = data => {
   const numRounds = data[0].record.split('-').reduce((a, b) => Number(a) + Number(b));
   const rdDist = calculateTriangle(10 ** 4, numRounds);

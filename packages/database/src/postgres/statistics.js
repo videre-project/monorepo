@@ -1,5 +1,8 @@
 import { sql } from '.';
 
+/**
+ * Gets current database connections' activity.
+ */
 export const get_stat_activity = async () => {
   return await sql`TABLE pg_stat_activity`
     .then(res =>
@@ -18,6 +21,9 @@ export const get_stat_activity = async () => {
     );
 }
 
+/**
+ * Returns statistics related to database transactions and health.
+ */
 export const get_db_stats = async () => {
   return await sql`TABLE pg_stat_database`
     .then(res =>

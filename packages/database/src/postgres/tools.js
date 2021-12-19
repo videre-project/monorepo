@@ -1,9 +1,10 @@
 import { CLI_REMOVE_LINE, CLI_CLEAR_CONSOLE, CLI_PAUSE } from '@packages/cli';
 import { eventsQuery } from '@packages/querybuilder';
 
-import { sql, setDelay } from '.';
-import { day } from './constants';
-import { delete_row_uids, delete_row_duplicates } from './functions';
+import { setDelay } from '../.';
+import { day } from './../constants';
+import { sql } from './../postgres';
+import { delete_row_uids, delete_row_duplicates } from './../postgres/functions';
 
 /**
  * Validates integrity of event results on results table by uid.
@@ -219,7 +220,5 @@ export const automated_db_audit = async (errors) => {
         await setDelay(1000);
       }
     }))
-    
-    
   }
 }
