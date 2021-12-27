@@ -1,4 +1,4 @@
-import { getParams, removeDuplicates } from './../../url-query';
+import { getParams, removeDuplicates } from './../../url-params';
 
 import { parseDateRange } from './dates';
 import { parseEventTypes } from './event-types';

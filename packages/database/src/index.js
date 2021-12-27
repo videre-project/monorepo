@@ -1,4 +1,5 @@
 export * as CONSTANTS from './constants';
+export * from './formatting';
 
 export * from './prisma';
 export * from './postgres';
@@ -10,15 +11,6 @@ export * from './utils';
 export const setDelay = ms => {
   return new Promise(res => setTimeout(res, ms));
 }
-
-/**
- * Converts an integer to an ordinal.
- */
-export const getNumberWithOrdinal = num => {
-  let seq = ['th', 'st', 'nd', 'rd'],
-    val = num % 100;
-  return num + (seq[(val - 20) % 10] || seq[val] || seq[0]);
-};
 
 /**
  * Removes undefined object keys.

@@ -1,4 +1,4 @@
-import { getParams } from './../../url-query';
+import { getParams } from './../../url-params';
 import { paramAliases } from '.';
 
 // Parse and pre-validate 'uids' parameter
