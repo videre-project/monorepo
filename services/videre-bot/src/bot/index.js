@@ -5,6 +5,7 @@ import { readdirSync } from 'fs';
 import { resolve } from 'path';
 
 import { validateCommand } from 'utils/discord';
+
 import { CLIENT_INTENTS } from 'constants';
 import config from 'config';
 

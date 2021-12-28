@@ -10,10 +10,10 @@ export const parseEventTypes = (event_types) => {
     .map(type => {
       const matched = type
         .replaceAll(' ', '-')
-        ?.match(/[a-zA-Z-]+/g).join('')
+        ?.match(/[a-zA-Z-]+/g)
       return MTGO.EVENT_TYPES
         .filter(_type => {
-          _type.toLowerCase() == matched.toLowerCase()
+          _type.toLowerCase() == matched.join('').toLowerCase()
         });
     }).flat(1)
     .filter(Boolean)
@@ -22,3 +22,5 @@ export const parseEventTypes = (event_types) => {
     ? parsedTypes
     : parsedTypes?.[0];
 }
+
+export default parseEventTypes;
