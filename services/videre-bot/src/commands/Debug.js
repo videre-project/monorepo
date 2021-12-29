@@ -13,8 +13,6 @@ const Debug = {
       // Get uptime in nearest days, hours, minutes and seconds
       let t = 0;
       const uptime = parseTime(client.uptime / 1000)
-        // Replace last comma with ' and' for fluency
-        .replace(/, ([^,]*)$/, ' and $1')
         // Add linebreak after second instance of comma
         .replace(/,/g, (match) => {
           t++;
