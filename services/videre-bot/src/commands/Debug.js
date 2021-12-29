@@ -30,6 +30,8 @@ const Debug = {
             fields: [
               // Uptime since 'Ready' status
               { name: 'Uptime', value: uptime, inline: false },
+              // Process PID
+              { name: 'PID', value: `\`${ process.pid }\``, inline: true },
               // Latency between Discord bot and user
               { name: 'Bot Latency', value: `\`${ Date.now() - interaction_timestamp } ms\``, inline: true },
               // Latency between Discord bot and Discord API
