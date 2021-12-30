@@ -80,7 +80,7 @@ const Card = {
         if (response.status !== 200) {
           // Get fuzzy response without set
           const response_1 = await fetch(`https://api.scryfall.com/cards/named?fuzzy=${ name }`);
-          let data = await response_1.json();
+          data = await response_1.json();
           if (response_1.status !== 200) {
             if (data.object === "error" || data.type === "ambiguous") {
               throw new Error('Multiple different cards match the requested cardname.\nPlease refine your search by adding more words or specifying a set code.');
@@ -275,10 +275,10 @@ const Card = {
         } else if (!collectors_number && set) {
           // Get cheapest (USD) printing by default for price info.
           let uri = `https://api.scryfall.com/cards/search?q=!"${ data.name }"+cheapest:usd`;
-          if (set) uri += `+e:${set}`;
+          if (set) uri += `&set=${set}`;
 
           const response_1 = await fetch(uri);
-          data = (await response_1.json()).data[0];
+          if (data.set == set) data = (await response_1.json()).data[0];
         }
 
         const cardText = [...(data?.card_faces || [data])]
