@@ -11,6 +11,7 @@ export const matchDeckUrl = (msg) => {
     url.includes('mtggoldfish.com/deck/')
     || (url.includes('scryfall.com/') && url.includes('/decks/'))
     || url.includes('tappedout.net/mtg-decks/')
+    || (url.includes('moxfield.com/') && url.includes('/decks/'))
   ) return url;
 };
 

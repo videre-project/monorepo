@@ -6,14 +6,14 @@ import { MessageActionRow, MessageAttachment, MessageButton } from 'discord.js';
 import puppeteer from 'puppeteer-extra';
 import StealthPlugin from 'puppeteer-extra-plugin-stealth';
 
+import{ toPascalCase } from '@packages/database';
+
 // import { sql } from 'utils/database';
 // import { getNumberWithOrdinal, getColors, formatEvent, formatDeck, drawDeck } from 'utils/magic';
 import { getColors, formatDeck, drawDeck } from 'utils/magic';
 
 import config from 'config';
 import { ERROR_DEFAULTS, ERROR_MESSAGE, x_button } from 'constants';
-
-924696249054158859
 
 const Decklist = {
   name: 'decklist',
@@ -38,19 +38,12 @@ const Decklist = {
           .url;
 
     try {
-
       if (!decklist_url) {
-        return {
-          ...ERROR_DEFAULTS,
-          description: `No \`decklist_url\` provided.`,
-        };
+        return { ...ERROR_DEFAULTS, description: `No \`decklist_url\` provided.` };
       }
 
-      if (mode !== undefined) {
-        await interaction.deferUpdate();
-      } else if (interaction) {
-        await interaction.deferReply();
-      }
+      if (mode !== undefined) await interaction.deferUpdate();
+      else if (interaction) await interaction.deferReply();
 
       let [author, title, deck, decklist] = [{}, '{COLORS} **Unknown** by Unknown', [], {}];
       let [footer, timestamp] = [{}, undefined];
@@ -163,8 +156,7 @@ const Decklist = {
               return `Format: ${format}`;
             }),
           };
-        }
-        else if (decklist_url.includes('scryfall.com/') && decklist_url.includes('/decks/')) {
+        } else if (decklist_url.includes('scryfall.com/') && decklist_url.includes('/decks/')) {
           author = {
             name: 'Scryfall.com • User Submitted Deck',
             url: 'https://scryfall.com/',
@@ -221,8 +213,7 @@ const Decklist = {
                 : 'Format: None';
             }),
           };
-        }
-        else if (decklist_url.includes('tappedout.net/mtg-decks/')) {
+        } else if (decklist_url.includes('tappedout.net/mtg-decks/')) {
           author = { name: 'TappedOut.net • User Submitted Deck', url: 'https://tappedout.net/' };
           deck_button = new MessageButton()
             .setStyle('LINK')
@@ -251,6 +242,45 @@ const Decklist = {
             const username = document.querySelector('.well-jumbotron > p:nth-child(5) > a').innerHTML.trim();
             return `{COLORS} **${archetype}** by ${username.replaceAll('</strong>', '')}`;
           });
+        } else if (decklist_url.includes('moxfield.com/') && decklist_url.includes('/decks/')) {
+          author = {
+            name: 'MoxField.com • User Submitted Deck',
+            url: 'https://moxfield.com/',
+            icon_url: 'https://www.moxfield.com/favicon.png',
+          };
+
+          const uid = decklist_url
+            .split('/decks/')[1]
+            .replace('\/','')
+            .split('?')[0];
+
+          const response = await fetch(`https://api.moxfield.com/v2/decks/all/${uid}`)
+            .then(res => res.json());
+
+          deck = await fetch(`https://api.moxfield.com/v1/decks/all/${uid}/download?exportId=${response.exportId}&arenaOnly=false`)
+            .then(res => res.text())
+            .then(text => `${JSON.stringify(text.trim())}`
+              .replace('"','').toLowerCase()
+              .replace('sideboard:\\r\\n', '')
+              .split('\\n\\r\\n')
+            );
+          
+          deck_button = new MessageButton()
+            .setStyle('LINK')
+            .setLabel('Open MoxField Page')
+            .setURL(`https://moxfield.com/decks/${uid}`)
+            .setEmoji('926302804686016522'); // :MoxField: moxfield emoji
+
+          title = `{COLORS} **${response.name}** by ${response.createdByUser.userName}`;
+
+          timestamp = response.lastUpdatedAtUtc || response.createdAtUtc;
+
+          footer = {
+            text: response.format
+              ? `Format: ${toPascalCase(response.format)}`
+              : 'Format: None'
+          };
+
         }
           // else if (decklist_url.includes('mtgdecks.net/')) {
           //     author = { name: 'MTGDecks.net • User Submitted Deck', url: 'https://mtgdecks.net/' };
@@ -295,7 +325,7 @@ const Decklist = {
             mainboard: deck?.[0]?.length
               ? deck[0].split('\\r\\n').map(card => (
                   {
-                    quantity: parseInt(card.split(' ')[0].match(/(\d+)/)[0]),
+                    quantity: parseInt(card.split(' ')[0]),
                     cardName: card.substring(card.indexOf(' ') + 1).replace('\\r','')
                   }
                 ))
@@ -373,7 +403,9 @@ const Decklist = {
           ? { url: 'attachment://canvas.png' }
           : null,
         footer: footer ? footer : {},
-        timestamp: timestamp ? timestamp : undefined
+        timestamp: timestamp
+          ? timestamp 
+          : undefined
       };
 
       // Send follow-up response
