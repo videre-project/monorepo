@@ -1,11 +1,12 @@
 #!/usr/bin/env bash
 
-# Shell script to collect various device and dev info (dumped to ./tools/logs by default).
+# Shell script to collect various device and dev info (dumped to ./scripts/logs by default).
 
 # This script must be in the tools directory when it runs because it uses the
 # script source file path to determine directories to work in.
 
 set -u # Check for undefined variables
+DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" &> /dev/null && (pwd -W 2> /dev/null || pwd))
 
 # Command-Line Formatting
 GREEN='\033[1;32m'; RED='\033[1;31m';  LIGHT_BLUE='\033[1;34m'; NC='\033[0m' # No Color
@@ -17,7 +18,7 @@ die() { echo -e "\n${RED}Error:${NC} $@"; exit 1; }
 # Set defaults
 TIMEFORMAT=''
 TIMESTAMP=$(date '+%Y-%m-%d %H:%M:%S')
-OUTPUT_FILE="./logs/${TIMESTAMP}.txt"
+OUTPUT_FILE="${DIR}/logs/env-summary-${TIMESTAMP}.txt"
 VERBOSE=0
 
 # Parse command-line args
@@ -73,11 +74,11 @@ time {
     if [ "${VERBOSE}" -gt 0 ]; then echo -e "=== Python ===\nFound python3 binary at '${python_bin_path}'."; fi
 
     # Check OS info w/ Python
-    ${python_bin_path} ./internal/check-os.py 2>&1 >> "${OUTPUT_FILE}"
+    ${python_bin_path} "${DIR}/internal/check-os.py" 2>&1 >> "${OUTPUT_FILE}"
     if [ "${VERBOSE}" -gt 0 ]; then echo "--> OS info saved to '${OUTPUT_FILE}'."; fi
 
     # Check Python version and build info
-    ${python_bin_path} ./internal/check-python.py 2>&1 >> "${OUTPUT_FILE}"
+    ${python_bin_path} "${DIR}/internal/check-python.py" 2>&1 >> "${OUTPUT_FILE}"
     if [ "${VERBOSE}" -gt 0 ]; then echo "--> Python version and build info saved to '${OUTPUT_FILE}'."; fi
 
     # Cleanup: Remove all *.pyc/*.pyo and __pycache__ directories recursively.
@@ -118,7 +119,7 @@ time {
     if [ "${VERBOSE}" -gt 0 ]; then echo -e "\nFound V8 Engine.\n└── Version: ${v8_ver}."; fi
 
     # Check NodeJS version and build info
-    node ./internal/check-node.js "${v8_ver}" "${release_meta}" "${commit_sha:0:8}" 2>&1 >> "${OUTPUT_FILE}"
+    node "${DIR}/internal/check-node.js" "${v8_ver}" "${release_meta}" "${commit_sha:0:8}" 2>&1 >> "${OUTPUT_FILE}"
     if [ "${VERBOSE}" -gt 0 ]; then echo -e "\n--> NodeJS version and build info saved to '${OUTPUT_FILE}'.\n"; fi
 
     # # Check for environment features, etc.

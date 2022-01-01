@@ -73,7 +73,7 @@ elif len(platform.mac_ver()[0]) > 0:
     xcode_installed = False
     xcode_version = 'N/A'
     try:
-        xcode_version = subprocess.check_output("xcodebuild --version",stderr=subprocess.STDOUT, shell=True)\
+        xcode_version = subprocess.check_output("xcodebuild -version",stderr=subprocess.STDOUT, shell=True)\
             .decode("utf-8").strip()\
             .replace('Xcode ', '')\
             .replace('Build version ', '')\
