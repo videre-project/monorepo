@@ -8,20 +8,20 @@ import { eventsQuery } from '@packages/querybuilder';
  */
 export const generateEventURIs = (dates) => {
   return dates
-      .map(date =>
-        MTGO.FORMATS
-          .filter(format =>
-            !['commander'].includes(format)
-          ).map(format => MTGO.EVENT_TYPES
-            .map(type => [
-                format,
-                type,
-                date.toISOString()
-                  .substring(0, 10)
-              ].join('-')
-            )
+    .map(date =>
+      MTGO.FORMATS
+        .filter(format =>
+          !['commander'].includes(format)
+        ).map(format => MTGO.EVENT_TYPES
+          .map(type => [
+              format,
+              type,
+              date.toISOString()
+                .substring(0, 10)
+            ].join('-')
           )
-      ).flat(2);
+        )
+    ).flat(2);
 }
 
 /**
