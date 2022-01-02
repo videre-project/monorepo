@@ -1,6 +1,6 @@
-import { CONSTANTS, sql, check_integrity, automated_db_audit } from '@packages/database';
-import { MTGO } from '@packages/magic';
-import { eventsQuery } from '@packages/querybuilder';
+import { CONSTANTS, sql, check_integrity, automated_db_audit } from '@videre/database';
+import { MTGO } from '@videre/magic';
+import { eventsQuery } from '@videre/querybuilder';
 
 /**
  * Generates new event uris per date / format / event-type.

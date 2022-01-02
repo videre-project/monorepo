@@ -1,7 +1,13 @@
-import { toPascalCase } from "@packages/database";
-import { MTGO } from '@packages/magic';
+import { toPascalCase } from "@videre/database";
+import { MTGO } from '@videre/magic';
 
-// Parse and reformat event formats from query string.
+/**
+ * Parse and reformat event formats from query string.
+ * @param {String|Array.<String>} event_types any format(s)
+ * @returns {String|Array.<String>} matched format(s).
+ * @example parseEventTypes('challenge') -> 'Challenge'
+ * @example parseEventTypes(['foo', 'challenge', 'super-qualifier']) -> ['Challenge', 'Super Qualifier']
+ */
 export const parseFormats = (formats) => {
   const _formats = typeof formats == 'object'
     ? formats

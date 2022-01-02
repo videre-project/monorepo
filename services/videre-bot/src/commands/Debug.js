@@ -1,6 +1,6 @@
 import chalk from 'chalk';
 
-import { parseTime } from '@packages/cli';
+import { parseTime } from '@videre/cli';
 
 import { ERROR_MESSAGE } from 'constants';
 

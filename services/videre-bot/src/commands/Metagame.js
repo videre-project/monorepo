@@ -4,8 +4,8 @@ import fetch from 'node-fetch';
 import config from 'config';
 import { ERROR_DEFAULTS, ERROR_MESSAGE } from 'constants';
 
-import { toPascalCase } from '@packages/database';
-import { MTGO } from '@packages/magic';
+import { toPascalCase } from '@videre/database';
+import { MTGO } from '@videre/magic';
 
 import { formatMonospaceTable } from 'utils/discord/table';
 import { formatListAsPages, createPagesInteractive } from 'utils/discord/interactive';

@@ -1,32 +1,66 @@
 {
   "name": "videre-project",
   "version": "1.0.0",
-  "main": "index.js",
+  "homepage": "https://github.com/videre-project/",
   "repository": "https://github.com/Qonfused/videre-project.git",
   "author": "Cory Bennett <32466081+Qonfused@users.noreply.github.com>",
   "license": "MIT",
+  "main": "index.js",
   "private": true,
   "engines": {
-    "yarn": ">=1.17.3"
+    "yarn": ">=1.17.3",
+    "node": ">=14.0.0"
   },
   "scripts": {
-    "build": "lerna run --parallel build",
-    "build-watch": "lerna run --parallel build-watch",
-    "database": "npm --prefix packages/database start",
+    "dev": "turbo run dev --parallel --no-cache",
+    "test": "turbo run test",
     "api": "npm --prefix services/videre-api start",
+    "bot": "npm --prefix services/videre-bot start",
     "scraper": "npm --prefix services/mtgo-scraper start",
-    "publish-all": "lerna publish",
-    "format": "prettier --write \"./**/*.{ts,js,json,md}\""
+    "build": "turbo run build",
+    "database": "npm --prefix packages/database start",
+    "prettier": "prettier --write \"./**/*.{ts,js,json,md}\""
   },
   "devDependencies": {
     "@swc/cli": "^0.1.52",
     "@swc/core": "^1.2.117",
     "chokidar": "^3.5.2",
     "lerna": "^4.0.0",
-    "prettier": "2.3.2"
+    "prettier": "2.3.2",
+    "turbo": "latest"
   },
   "workspaces": [
     "packages/*",
     "services/*"
-  ]
+  ],
+  "turbo": {
+    "baseBranch": "origin/main",
+    "pipeline": {
+      "build": {
+        "outputs": [
+          "dist/**"
+        ],
+        "dependsOn": [
+          "^build"
+        ]
+      },
+      "test": {
+        "outputs": [],
+        "dependsOn": [
+          "build"
+        ]
+      },
+      "test:ci": {
+        "outputs": [
+          "coverage/**"
+        ],
+        "dependsOn": [
+          "build"
+        ]
+      },
+      "dev": {
+        "cache": false
+      }
+    }
+  }
 }

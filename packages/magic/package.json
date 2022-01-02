@@ -1,5 +1,5 @@
 {
-  "name": "@packages/magic",
+  "name": "@videre/magic",
   "version": "1.0.0",
   "main": "build",
   "module": "src",
@@ -8,8 +8,8 @@
     "build-watch": "swc src -d build -w"
   },
   "dependencies": {
-    "@packages/cli": "1.0.0",
-    "@packages/database": "1.0.0",
+    "@videre/cli": "1.0.0",
+    "@videre/database": "1.0.0",
     "fetch-h2": "^3.0.1"
   }
 }

@@ -1,7 +1,7 @@
 import chalk from 'chalk';
 
-import { getArgs, parseTime, CLI_CLEAR_CONSOLE, CLI_PAUSE } from '@packages/cli';
-import { setDelay } from '@packages/database';
+import { getArgs, parseTime, CLI_CLEAR_CONSOLE, CLI_PAUSE } from '@videre/cli';
+import { setDelay } from '@videre/database';
 
 import { generateEventURIs, addEventEntry, updateEventEntry, checkDatabaseEntries } from './../utils/database';
 import { getDates } from './../utils/dates';
@@ -9,8 +9,6 @@ import { getDates } from './../utils/dates';
 import usePuppeteerStealth from './puppeteer';
 import { formatCardsCollection } from './scrape-cards';
 import { scrapeWotCEvent, scrapeGoldfishEvent } from './scrape-event';
-
-const fs = require('fs');
 
 const run = async (args) => {
   try {
@@ -20,7 +18,6 @@ const run = async (args) => {
     if (getArgs(args, ['-c', '--cards'], 0)) {
       await CLI_PAUSE();
       const data = await formatCardsCollection({ page });
-      fs.writeFileSync('tags_output.json', JSON.stringify(data));
     } else {
       // Create date range.
       const dates = getDates(args);

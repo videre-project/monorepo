@@ -1,6 +1,6 @@
 import readline from 'readline';
 
-import { setDelay } from '@packages/database';
+import { setDelay } from '@videre/database';
 
 import { CLEAR_CONSOLE } from './constants';
 

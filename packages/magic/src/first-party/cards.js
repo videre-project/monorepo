@@ -1,4 +1,4 @@
-import { pruneObjectKeys } from '@packages/database';
+import { pruneObjectKeys } from '@videre/database';
 
 import { FORMATS } from './../constants.js';
 

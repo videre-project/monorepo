@@ -1,5 +1,5 @@
-import { CLI_REMOVE_LINE, CLI_CLEAR_CONSOLE, CLI_PAUSE } from '@packages/cli';
-import { eventsQuery } from '@packages/querybuilder';
+import { CLI_REMOVE_LINE, CLI_CLEAR_CONSOLE, CLI_PAUSE } from '@videre/cli';
+import { eventsQuery } from '@videre/querybuilder';
 
 import { setDelay } from '../.';
 import { day } from './../constants';

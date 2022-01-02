@@ -1,4 +1,4 @@
-import { CONSTANTS } from '@packages/database';
+import { CONSTANTS } from '@videre/database';
 
 /**
  * Converts an expression of days to milliseconds.
@@ -9,7 +9,7 @@ import { CONSTANTS } from '@packages/database';
 const convertDaystoMS = (days) => (days ? parseInt(days) : 0) * CONSTANTS.day;
 
 /**
- * Validates whether a stringified date is valid.
+ * Checks whether a stringified date is valid.
  * @param {String} date Date to be tested.
  * @returns {Boolean} Boolean of whether date is valid.
  * @example validateDate('12/31/1969') -> True
@@ -45,17 +45,19 @@ export const formatDate = (date, standard = 'en-US') => {
  * parseDateRange('12/31/1969', null, 0, 14) -> { min_date: 12/31/1969, max_date: 1/14/1970 }
  */
 export const parseDateRange = (min_date, max_date, offset, time_interval) => {
+  // Convert date units to milliseconds.
   const _offset = convertDaystoMS(offset);
   const _time_interval = convertDaystoMS(time_interval);
 
+  // Get dates and apply offset if valid.
   const _min_date = validateDate(min_date)
     ? formatDate(new Date(min_date).getTime() + _offset)
     : undefined;
-
   const _max_date = validateDate(max_date)
     ? formatDate(new Date(max_date).getTime() - _offset)
     : formatDate(new Date().getTime() - _offset);
 
+  // Constrain date range to time interval.
   return {
     min_date: !validateDate(min_date)
     || !(validateDate(min_date) && validateDate(max_date))

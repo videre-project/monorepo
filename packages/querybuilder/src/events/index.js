@@ -1,5 +1,5 @@
-import { MTGO } from '@packages/magic';
-import { sql, pruneObjectKeys } from '@packages/database';
+import { MTGO } from '@videre/magic';
+import { sql, pruneObjectKeys } from '@videre/database';
 
 import { parseEventParams } from './parameters';
 

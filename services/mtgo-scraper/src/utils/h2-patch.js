@@ -1,6 +1,6 @@
 import fetch from 'node-fetch';
 
-import { THIRD_PARTY } from '@packages/magic';
+import { THIRD_PARTY } from '@videre/magic';
 
 /**
  * Temporary workaround for fetch-h2 opinions.

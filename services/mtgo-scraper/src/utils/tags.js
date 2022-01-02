@@ -1,5 +1,5 @@
-import { setDelay } from '@packages/database';
-import { FIRST_PARTY, THIRD_PARTY } from '@packages/magic';
+import { setDelay } from '@videre/database';
+import { FIRST_PARTY, THIRD_PARTY } from '@videre/magic';
 
 const { formatTaggerCatalog, formatTaggerObjects } = FIRST_PARTY.tags;
 const { formatTags, formatTaggings } = THIRD_PARTY.scryfall.TAGGER;

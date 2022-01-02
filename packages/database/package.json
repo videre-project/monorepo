@@ -1,5 +1,5 @@
 {
-  "name": "@packages/database",
+  "name": "@videre/database",
   "version": "1.0.0",
   "main": "build",
   "module": "src",
@@ -14,7 +14,7 @@
     "prisma": "3.6.0"
   },
   "dependencies": {
-    "@packages/cli": "^1.0.0",
+    "@videre/cli": "^1.0.0",
     "dotenv": "^9.0.2",
     "postgres": "^1.0.2",
     "@prisma/client": "3.6.0"

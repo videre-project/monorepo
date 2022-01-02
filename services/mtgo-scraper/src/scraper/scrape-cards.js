@@ -1,6 +1,6 @@
-import { dynamicSortMultiple } from '@packages/database';
+import { dynamicSortMultiple } from '@videre/database';
 
-import { FIRST_PARTY, THIRD_PARTY } from '@packages/magic';
+import { FIRST_PARTY, THIRD_PARTY } from '@videre/magic';
 
 const { injectCardProps, formatCardObjects } = FIRST_PARTY.cards;
 const { getAtomicData, getSetData } = THIRD_PARTY.mtgjson;

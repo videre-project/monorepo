@@ -1,5 +1,5 @@
-import { COLORS, CARD_TYPES, COMPANIONS } from '@packages/magic';
-import { groupBy, dynamicSortMultiple } from '@packages/database';
+import { COLORS, CARD_TYPES, COMPANIONS } from '@videre/magic';
+import { groupBy, dynamicSortMultiple } from '@videre/database';
 
 import { manamoji } from './manamoji';
 

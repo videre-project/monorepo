@@ -1,8 +1,8 @@
 import fetch from 'node-fetch';
 
-import { sql, dynamicSortMultiple, pruneObjectKeys, calculateEventStats } from '@packages/database';
-import { MTGO } from '@packages/magic';
-import { getParams, getQueryArgs, groupQuery, eventsQuery } from '@packages/querybuilder';
+import { sql, dynamicSortMultiple, pruneObjectKeys, calculateEventStats } from '@videre/database';
+import { MTGO } from '@videre/magic';
+import { getParams, getQueryArgs, groupQuery, eventsQuery } from '@videre/querybuilder';
 
 const Metagame = async (req, res) => {
   // Parse and pre-validate 'uids' parameter

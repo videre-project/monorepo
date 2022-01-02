@@ -1,6 +1,6 @@
 import morgan from 'morgan';
 import chalk from 'chalk';
-import { getNumberWithOrdinal } from '@packages/database';
+import { getNumberWithOrdinal } from '@videre/database';
 import { API_DIR, parseRoute, crawlRoutes } from './routes';
 
 const colors = {

@@ -86,3 +86,5 @@ typings/
 !.yarn/versions
 
 build/
+dist/
+.turbo

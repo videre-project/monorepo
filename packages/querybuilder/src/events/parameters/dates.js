@@ -1,4 +1,4 @@
-import { CONSTANTS } from '@packages/database';
+import { CONSTANTS } from '@videre/database';
 
 const validateDate = date => (date?.split(/(?:\/|-)+/) || []).length == 3;
 

@@ -6,7 +6,7 @@ import { MessageActionRow, MessageAttachment, MessageButton } from 'discord.js';
 import puppeteer from 'puppeteer-extra';
 import StealthPlugin from 'puppeteer-extra-plugin-stealth';
 
-import{ toPascalCase } from '@packages/database';
+import{ toPascalCase } from '@videre/database';
 
 // import { sql } from 'utils/database';
 // import { getNumberWithOrdinal, getColors, formatEvent, formatDeck, drawDeck } from 'utils/magic';

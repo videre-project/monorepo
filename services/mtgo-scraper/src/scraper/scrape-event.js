@@ -2,8 +2,8 @@ import chalk from 'chalk';
 import fetch from 'node-fetch';
 import { JSDOM } from 'jsdom';
 
-import { CLI_CLEAR_CONSOLE } from '@packages/cli';
-import { setDelay } from '@packages/database';
+import { CLI_CLEAR_CONSOLE } from '@videre/cli';
+import { setDelay } from '@videre/database';
 
 /**
  * Scrapes an event from MTGO standings by URI.

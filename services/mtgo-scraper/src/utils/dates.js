@@ -1,5 +1,5 @@
-import { getArgs } from '@packages/cli';
-import { CONSTANTS } from '@packages/database';
+import { getArgs } from '@videre/cli';
+import { CONSTANTS } from '@videre/database';
 
 // Check if Daylight Savings is in effect.
 const isDST = (date) => {

@@ -22,9 +22,9 @@
     "rollup": "^2.56.3"
   },
   "dependencies": {
-    "@packages/database": "1.0.0",
-    "@packages/magic": "1.0.0",
-    "@packages/querybuilder": "1.0.0",
+    "@videre/database": "1.0.0",
+    "@videre/magic": "1.0.0",
+    "@videre/querybuilder": "1.0.0",
     "chalk": "^4.1.2",
     "cors": "^2.8.5",
     "express": "^4.17.1",
