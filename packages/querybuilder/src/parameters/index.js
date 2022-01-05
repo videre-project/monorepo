@@ -6,4 +6,4 @@ export * from './uids.js';
 export * as events from './events';
 
 // Express parameter parsing
-export * as url from './url-parse';
+export * as express from './express';
