@@ -9,22 +9,23 @@ import { MTGO } from '@videre/magic';
  * @example parseEventTypes(['foo', 'legacy', 'pauper']) -> ['Legacy', 'Pauper']
  */
 export const parseEventTypes = (event_types) => {
-  const _event_types = typeof event_types == 'object'
+  const _event_types = Array.isArray(event_types)
     ? event_types
     : [event_types];
   const parsedTypes = _event_types
     .map(type => {
       const matched = type
-        .replaceAll(' ', '-')
+        ?.replaceAll(' ', '-')
         ?.match(/[a-zA-Z-]+/g)
+        ?.join('')
+        ?.toLowerCase();
       return MTGO.EVENT_TYPES
-        .filter(_type => {
-          _type.toLowerCase() == matched.join('').toLowerCase()
-        });
+        .map(_type => _type.toLowerCase())
+        .filter(_type => _type == matched);
     }).flat(1)
     .filter(Boolean)
     .map(toPascalCase);
-  return typeof event_types == 'object'
+  return Array.isArray(event_types)
     ? parsedTypes
     : parsedTypes?.[0];
 }

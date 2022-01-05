@@ -9,17 +9,23 @@
  * @example parseUIDs(['cef885g', ...], true) -> ['cef885g', ...]
  */
 export const parseUIDs = (uids, alphanumerical = false) => {
-  const _uids = typeof uids == 'object'
+  const _uids = Array.isArray(uids)
     ? uids
     : [uids];
-  return _uids
+
+  const parsedUIDS = _uids
     .map(id => `${id}`.match(
       alphanumerical
         ? /[A-Za-z0-9-]+/g
         : /[0-9]+/g
       ).join('')
-    ).filter(Boolean)
+    ).flat(1)
+    .filter(Boolean)
     .map(id => alphanumerical ? id : parseInt(id));
+
+  return Array.isArray(uids)
+    ? parsedUIDS
+    : parsedUIDS?.[0];
 }
 
 export default parseUIDs;

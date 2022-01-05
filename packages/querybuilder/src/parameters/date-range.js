@@ -25,9 +25,13 @@ export const validateDate = (date) => {
  * @param {String} standard     Intl standard for date format.
  * @returns {String} Formatted date.
  * @example formatDate('1969/12/31', 'en-US') -> "12/31/1969"
+ * @example formatDate(new Date('1969/12/31'), 'en-US') -> "12/31/1969"
  */
 export const formatDate = (date, standard = 'en-US') => {
-  return new Intl.DateTimeFormat(standard).format(date);
+  const _date = typeof date == 'object'
+    ? date
+    : new Date(date);
+  return new Intl.DateTimeFormat(standard).format(_date);
 }
 
 /**
@@ -42,7 +46,7 @@ export const formatDate = (date, standard = 'en-US') => {
  * @returns {{ min_date: String, max_date: String }}
  * An object with a 'min_date' and 'max_date' key.
  * @example
- * parseDateRange('12/31/1969', null, 0, 14) -> { min_date: 12/31/1969, max_date: 1/14/1970 }
+ * parseDateRange('12/31/1969', null, 0, 14) -> { min_date: '12/31/1969', max_date: '1/14/1970' }
  */
 export const parseDateRange = (min_date, max_date, offset, time_interval) => {
   // Convert date units to milliseconds.
@@ -54,18 +58,18 @@ export const parseDateRange = (min_date, max_date, offset, time_interval) => {
     ? formatDate(new Date(min_date).getTime() + _offset)
     : undefined;
   const _max_date = validateDate(max_date)
-    ? formatDate(new Date(max_date).getTime() - _offset)
-    : formatDate(new Date().getTime() - _offset);
+    ? formatDate(new Date(max_date).getTime() + _offset)
+    : formatDate(new Date().getTime() + _offset);
 
   // Constrain date range to time interval.
   return {
     min_date: !validateDate(min_date)
-    || !(validateDate(min_date) && validateDate(max_date))
+    // || !(validateDate(min_date) && validateDate(max_date))
       ? formatDate(new Date(_max_date).getTime() - _time_interval)
       : _min_date,
     max_date: !validateDate(max_date)
-    || !(validateDate(min_date) && validateDate(max_date))
-      ? formatDate(new Date().getTime(_min_date) + _time_interval)
+    // || !(validateDate(min_date) && validateDate(max_date))
+      ? formatDate(new Date(_min_date).getTime() + _time_interval)
       : _max_date
   };
 }
