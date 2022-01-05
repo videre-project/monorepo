@@ -47,6 +47,12 @@ const MessageEvent = {
           components: [new MessageActionRow().addComponents(button, x_button())],
           allowedMentions: { repliedUser: false }
         });
+      } else if (msg.content.toLowerCase() == 'good bot') {
+        const { messageId } = msg.reference;
+        const message = await msg.channel.messages.fetch(messageId);
+        if (message.author.username == 'Videre Bot') {
+          await msg.react('❤️'); return;
+        } else return;
       }
     } catch (error) {
       console.error(chalk.white(`${chalk.yellow(`[events/message]`)}\n>> ${chalk.red(error.stack)}`));
