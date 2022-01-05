@@ -24,6 +24,7 @@
   "devDependencies": {
     "@swc/cli": "^0.1.52",
     "@swc/core": "^1.2.117",
+    "@swc/jest": "^0.2.15",
     "chokidar": "^3.5.2",
     "lerna": "^4.0.0",
     "prettier": "2.3.2",

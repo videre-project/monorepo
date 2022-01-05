@@ -1768,6 +1768,13 @@
     slash "^3.0.0"
     strip-ansi "^6.0.0"
 
+"@jest/create-cache-key-function@^27.3.1":
+  version "27.4.2"
+  resolved "https://registry.yarnpkg.com/@jest/create-cache-key-function/-/create-cache-key-function-27.4.2.tgz#09b585f9dbafec0f56cfb0e4d4edfe2bec0e0768"
+  integrity sha512-aSSCAJwUNX4R1hJQoyimsND5l+2EsFgzlepS8NuOJJHjXij/UdxYFngac44tmv9IYdI+kglAyORg0plt4/aFMQ==
+  dependencies:
+    "@jest/types" "^27.4.2"
+
 "@jest/environment@^27.4.2":
   version "27.4.2"
   resolved "https://registry.npmjs.org/@jest/environment/-/environment-27.4.2.tgz"
@@ -2942,6 +2949,11 @@
   dependencies:
     "@sinonjs/commons" "^1.7.0"
 
+"@stitches/react@^1.2.6":
+  version "1.2.6"
+  resolved "https://registry.yarnpkg.com/@stitches/react/-/react-1.2.6.tgz#61f2a3d1110334ecd33bcb7463650127d42470cb"
+  integrity sha512-gRVITYj8W4jJmoiVxWDv72yCvd12VvtUUAnTzs07EqmtvGCVgKZu3Dx0x5KVCcb0b6tfgvvNH2L84YrzdM4Mag==
+
 "@swc/cli@^0.1.52":
   version "0.1.52"
   resolved "https://registry.npmjs.org/@swc/cli/-/cli-0.1.52.tgz"
@@ -3031,6 +3043,13 @@
     "@swc/core-win32-arm64-msvc" "^1.2.117"
     "@swc/core-win32-ia32-msvc" "^1.2.117"
     "@swc/core-win32-x64-msvc" "^1.2.117"
+
+"@swc/jest@^0.2.15":
+  version "0.2.15"
+  resolved "https://registry.yarnpkg.com/@swc/jest/-/jest-0.2.15.tgz#e0418c88bce0c9ad49ba78a5fb29f7ba33490da9"
+  integrity sha512-Ja+YCVPOGPX/nFnPvPKaWpx2HUwrtuvHP1onHOey1gNGhq8CktQ7xQhCFSuyYBQJiW3WOZ+qMsv3aZk1XUBSOg==
+  dependencies:
+    "@jest/create-cache-key-function" "^27.3.1"
 
 "@szmarczak/http-timer@^1.1.2":
   version "1.1.2"
@@ -7012,7 +7031,7 @@ jest@27.1.1:
     import-local "^3.0.2"
     jest-cli "^27.1.1"
 
-jest@^27.4.3:
+jest@^27.4.3, jest@^27.4.5:
   version "27.4.5"
   resolved "https://registry.yarnpkg.com/jest/-/jest-27.4.5.tgz#66e45acba44137fac26be9d3cc5bb031e136dc0f"
   integrity sha512-uT5MiVN3Jppt314kidCk47MYIRilJjA/l2mxwiuzzxGUeJIvA8/pDaJOAX5KWvjAo7SCydcW0/4WEtgbLMiJkg==

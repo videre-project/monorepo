@@ -4,11 +4,29 @@
   "main": "build",
   "module": "src",
   "scripts": {
+    "test": "jest src --testTimeout=30000",
+    "test-watch": "jest --watchAll --verbose --testTimeout=30000",
     "build": "rimraf build && swc src -d build",
     "build-watch": "swc src -d build -w"
   },
+  "jest": {
+    "collectCoverage": true,
+    "collectCoverageFrom": [
+        "src/**/{!(index),}.js"
+    ],
+    "coveragePathIgnorePatterns": [
+      "<rootDir>/src/events"
+    ],
+    "testEnvironment": "node",
+    "transform": {
+      "^.+\\.js$": "@swc/jest"
+    }
+  },
   "dependencies": {
-    "@videre/magic": "1.0.0",
-    "@videre/database": "1.0.0"
+    "@videre/database": "1.0.0",
+    "@videre/magic": "1.0.0"
+  },
+  "devDependencies": {
+    "jest": "^27.4.5"
   }
 }
