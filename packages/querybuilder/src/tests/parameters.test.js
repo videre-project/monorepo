@@ -2,109 +2,6 @@ import { toPascalCase } from "@videre/database";
 import { MTGO } from '@videre/magic';
 
 /**
- * Test URL Query Parameters
- */
-
-import { getParams, removeDuplicates } from '../parameters/url-parse/params.js';
-import { getQueryArgs, groupQuery } from '../parameters/url-parse/query.js';
-
-describe('URL Parse', () => {
-  // Handle parameter-level parsing
-  describe('params', () => {
-    describe('getParams', () => {
-      const query = { id: 1, uid: 2, other: 3 };
-      it('maps query params to prop', () => {
-        const output = getParams(query, 'uid');
-        expect(output).toEqual([2]);
-      });
-      it('maps query params to aliases', () => {
-        const output = getParams(query, 'id', 'uid');
-        expect(output).toEqual([1, 2]);
-      });
-    });
-    describe('removeDuplicates', () => {
-      const query = { id: 1, id: [2, 3], uid: 4 };
-      it('removes duplicate parameters', () => {
-        const output = removeDuplicates(query);
-        expect(output).toEqual({ id: 2, uid: 4 });
-      });
-    });
-  });
-  // Handle query-level parsing
-  describe('query', () => {
-    // Parse express query parameters
-    describe('getQueryArgs', () => {
-      // Mock express url param handling with query object keys.
-      const query = {
-        q: 'condition1>=value1', // Test 'query' param aliases
-        query: 'condition2>=value2 condition3!=value3'
-      };
-      const output = getQueryArgs(query);
-      it('handles duplicate queries', () => {
-        expect(output).toHaveLength(2);
-      });
-      it('splits query conditions into a structured array', () => {
-        expect(output).toEqual([
-          [
-            'condition1>=value1'
-          ],
-          [
-            'condition2>=value2',
-            'condition3!=value3'
-          ]
-        ]);
-      });
-    });
-    // Group query conditions based on primary (grouping) condition
-    describe('groupQuery', () => {
-      // Mock query condition groups
-      const query = {
-        query: [
-          'condition0=value0',
-          'condition1>=value1',
-          'condition2<=2.1',
-          'condition3>=3',
-          'condition4<=2',
-          'condition1=value2',
-          'condition2!=-4'
-        ].join(' ')
-      };
-      it('groups query conditions on main key', () => {
-        const output = groupQuery({
-          query: query,
-          // main key
-          mainParam: 'condition1',
-          // additional arguments
-          param1: 'condition0',
-          param2: 'condition2',
-          param3: 'condition3'
-        });
-        expect(output).toEqual([
-          { "group": 1, "operator": "=",  "parameter": "condition0",  "value": "value0" },
-          { "group": 1, "operator": ">=", "parameter": "condition1",  "value": "value1" },
-          { "group": 1, "operator": "<=", "parameter": "condition2",  "value": 2.1      },
-          { "group": 1, "operator": ">=", "parameter": "condition3",  "value": 3        },
-          { "group": 2, "operator": "=",  "parameter": "condition1",  "value": "value2" },
-          { "group": 2, "operator": "!=", "parameter": "condition2",  "value": -4       }
-        ]);
-      });
-      it('handles multiple queries', () => {
-        const { query: _query } = query;
-        const output = groupQuery({
-          query: { q: _query, query: _query },
-          // main key
-          mainParam: 'condition1',
-          // additional arguments
-          param1: 'condition0',
-          param2: 'condition2',
-          param3: 'condition3'
-        });
-        expect(output).toHaveLength(2 * (_query.split(' ').length - 1)); // 12
-      });
-    });
-  });
-});
-/**
  * Test Global Parameters
  */
 
@@ -238,3 +135,107 @@ describe('Events', () => {
     });
   });
 });
+
+/**
+ * Test URL Query Parameters
+ */
+
+ import { getParams, removeDuplicates } from '../parameters/url-parse/params.js';
+ import { getQueryArgs, groupQuery } from '../parameters/url-parse/query.js';
+ 
+ describe('URL Parse', () => {
+   // Handle parameter-level parsing
+   describe('params', () => {
+     describe('getParams', () => {
+       const query = { id: 1, uid: 2, other: 3 };
+       it('maps query params to prop', () => {
+         const output = getParams(query, 'uid');
+         expect(output).toEqual([2]);
+       });
+       it('maps query params to aliases', () => {
+         const output = getParams(query, 'id', 'uid');
+         expect(output).toEqual([1, 2]);
+       });
+     });
+     describe('removeDuplicates', () => {
+       const query = { id: 1, id: [2, 3], uid: 4 };
+       it('removes duplicate parameters', () => {
+         const output = removeDuplicates(query);
+         expect(output).toEqual({ id: 2, uid: 4 });
+       });
+     });
+   });
+   // Handle query-level parsing
+   describe('query', () => {
+     // Parse express query parameters
+     describe('getQueryArgs', () => {
+       // Mock express url param handling with query object keys.
+       const query = {
+         q: 'condition1>=value1', // Test 'query' param aliases
+         query: 'condition2>=value2 condition3!=value3'
+       };
+       const output = getQueryArgs(query);
+       it('handles duplicate queries', () => {
+         expect(output).toHaveLength(2);
+       });
+       it('splits query conditions into a structured array', () => {
+         expect(output).toEqual([
+           [
+             'condition1>=value1'
+           ],
+           [
+             'condition2>=value2',
+             'condition3!=value3'
+           ]
+         ]);
+       });
+     });
+     // Group query conditions based on primary (grouping) condition
+     describe('groupQuery', () => {
+       // Mock query condition groups
+       const query = {
+         query: [
+           'condition0=value0',
+           'condition1>=value1',
+           'condition2<=2.1',
+           'condition3>=3',
+           'condition4<=2',
+           'condition1=value2',
+           'condition2!=-4'
+         ].join(' ')
+       };
+       it('groups query conditions on main key', () => {
+         const output = groupQuery({
+           query: query,
+           // main key
+           mainParam: 'condition1',
+           // additional arguments
+           param1: 'condition0',
+           param2: 'condition2',
+           param3: 'condition3'
+         });
+         expect(output).toEqual([
+           { "group": 1, "operator": "=",  "parameter": "condition0",  "value": "value0" },
+           { "group": 1, "operator": ">=", "parameter": "condition1",  "value": "value1" },
+           { "group": 1, "operator": "<=", "parameter": "condition2",  "value": 2.1      },
+           { "group": 1, "operator": ">=", "parameter": "condition3",  "value": 3        },
+           { "group": 2, "operator": "=",  "parameter": "condition1",  "value": "value2" },
+           { "group": 2, "operator": "!=", "parameter": "condition2",  "value": -4       }
+         ]);
+       });
+       it('handles multiple queries', () => {
+         const { query: _query } = query;
+         const output = groupQuery({
+           query: { q: _query, query: _query },
+           // main key
+           mainParam: 'condition1',
+           // additional arguments
+           param1: 'condition0',
+           param2: 'condition2',
+           param3: 'condition3'
+         });
+         expect(output).toHaveLength(2 * (_query.split(' ').length - 1)); // 12
+       });
+     });
+   });
+ });
