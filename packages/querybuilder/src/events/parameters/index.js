@@ -1,4 +1,4 @@
-import { getParams, removeDuplicates } from './../../url-params';
+import { getParams, removeDuplicates } from './../../parameters/express/params.js';
 
 import { parseDateRange } from './dates';
 import { parseEventTypes } from './event-types';

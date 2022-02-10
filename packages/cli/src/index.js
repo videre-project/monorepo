@@ -7,6 +7,7 @@ export * from './functions';
  */
  export const getArgs = (args, flags, offset = 1) => {
   return flags.map(opt => {
-    if (process.argv.includes(opt)) return args[args.indexOf(opt)+offset];
-  })?.[0];
+    if (args.includes(opt)) return args[args.indexOf(opt)+offset];
+  }).filter(Boolean)
+  ?.[0];
 }

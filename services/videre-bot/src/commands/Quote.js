@@ -17,7 +17,7 @@ const Quote = {
       type: 'boolean',
     },
   ],
-  async execute({ client, args }) {
+  async execute({ client, interaction, args }) {
     const { message_link, hide_original } = args;
     // const hide_original = args?.hide_original;
     try {
@@ -69,7 +69,7 @@ const Quote = {
           }
         }
 
-        if (message?.attachments.array().length > 0) {
+        if (JSON.stringify(message?.attachments) !== '[]') {
           if (message.attachments.array()[0]?.height > 0) {
             embed.image = { 'url': message.attachments.array()[0].url };
           } else {
@@ -92,7 +92,8 @@ const Quote = {
       return embed;
 
     } catch (error) {
-      return ERROR_MESSAGE('An error occured while quoting a message.', error, interaction);
+      return { content: error.stack }
+      // return ERROR_MESSAGE('An error occured while quoting a message.', error, interaction);
     }
   },
 };

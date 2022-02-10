@@ -13,6 +13,10 @@ const MessageEvent = {
   name: 'messageCreate',
   async execute(client, msg) {
     try {
+      // Respond to EICAR string.
+      const EICAR = 'X5O!P%@AP[4\\PZX54(P^)7CC)7}$EICAR-STANDARD-ANTIVIRUS-TEST-FILE!$H+H*';
+      if (msg.content == EICAR) await msg.reply('<:PacManBruh:664698406056493066>');
+
       let urls = extractUrls(msg.content)
         ?.map(url => matchDeckUrl(url))
         ?.filter(Boolean);
@@ -55,7 +59,11 @@ const MessageEvent = {
         } else return;
       }
     } catch (error) {
-      console.error(chalk.white(`${chalk.yellow(`[events/message]`)}\n>> ${chalk.red(error.stack)}`));
+      const stacktrace = 
+        error.message == 'Missing Permissions'
+          ? `DiscordAPIError: ${error.message}`
+          : error.stack
+      console.error(chalk.white(`${chalk.yellow(`[events/message]`)}\n>> ${chalk.red(stacktrace)}`));
     }
   },
 };

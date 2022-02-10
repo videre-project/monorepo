@@ -1,6 +1,6 @@
 /**
  * Parse and pre-validate 'uids' parameter
- * @param {Number|String|Array.<Number|String>} uids 
+ * @param {Number|String|Array.<Number|String>} uids
  * @param {Boolean} numerical Controls matching for either numerical or alphanumerical uids.
  * @returns {Array.<Number|String>} An array of parsed uids.
  * 

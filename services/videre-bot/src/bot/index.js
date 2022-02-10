@@ -147,6 +147,12 @@ class Bot extends Client {
         this.listeners = new Collection();
       }
 
+      // Fetch all emoji guilds.
+      [
+        '772093785176801310', // Videre Discord
+        '922909415118614538' // Emoji Discord 1
+      ].forEach(id => this.guilds.resolve(id));
+
       this.user.setPresence({
         status: 'online',
         activities: [

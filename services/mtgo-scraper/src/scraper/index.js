@@ -18,6 +18,7 @@ const run = async (args) => {
     if (getArgs(args, ['-c', '--cards'], 0)) {
       await CLI_PAUSE();
       const data = await formatCardsCollection({ page });
+      console.log(data);
     } else {
       // Create date range.
       const dates = getDates(args);

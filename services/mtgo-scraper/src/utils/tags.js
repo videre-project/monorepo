@@ -19,7 +19,7 @@ export const getTagsData = async (page) => {
   let json = await SearchTags({ headers });
 
   let { perPage, total, results } = json.data.tags;
-  let num_pages = 2 || Math.ceil(total / perPage);
+  let num_pages = Math.ceil(total / perPage);
 
   // Enumerate tag pages
   let data = [results];
@@ -51,7 +51,7 @@ export const getTagsData = async (page) => {
     }
 
     // Create index for tag id.
-    _taggings[json.data.tag.id] = formatTaggings(_data)
+    _taggings[json.data.tag.id] = formatTaggings(_data);
   }
 
   // Combine results under a monolitic object array.

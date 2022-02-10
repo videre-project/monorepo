@@ -1,5 +1,5 @@
 const Prices = async (req, res) => {
-  return {};
+  return { content: 'test' };
 };
 
 export default Prices;

@@ -1,4 +1,4 @@
-import { getParams } from './../../url-params';
+import { getParams, removeDuplicates } from './../../parameters/express/params.js';
 import { paramAliases } from '.';
 
 // Parse and reformat event formats from query string.

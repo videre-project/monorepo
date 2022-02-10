@@ -1,2 +1,2 @@
 export * from './events';
-// export * from './parameters';
+export * from './parameters';

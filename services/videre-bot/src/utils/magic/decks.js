@@ -7,10 +7,10 @@ import { manamoji } from './manamoji';
 /**
  * Gets unique colors in a scryfall collection for card sorting.
  * @param {Array.<Object>} collection An array of scryfall card objects.
- * @param {*} emojiGuild 
+ * @param {*} client 
  * @returns {String}
  */
-export const getColors = (collection, emojiGuild) => {
+export const getColors = (collection, client) => {
   // Get unique colors for each card (or each card face)
   const data = collection.map(({ name, image_uris, colors, card_faces }, i) => {
     // Exclude companion colors for sorting sideboards..
@@ -50,7 +50,7 @@ export const getColors = (collection, emojiGuild) => {
     .map(c => COLORS.indexOf(c))
     .sort();
   const colors = manamoji(
-    emojiGuild,
+    client,
     `{${colorsArray.map(i => COLORS[i]).join('}{')}}`
   );
 
@@ -141,8 +141,12 @@ export const formatDeck = (json, deck, emojiGuild, mode) => {
           ), ([display_type, qty]) => qty);
           array.push({
             name: `${type == 'Sideboard' ? type : (type == 'Sorcery' ? 'Sorceries' : type + 's')} (${subsetSum})`,
-            value: subsetData.map(({ qty, name }) => `**${qty}** ${name}`).join('\n'),
-            inline: type == 'Land' || type == 'Sideboard' ? true : false
+            value: subsetData
+              .map(({ qty, name }) => `**${qty}** ${name}`)
+              .join('\n'),
+            inline: type == 'Land' || type == 'Sideboard'
+              ? true
+              : false
           });
           break;
         default:

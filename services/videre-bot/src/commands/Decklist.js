@@ -6,7 +6,7 @@ import { MessageActionRow, MessageAttachment, MessageButton } from 'discord.js';
 import puppeteer from 'puppeteer-extra';
 import StealthPlugin from 'puppeteer-extra-plugin-stealth';
 
-import{ toPascalCase } from '@videre/database';
+import { toPascalCase } from '@videre/database';
 
 // import { sql } from 'utils/database';
 // import { getNumberWithOrdinal, getColors, formatEvent, formatDeck, drawDeck } from 'utils/magic';
@@ -396,7 +396,7 @@ const Decklist = {
       const embed = {
         author: author,
         title: title
-          .replace('{COLORS}', getColors(collection.data, client.guilds.resolve(config.emojiGuild))),
+          .replace('{COLORS}', getColors(collection.data, client)),
         url: decklist_url.replace('https//', 'https://'),
         fields,
         image: buffer

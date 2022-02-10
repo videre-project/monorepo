@@ -59,10 +59,10 @@ const Card = {
         data = await response.json();
         cardTitle = !data?.card_faces
           ? manamoji(
-            client.guilds.resolve(config.emojiGuild),
+            client,//.guilds.resolve(config.emojiGuild),
             `${data.name} ${data.mana_cost}`
           ) : manamoji(
-            client.guilds.resolve(config.emojiGuild),
+            client,//.guilds.resolve(config.emojiGuild),
             [
               `${data.card_faces[0].name} ${data.card_faces[0].mana_cost}`,
               `${data.card_faces[1].name} ${data.card_faces[1].mana_cost}`
@@ -133,10 +133,10 @@ const Card = {
 
         cardTitle = !data?.card_faces
           ? manamoji(
-            client.guilds.resolve(config.emojiGuild),
+            client,//.guilds.resolve(config.emojiGuild),
             `${data.name} ${data.mana_cost}`
           ) : manamoji(
-            client.guilds.resolve(config.emojiGuild),
+            client,//.guilds.resolve(config.emojiGuild),
             [
               `${data.card_faces[0].name} ${data.card_faces[0].mana_cost}`,
               `${data.card_faces[1].name} ${data.card_faces[1].mana_cost}`
@@ -168,7 +168,7 @@ const Card = {
                 quantity: `${ set.toUpperCase() }#${ collector_number }`
               }))
             },
-            client.guilds.resolve(config.emojiGuild),
+            client,//.guilds.resolve(config.emojiGuild),
           );
           
           const buffer = await drawDeck(decklist, num_rows, true);
@@ -293,7 +293,7 @@ const Card = {
             loyalty
           }) =>
           manamoji(
-            client.guilds.resolve(config.emojiGuild),
+            client,//.guilds.resolve(config.emojiGuild),
             (data?.card_faces
               ? `**${name}** ${mana_cost}\n`
               : '')

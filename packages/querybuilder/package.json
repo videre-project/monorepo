@@ -12,7 +12,7 @@
   "jest": {
     "collectCoverage": true,
     "collectCoverageFrom": [
-        "src/**/{!(index),}.js"
+      "src/**/{!(index),}.js"
     ],
     "coveragePathIgnorePatterns": [
       "<rootDir>/src/events"

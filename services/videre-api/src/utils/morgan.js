@@ -1,6 +1,8 @@
-import morgan from 'morgan';
 import chalk from 'chalk';
+import morgan from 'morgan';
+
 import { getNumberWithOrdinal } from '@videre/database';
+
 import { API_DIR, parseRoute, crawlRoutes } from './routes';
 
 const colors = {
@@ -37,7 +39,7 @@ export const morganMiddleware = morgan((tokens, req, res) => {
   const apiMethod = tokens.url(req, res)?.split('?')[0];
 
   const status = tokens.status(req, res);
-  const statusColor = colors.STATUS?.[status.slice(0, 1) + '00'] || '#ffffff';
+  const statusColor = colors.STATUS?.[status?.slice(0, 1) + '00'] || '#ffffff';
 
   const responseTime = tokens['response-time'](req, res);
   const resonseTimeColor =
@@ -52,7 +54,7 @@ export const morganMiddleware = morgan((tokens, req, res) => {
       : '#800080'; // Purple
 
   const methodPadding = Math.max(
-    ...crawlRoutes(API_DIR).map(route => parseRoute(route.slice(API_DIR.length)).length)
+    ...crawlRoutes(API_DIR).map(route => parseRoute(route?.slice(API_DIR.length)).length)
   );
 
   return chalk.hex('#000000')(
@@ -66,7 +68,7 @@ export const morganMiddleware = morgan((tokens, req, res) => {
             [apiMethod, new Array(1 + methodPadding).fill(',')]
               .join('')
               .replaceAll(',', ' ')
-              .slice(0, methodPadding)
+              ?.slice(0, methodPadding)
           ),
         chalk.hex('#7E7E89')('Took ' + chalk.hex(resonseTimeColor)(responseTime) + ' ms'),
       ].join(chalk.hex('#7E7E89')(chalk.bold(' | ')))

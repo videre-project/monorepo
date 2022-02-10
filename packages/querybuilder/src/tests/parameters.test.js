@@ -195,11 +195,13 @@ describe('Express', () => {
       // Mock query condition groups
       const query = {
         query: [
+          // Group 1
           'condition0=value0',
           'condition1>=value1',
           'condition2<=2.1',
           'condition3>=3',
           'condition4<=2',
+          // Group 2
           'condition1=value2',
           'condition2!=-4'
         ].join(' ')
