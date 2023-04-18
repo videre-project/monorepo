@@ -23,7 +23,11 @@ let guildCommands = [];
  */
 class Bot extends Client {
   constructor({ ...rest }) {
-    super({ intents: CLIENT_INTENTS, ...rest });
+    super({
+      intents: CLIENT_INTENTS,
+      partials: ['MESSAGE', 'CHANNEL', 'REACTION'],
+      ...rest
+    });
   }
 
   /**
@@ -152,16 +156,6 @@ class Bot extends Client {
         '772093785176801310', // Videre Discord
         '922909415118614538' // Emoji Discord 1
       ].forEach(id => this.guilds.resolve(id));
-
-      this.user.setPresence({
-        status: 'online',
-        activities: [
-          {
-            name: 'feedback • /help',
-            type: 'LISTENING',
-          }
-        ]
-      });
 
       console.info(`${chalk.cyanBright('[Bot]')} Bot is now online`);
 

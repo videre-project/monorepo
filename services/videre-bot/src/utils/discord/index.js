@@ -126,8 +126,10 @@ export const validateMessage = message => {
     components: message.components
       || (message.buttons?.length ? validateButtons(message.buttons) : null),
     content: message.content?.slice(0, MESSAGE_LIMITS.CONTENT_LENGTH) || null,
-    embed: message.content ? null : validateEmbed(message.embed || message),
-    embeds: message.content ? null : (message.embeds || [message]).map(validateEmbed),
+    // embed: message.content ? null : validateEmbed(message.embed || message),
+    // embeds: message.content ? null : (message.embeds || [message]).map(validateEmbed),
+    embed: !message.embed ? null : validateEmbed(message.embed || message),
+    embeds: !message.embeds ? null : (message.embeds || [message]).map(validateEmbed),
     ephemeral: Boolean(message.ephemeral)
   };
 };
