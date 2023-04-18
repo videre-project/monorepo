@@ -1,0 +1,14 @@
+{
+  "name": "@videre/edgedb",
+  "version": "1.0.0",
+  "main": "build",
+  "module": "src",
+  "scripts": {
+    "build": "rimraf build && swc src -d build",
+    "build-watch": "swc src -d build -w"
+  },
+  "dependencies": {
+    "dotenv": "^16.0.0",
+    "edgedb": "^0.19.0"
+  }
+}
