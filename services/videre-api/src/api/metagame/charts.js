@@ -84,6 +84,11 @@ const Charts = async (req, res) => {
           count: filtered
             .map(({ count }) => count)
             .reduce((a, b) => a + b, 0),
+          average: (
+              Object.values(countData)
+                .reduce((a, b) => a + b, 0)
+              / Object.keys(countData).length
+            ).toFixed(2) + '%',
           countData,
         }
       }).sort((a, b) => (new Date(a.count) < new Date (b.count) ? 1 : -1))

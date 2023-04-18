@@ -1,154 +1,40 @@
-import fetch from 'node-fetch';
-
-import { sql, dynamicSortMultiple, pruneObjectKeys, calculateEventStats } from '@videre/database';
+import { sql, dynamicSortMultiple, pruneObjectKeys } from '@videre/database';
 import { MTGO } from '@videre/magic';
-import { express, eventsQuery } from '@videre/querybuilder';
-const { getParams, getQueryArgs, groupQuery } = express;
+import { eventsQuery } from '@videre/querybuilder';
+
+// data types for output
+import getEventRecords from '../../utils/dataTypes/results/eventRecords.js';
+
+import parseUIDS from '../../utils/parsing/uids.js';
+import parseQuery, { extractQuery } from '../../utils/parsing/query.js';
+
+import { getQueryWarnings } from '../../utils/validation/warnings.js';
+import { getEventErrors } from '../../utils/validation/errors.js';
 
 const Metagame = async (req, res) => {
   // Parse and pre-validate 'uids' parameter
-  const _uids = getParams(req.query, 'id', 'uid', 'uids', 'event', 'event_id', 'eventID');
-  const uids = _uids
-    .map(id => [...id.split(',')].map(_id => _id.match(/[0-9]+/g).join('')) || null)
-    .flat(1)
-    .filter(Boolean);
-  if (_uids.length && !uids?.length) {
+  const uids = parseUIDS(req.query);
+  if (uids === null) {
     return res.status(400).json({
       details: `No valid 'eventID' ${
-        uids?.length == 1 ? 'parameter' : 'parameters'
+        uids?.length === 1
+          ? 'parameter'
+          : 'parameters'
       } provided.`,
     });
-  }
-  // Group query parameters by named params and aliases.
-  const queryParams = groupQuery({
-    query: getQueryArgs(req?.query).flat(1),
-    _mainParam: ['card', 'name', 'cardname'],
-    _param1: ['qty', 'quantity'],
-    _param2: ['is', 'c', 'cont', 'container'],
-  });
-  // Match query against params and extract query logic.
-  const _query = [...new Set(queryParams.map(obj => obj.group))]
-    .map(group => queryParams.filter(obj => obj.group == group))
-    .flat(1);
-  if (_query?.length == 1 && _query[0]?.value === 0) {
-    return res.status(400).json({ details: "You didn't enter anything to search for." });
-  }
+  };
 
-  // Remove unmatched cards from query conditions.
-  let ignoredGroups = [];
-  let query = await Promise.all(
-    _query
-      .map(async obj => {
-        if (obj.parameter == 'cardname') {
-          const request = await fetch(
-            `https://api.scryfall.com/cards/named?fuzzy=${obj.value}`
-          ).then(response => response.json());
-          if (!request?.name) ignoredGroups.push(obj.group);
-          return { ...obj, value: request?.name || null };
-        }
-        if (obj.parameter == 'quantity') {
-          if (isNaN(obj.value)) {
-            ignoredGroups.push(obj.group);
-            return { ...obj, value: null };
-          }
-        }
-        if (obj.parameter == 'container') {
-          if (!['mainboard', 'sideboard'].includes(obj.value)) {
-            ignoredGroups.push(obj.group);
-            return { ...obj, value: null };
-          }
-        }
-        return obj;
-      })
-      .filter(Boolean)
-  );
+  // Group query parameters by named params and aliases.
+  let query = extractQuery(req.query);
+  const { ignoredGroups, _query } = await parseQuery(query);
+  if (_query === null) {
+    return res.status(400).json({
+      details: "You didn't enter anything to search for."
+    });
+  };
 
   // Create warnings for invalid parameters.
-  let warnings = ignoredGroups.length
-    ? {
-        errors: [
-          // Query errors
-          ...[...new Set(query.map(obj => obj.group))]
-            .filter(Boolean)
-            .filter(group => ignoredGroups.includes(group))
-            .map(group => {
-              const getValue = parameter =>
-                _query
-                  .filter(obj => obj.group == group)
-                  .filter(obj => obj.parameter == parameter)
-                  .map(obj => obj.value)[0];
-              const errors = query
-                .filter(obj => obj.group == group)
-                .filter(obj => obj.value === null)
-                .map(obj => obj.parameter);
-              const condition = _query
-                .filter(obj => obj.group == group)
-                .map(_obj =>
-                  [
-                    _obj.parameter.toLowerCase(),
-                    _obj.operator,
-                    !isNaN(_obj.value) ? _obj.value : `'${_obj.value || ''}'`,
-                  ].join(' ')
-                )
-                .join(' and ');
-              return [
-                'T' +
-                  [
-                    errors.includes('cardname')
-                      ? `the card '${getValue('cardname')}' could not be found`
-                      : '',
-                    errors.includes('quantity')
-                      ? `the quantity '${getValue('quantity')}' is not a number`
-                      : '',
-                    errors.includes('container')
-                      ? `the container '${getValue('container')}' does not exist`
-                      : '',
-                  ]
-                    .filter(Boolean)
-                    .join(', ')
-                    .replace(/, ([^,]*)$/, ' and $1')
-                    .slice(1) +
-                  '.',
-                `Condition ${group} “${condition}” was ignored.`,
-              ]
-                .join(' ')
-                .replace(/\s+/g, ' ')
-                .trim();
-            })
-            .flat(1),
-        ],
-      }
-    : {};
-
-  // Query warnings
-  warnings.warnings = [
-    // ...(warnings?.warnings || []),
-    ...[
-      ...new Set(
-        query
-          .filter(obj => obj.parameter == 'quantity' && obj.value <= 0)
-          .map(obj => obj.group)
-      ),
-    ]
-      .map(group => {
-        const getValue = parameter =>
-          _query
-            .filter(obj => obj.group == group)
-            .filter(obj => obj.parameter == parameter)
-            .map(obj => obj.value)[0];
-        return [
-          `Condition ${group} parameter 'quantity' with value '${getValue(
-            'quantity'
-          )}' is less than 1.`,
-          `Please use “cardname != ${getValue('cardname')}” instead. Corrected.`,
-        ]
-          .join(' ')
-          .replace(/\s+/g, ' ')
-          .trim();
-      })
-      .flat(1),
-  ];
-  if (!warnings.warnings.length) delete warnings.warnings;
+  let warnings = getQueryWarnings(query, ignoredGroups, _query);
 
   // Filter query for valid query conditions.
   query = query.filter(obj => !ignoredGroups.includes(obj.group));
@@ -156,89 +42,64 @@ const Metagame = async (req, res) => {
   if (_query.length && !query?.length) {
     return res.status(400).json({
       details: `Provided query ${
-        ignoredGroups?.length == 1 ? 'condition' : 'conditions'
+        ignoredGroups?.length === 1
+          ? 'condition'
+          : 'conditions'
       } had one or more invalid parameters.`,
       ...Object.keys(warnings)
         .sort()
         .reduce((r, k) => ((r[k] = warnings[k]), r), {}),
     });
-  }
-  query.forEach((obj, _i) => {
-    if (obj.parameter == 'quantity' && obj.value <= 0) {
-      const queryGroup = query.filter(_obj => _obj.group == obj.group);
-      if (queryGroup.length && queryGroup.find(_obj => _obj.parameter == 'cardname')) {
-        query = query
-          .map((condition, i) => {
-            if (condition.group == obj.group && condition.parameter == 'cardname') {
-              return { ...condition, operator: '!=' };
-            } else if (_i !== i) return condition;
-            return;
-          })
-          .filter(Boolean);
-      } else query = query.filter(_obj => _obj.group != obj.group);
-    }
-  });
+  };
 
   // Get event catalog and parsed parameters.
   const { parameters, data: request_1 } = await eventsQuery(req.query, uids);
 
+  // Find unmatched event parameters from event results
+  warnings.errors = [
+    ...(warnings?.errors || []),
+    getEventErrors(parameters, uids, request_1)
+  ];
+  if (!warnings.errors?.length) {
+    delete warnings.errors;
+  };
+
   // Handle erronous parameters.
-  const _format = [...(parameters?.format || parameters?.formats || [])];
-  if (
-    _format &&
-    ![_format].flat(1).filter(format => MTGO.FORMATS.includes(format.toLowerCase()))
-  ) {
-    return res.status(400).json({ details: "No valid 'format' parameter provided." });
-  }
-  if (parameters?.time_interval && parameters?.time_interval <= 0) {
-    return res
-      .status(400)
-      .json({ details: "'time_interval' parameter must be greater than zero." });
-  }
-  // Find unmatched formats from event results
-  const unmatchedFormats = (
-    typeof parameters?.format == 'object'
-      ? [...new Set(parameters?.format)]
-      : [parameters?.format]
-  )
-    .filter(format => !MTGO.FORMATS.includes(format?.toLowerCase()))
-    .filter(Boolean);
-  // Find unmatched event types from event results
-  const unmatchedTypes = (
-    typeof (parameters?.type || parameters?.types) == 'object'
-      ? [...new Set(parameters?.type || parameters?.types)]
-      : [parameters?.type || parameters?.types]
-  )
-    .filter(type => !MTGO.EVENT_TYPES.includes(type?.toLowerCase()))
-    .filter(Boolean);
-  // Find unmatched event uids from event results
-  const unmatchedUIDs = [...new Set(uids)].filter(
-    uid => ![...new Set(request_1.map(obj => obj.uid.toString()))].includes(uid)
-  );
-  // Add additional warnings for mismatches
-  if ([...unmatchedFormats, ...unmatchedTypes].length) {
-    // Invalid format and/or event types might create erronous warnings for invalid event ids.
-    warnings.errors = [
-      ...unmatchedFormats.map(
-        format => `The format parameter '${format}' does not exist.`
-      ),
-      ...unmatchedTypes.map(type => `The event type parameter '${type}' does not exist.`),
-    ];
-  } else if (unmatchedUIDs.length) {
-    // Show invalid event ids once format type and/or event type is valid.
-    warnings.errors = [
-      ...unmatchedUIDs.map(uid => `The event id parameter '${uid}' could not be found.`),
-    ];
-  }
+  {
+    const _format = [...(parameters?.format || parameters?.formats || [])];
+    const validFormats = [_format]
+      .flat(1)
+      .filter(format => MTGO.FORMATS.includes(format.toLowerCase()));
+    if (_format && !validFormats) {
+      return res.status(400).json({
+        details: "No valid 'format' parameter provided.",
+        ...warnings
+      });
+    };
+    if (parameters?.time_interval && parameters?.time_interval <= 0) {
+      return res.status(400).json({
+        details: "'time_interval' parameter must be greater than zero.",
+        ...warnings
+      });
+    };
+  };
+
   // Throw error if no event data is found.
   if (!request_1[0]) {
-    return res.status(404).json({ details: 'No event data was found.', ...warnings });
-  }
+    return res.status(404).json({
+      details: 'No event data was found.',
+      ...warnings
+    });
+  };
 
   // Get unique formats from matched events.
-  const formats = MTGO.FORMATS.filter(format =>
-    [...new Set(request_1.map(obj => obj.format.toLowerCase()))].includes(format)
-  );
+  const formats = MTGO.FORMATS
+    .filter(format =>
+      [...new Set(
+        request_1
+          .map(obj => obj.format.toLowerCase())
+      )].includes(format)
+    );
 
   // Get event results from event catalog.
   const request_2 = await sql.unsafe(`
@@ -246,28 +107,13 @@ const Metagame = async (req, res) => {
     WHERE event in (${request_1.map(obj => obj.uid)});
   `);
   if (!request_2[0]) {
-    return res.status(404).json({ details: 'No archetype data was found.', ...warnings });
-  }
+    return res.status(404).json({
+      details: 'No archetype data was found.',
+      ...warnings
+    });
+  };
   // Get approx total players and swiss distribution per event.
-  const eventRecords = [...new Set(request_2.map(obj => obj.event))]
-    .map(uid => {
-      const records = request_2
-        .filter(obj => obj.event == uid)
-        .map(obj => obj?.stats?.record);
-      const recordData = [...new Set(records)]
-        .map(record => ({
-          record,
-          count: records.filter(_record => _record == record).length,
-        }))
-        .sort(
-          (a, b) => parseInt(b.record.split('-')[0]) - parseInt(a.record.split('-')[0])
-        );
-      return {
-        [uid]: calculateEventStats(recordData),
-      };
-    })
-    .flat(1)
-    .reduce((a, b) => ({ ...a, ...b }));
+  const eventRecords = getEventRecords(request_2);
 
   // Parse results for valid archetypes.
   const archetypes = request_2
@@ -321,43 +167,47 @@ const Metagame = async (req, res) => {
           .includes(card.event)
       );
       let formatData = _formatData;
-      [...new Set(query.map(obj => obj.group))].filter(Boolean).forEach(group => {
-        const _query = query.filter(_obj => _obj.group == group);
-        const filteredUIDs = [...new Set(formatData.map(_obj => _obj.deck_uid))]
-          .map(_uid => {
-            const filteredData = _formatData
-              .filter(obj => obj.deck_uid == _uid)
-              .filter(_data => {
-                const _filter = _query
-                  .map(_condition => {
-                    const { parameter, operator, value } = _condition;
-                    switch (operator) {
-                      case '>=':
-                        return _data[parameter] >= value;
-                      case '<=':
-                        return _data[parameter] <= value;
-                      case '>':
-                        return _data[parameter] > value;
-                      case '<':
-                        return _data[parameter] < value;
-                      case '=':
-                        return _data[parameter] == value;
-                      case '!=': {
-                        const data = formatData.filter(
-                          obj => obj.deck_uid == _data.deck_uid && obj[parameter] == value
-                        )?.length;
-                        return data == 0 && _data[parameter] !== value;
+      [...new Set(query.map(obj => obj.group))]
+        .filter(Boolean)
+        .forEach(group => {
+          const _query = query.filter(_obj => _obj.group == group);
+          // Filter by each unique deck id
+          const filteredUIDs = [...new Set(formatData.map(_obj => _obj.deck_uid))]
+            .map(_uid => {
+              const filteredData = _formatData
+                .filter(obj => obj.deck_uid == _uid)
+                .filter(_data => {
+                  const _filter = _query
+                    .map(({ parameter, operator, value }) => {
+                      switch (operator) {
+                        case '>=':
+                          return _data[parameter] >= value;
+                        case '<=':
+                          return _data[parameter] <= value;
+                        case '>':
+                          return _data[parameter] > value;
+                        case '<':
+                          return _data[parameter] < value;
+                        case '=':
+                          return _data[parameter] == value;
+                        case '!=': {
+                          const data = formatData.filter(obj =>
+                            obj.deck_uid === _data.deck_uid
+                            && obj[parameter] === value
+                          )?.length;
+                          return data === 0
+                            && _data[parameter] !== value;
+                        }
                       }
-                    }
-                  })
-                  .filter(Boolean);
-                return _filter?.length == _query?.length;
-              });
-            return filteredData?.length ? _uid : null;
-          })
-          .filter(_uid => _uid !== null);
-        formatData = formatData.filter(obj => filteredUIDs.includes(obj.deck_uid));
-      });
+                    }).filter(Boolean);
+                  return _filter?.length == _query?.length;
+                });
+              return filteredData?.length ? _uid : null;
+            })
+            .filter(_uid => _uid !== null);
+          formatData = formatData
+            .filter(obj => filteredUIDs.includes(obj.deck_uid));
+        });
       return {
         [format]: {
           object: 'catalog',
@@ -379,12 +229,10 @@ const Metagame = async (req, res) => {
                 [...new Set(formatData.map(_obj => _obj.deck_uid))].includes(
                   archetype.uid
                 )
-            )
-            .sort(dynamicSortMultiple('-count', 'displayName')),
+            ).sort(dynamicSortMultiple('-count', 'displayName')),
         },
       };
-    })
-    .reduce((a, b) => ({ ...a, ...b }));
+    }).reduce((a, b) => ({ ...a, ...b }));
 
   // Return collection object.
   return res.status(200).json({
@@ -404,13 +252,12 @@ const Metagame = async (req, res) => {
                   _obj.operator,
                   !isNaN(_obj.value) ? _obj.value : `'${_obj.value || ''}'`,
                 ].join(' ')
-              )
-              .join(' and ')
-          )
-          .flat(1),
+              ).join(' and ')
+          ).flat(1),
       },
     }),
     ...Object.keys(warnings)
+      .filter(key => warnings[key].flat(2).length)
       .sort()
       .reduce((r, k) => ((r[k] = warnings[k]), r), {}),
     data: formats
@@ -555,6 +402,53 @@ const Metagame = async (req, res) => {
                         archetypes.length) *
                       100
                     ).toFixed(2) + '%',
+                  // placements: _events
+                  //   .map(({ uid, date }) => {
+                  //     // archetype-specific data
+                  //     const records = _archetypes
+                  //       .filter(_obj =>
+                  //         _obj.archetype_uid == _uid
+                  //         && _obj.event == uid
+                  //       ).map(({ stats }) => stats.record);
+
+                  //     // event-specific data
+                  //     const allRecords = _archetypes
+                  //       .filter(_obj => _obj.event == uid)
+                  //       .map(({ stats }) => stats.record);
+
+                  //     const possibleRecords = [...new Set(allRecords)];
+
+                  //     const data = possibleRecords
+                  //       .sort((a, b) =>
+                  //         parseInt(a.split('-')[0]) < parseInt(b.split('-')[0]) ? 1 : -1
+                  //       ).map(record => ({
+                  //         key: record,
+                  //         value: (100
+                  //           * records
+                  //             .filter(_record => _record === record)
+                  //             ?.length
+                  //           / allRecords
+                  //             .filter(_record => _record === record)
+                  //             ?.length
+                  //         ).toFixed(2) + '% ('
+                  //         + records
+                  //           .filter(_record => _record === record)
+                  //           ?.length
+                  //         + '/'
+                  //         + allRecords
+                  //           .filter(_record => _record === record)
+                  //           ?.length
+                  //         + ')'
+                  //       })).reduce((obj, item)=> {
+                  //         obj[item.key] = item.value; 
+                  //         return obj;
+                  //       }, {});
+                      
+                  //     return { key: date, value: data };
+                  //   }).reduce((obj, item)=> {
+                  //     obj[item.key] = item.value; 
+                  //     return obj;
+                  //   }, {})
                 }))
                 .sort(dynamicSortMultiple('-count', 'displayName')),
             },
