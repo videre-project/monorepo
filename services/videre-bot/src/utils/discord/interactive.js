@@ -46,14 +46,14 @@ export const formatListAsPages = (items, message, length = 10, mode) => {
       //   } else pageProps = page[0];
       // }
       embeds = [{ ...pageProps, ...pageMessage }];
-    }
+    };
 
     return {
       embeds,
       ...(page?.files)
         ? { files: page?.files }
         : null
-    }
+    };
   })
 };
 
