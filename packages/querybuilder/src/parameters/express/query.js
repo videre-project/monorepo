@@ -32,7 +32,7 @@ export const groupQuery = ({ query, mainParam, ..._args }) => {
   if (!Object.keys(query)?.length) return [];
 
   // Get query conditions
-  const _query = getQueryArgs(query);
+  const _query = getQueryArgs(query)?.flat(1);
   if (!_query?.length) return [];
 
   // Enumerate parameters to map final item in array as parameter name.
