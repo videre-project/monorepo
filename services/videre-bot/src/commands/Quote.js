@@ -1,4 +1,5 @@
 import { ERROR_MESSAGE } from 'constants';
+import { logError } from 'utils/logging';
 
 const Quote = {
   name: 'quote',
@@ -46,6 +47,12 @@ const Quote = {
         timestamp: new Date(message.createdTimestamp).toISOString()
       };
 
+      if (hide_original) {
+        return {
+          embeds: [embed]
+        };
+      }
+
       if (!(hide_original) || char_count > 2000) {
         if (message?.embeds.length > 0 && message?.embeds[0]?.type == 'rich') {
           if (message.embeds.length == 1) {
@@ -70,10 +77,10 @@ const Quote = {
         }
 
         if (JSON.stringify(message?.attachments) !== '[]') {
-          if (message.attachments.array()[0]?.height > 0) {
-            embed.image = { 'url': message.attachments.array()[0].url };
+          if (message.attachments/**.array()[0]*/?.height > 0) {
+            embed.image = { 'url': message.attachments/**.array()[0]*/.url };
           } else {
-            embed.description = `\`[ Attachment: ${ message.attachments.array()[0].name } ]\``;
+            embed.description = `\`[ Attachment: ${ message.attachments/**.array()[0]*/.name } ]\``;
           }
         }
       } else {
@@ -92,8 +99,8 @@ const Quote = {
       return embed;
 
     } catch (error) {
-      return { content: error.stack }
-      // return ERROR_MESSAGE('An error occured while quoting a message.', error, interaction);
+      logError(args, error, __filename);
+      return ERROR_MESSAGE('An error occured while quoting a message.', error, interaction);
     }
   },
 };

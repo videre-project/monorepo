@@ -3,12 +3,13 @@ import chalk from 'chalk';
 import { parseTime } from '@videre/cli';
 
 import { ERROR_MESSAGE } from 'constants';
+import { logError } from 'utils/logging';
 
 const Debug = {
   name: 'debug',
   description: "Displays the bot's current uptime, cluster info, and latency.",
   type: 'guild',
-  execute({ client, interaction }) {
+  execute({ client, interaction, args }) {
     try {
       // Get uptime in nearest days, hours, minutes and seconds
       let t = 0;
@@ -41,10 +42,7 @@ const Debug = {
         ]
       };
     } catch (error) {
-      console.error(
-        chalk.cyan(`[/debug]`)+
-        chalk.grey('\n>> ') + chalk.red(`Error: ${error.message}`)
-      );
+      logError(args, error, __filename);
       return ERROR_MESSAGE('An error occured while generating debugging data.', error, interaction);
     }
   },

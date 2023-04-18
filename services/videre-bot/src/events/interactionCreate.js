@@ -6,6 +6,9 @@ import { ERROR_DEFAULTS } from 'constants';
 import { sanitize, validateMessage, registerComponents } from 'utils/discord';
 import { extractUrls, matchDeckUrl } from 'utils/deck-urls';
 
+// // TODO: use options interaction object for fetching prev args
+// console.log(interaction.options.data);
+
 /**
  * Handles interaction events.
  */
@@ -43,6 +46,9 @@ const InteractionEvent = {
 
           const data = validateMessage(output);
 
+          // const util = require('util');
+          // console.log(util.inspect(output, false, null, true));
+
           if (output?.deferred) {
             // Timeout after 15 minutes.
             if (time_2() >= 9 * 10**5) return;
@@ -61,65 +67,90 @@ const InteractionEvent = {
         // Button interactions
         case 'MESSAGE_COMPONENT': {
           try {
-            if (interaction.customId == 'x_button') {
-              await interaction.message.delete();
-              return;
-            } else if (interaction.customId == 'null') {
-              return;
-            }
-
-            // Timeout after 15 minutes.
-            const timestamp = interaction.message.createdTimestamp;
-            if (time_2(new Date(timestamp)) >= 9 * 10**5) {
-              const { commandName } = interaction?.message?.interaction;
-              // const button = new MessageButton()
-              //   .setStyle('PRIMARY')
-              //   .setLabel('Start a new interaction')
-              //   .setCustomId(interaction.customId.toString());
-              await interaction.reply(validateMessage({
-                embeds: [{
-                  ...ERROR_DEFAULTS,
-                  title: 'This interaction has expired.',
-                  description: `Use \`/${commandName}\` to create a new interaction.`,
-                  footer: { text: 'You can also use /help for more command info.' }
-                }],
-                // components: [new MessageActionRow().addComponents(button)],
-                ephemeral: true
-              }));
+            if (interaction.customId === 'x_button') {
+              return await interaction.message.delete();
+            } else if (interaction.customId === 'null') {
               return;
             }
 
-            let command, _args/**, mode*/;/**
-            if (interaction.message.embeds?.[0]?.title == 'This interaction has expired.') {
-              mode = 'interaction-renew';
+            // Handle visual loading state
+            const embedTitle = interaction.message.embeds?.[0]?.title;
+            // if (interaction.componentType !== 'SELECT_MENU') {
+            if (!['Help', 'Metagame'].includes(embedTitle)) {
+              const components = interaction.message.components
+                ?.map(row => {
+                  const _components = row.components
+                    .map(button => {
+                      if (button?.url && button.style === 'LINK') {
+                        return button;
+                      }
+                      else return { ...button, disabled: true };
+                    });
+                  return { ...row, components: _components };
+                });
+              await interaction.message.edit(
+                validateMessage({
+                  content: '',
+                  embeds: [{
+                    fields: [{
+                      name: '<a:loading:951315050826715166>  Fetching response...',
+                      value: 'This should take no more than a few seconds.'
+                    }],
+                    color: '#99aab5', //'#7289da'
+                  }],
+                  components
+                })
+              );
+              await interaction.message.removeAttachments();
+            }
 
-              const { messageId } = interaction.message.reference;
-              const message = await interaction
-                .message
-                .channel.messages.fetch(messageId);
+            // // Timeout after 15 minutes.
+            // const timestamp = interaction.message.createdTimestamp;
+            // if (time_2(new Date(timestamp)) >= 9 * 10**5) {
+            //   const components = interaction.message.components
+            //     ?.map(row => {
+            //       const _components = row.components
+            //         .map(button => {
+            //           if (button?.url && button.style === 'LINK') {
+            //             return button;
+            //           }
+            //           else return { ...button, disabled: true };
+            //         });
+            //       return { ...row, components: _components };
+            //     });
+            //   await interaction.message.removeAttachments();
+            //   await interaction.message.edit(
+            //     validateMessage({
+            //       ...interaction.message, components
+            //     })
+            //   );
 
-              const { commandName } = message.interaction;
-              command = client.commands.get(commandName);
+            //   const { commandName } = interaction?.message?.interaction;
+            //   // const button = new MessageButton()
+            //   //   .setStyle('PRIMARY')
+            //   //   .setLabel('Start a new interaction')
+            //   //   .setCustomId(interaction.customId.toString());
+            //   await interaction.reply(
+            //     validateMessage({
+            //       embeds: [{
+            //         ...ERROR_DEFAULTS,
+            //         title: 'This interaction has expired.',
+            //         description: `Use \`/${commandName}\` to create a new interaction.`,
+            //         footer: { text: 'You can also use /help for more command info.' }
+            //       }],
+            //       // components: [new MessageActionRow().addComponents(button)],
+            //       ephemeral: true
+            //     })
+            //   );
+            //   return;
+            // }
 
-              switch (commandName) {
-                case 'card':
-                  const [
-                    set,
-                    collectors_number,
-                    name
-                  ] = message
-                      ?.components[0]
-                      ?.components[1]
-                      .url
-                      .split('/card/')[1]
-                      .split('/');
-                  _args = JSON.stringify({ name, set, collectors_number });
-                  break;
-              }
-            } else*/ if (!interaction.message.interaction) {
-              command = client.commands.get('decklist');
-              const { messageId } = interaction.message.reference;
-              const decklist_url = await interaction
+            let command, _args;
+            if (!interaction.message.interaction) {
+              if (interaction.customId == 'decklist-prompt') {
+                command = client.commands.get('decklist');
+                const { messageId } = interaction.message.reference;
+                const decklist_url = await interaction
                 .message
                 .channel.messages.fetch(messageId)
                 .then(msg => 
@@ -127,7 +158,6 @@ const InteractionEvent = {
                     .map(url => matchDeckUrl(url))
                     .filter(Boolean)[0]
                 );
-              if (interaction.customId == 'decklist-prompt') {
                 _args = JSON.stringify({
                   decklist_url,
                   mode: false
@@ -136,6 +166,53 @@ const InteractionEvent = {
             } else {
               const { commandName } = interaction?.message?.interaction;
               command = client.commands.get(commandName);
+
+              if (interaction.componentType === 'SELECT_MENU') {
+                // await interaction.deferReply({ ephemeral: true });
+                let options = [],
+                  optionLabel = '',
+                  emoji = {};
+
+                const components = interaction.message.components
+                  ?.map(row => {
+                    const _components = row.components
+                      .map(button => {
+                        if (button.customId === interaction.customId) {
+                          options = button.options;
+                          optionLabel = options
+                            .filter(({ value }) => interaction.values.includes(value))
+                            .map(({ emoji, label }) => label)
+                            ?.[0];
+                          emoji = options
+                            .filter(({ label }) => label == optionLabel)
+                            .map(({ emoji }) => `<:${emoji.name}:${emoji.id}>`)
+                            ?.[0];
+
+                          return {
+                            ...button,
+                            placeholder: optionLabel,
+                            disabled: true
+                          }
+                        } else if (button?.url && button.style === 'LINK') {
+                          return button;
+                        } else return { ...button, disabled: true };
+                      });
+                    return { ...row, components: _components };
+                  });
+                await interaction.message.removeAttachments();
+
+                await interaction.message.edit(
+                  validateMessage({
+                    ...interaction.message,
+                    content: `Selected ${emoji} **${optionLabel}**.`,
+                    components
+                  })
+                );
+
+                _args = JSON.stringify({
+                  [interaction.customId]: interaction.values[0]
+                });
+              }
             }
 
             // Create object with arg props
@@ -150,17 +227,30 @@ const InteractionEvent = {
 
             const data = validateMessage(output);
 
-            // if (mode == 'interaction-renew') {
-            //   return await interaction.reply(data);
-            // }
-
             // Address persisting attachment behavior.
             await interaction.message.removeAttachments();
   
             if (output?.deferred) {
               // Timeout after 15 minutes.
               if (time_2() >= 9 * 10**5) return;
-              return await interaction.editReply(data);
+              if (interaction.componentType === 'SELECT_MENU') {
+                // await interaction.deleteReply();
+                // const isError = output?.embeds?.[0] === 'Error';
+                // await interaction.editReply(
+                //   validateMessage({
+                //     embeds: [{
+                //       title: !isError ? 'Success' : 'Error',
+                //       color: !isError ? '#009944' : '#cf000f',
+                //       description: !isError
+                //         ? 'Message response was successfully updated.'
+                //         : 'An error occured while fetching a response.'
+                //     }]
+                //   })
+                // );
+                return await interaction.message.edit(data);
+              } else {
+                return await interaction.editReply(data);
+              }
             } else {
               // Timeout after 3 seconds.
               if (time_2() >= 3 * 10**3) return;

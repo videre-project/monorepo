@@ -4,9 +4,11 @@ import fetch from 'node-fetch';
 import { MessageActionRow, MessageAttachment, MessageButton } from 'discord.js';
 
 import { formatDeck, manamoji, drawDeck, cardPrices } from 'utils/magic';
+import { logError } from 'utils/logging';
 
-import config from 'config';
-import { ERROR_MESSAGE } from 'constants';
+import getCardPreviews from 'utils/card-previews';
+
+import { ERROR_DEFAULTS, ERROR_MESSAGE } from 'constants';
 
 const Card = {
   name: 'card',
@@ -31,8 +33,13 @@ const Card = {
     }
   ],
   async execute({ client, interaction, args }) {
-
     let { name, set, collectors_number } = args;
+
+    if (name === 'test') {
+      const result = await getCardPreviews(client);
+      // result.forEach(res => console.log(res.embeds.length))
+      // return result[0];
+    }
 
     // For buttons interaction
     const { mode, uid } = args;
@@ -79,11 +86,76 @@ const Card = {
         // Handle conditions for invalid Scryfall response by each query parameter and condition
         if (response.status !== 200) {
           // Get fuzzy response without set
-          const response_1 = await fetch(`https://api.scryfall.com/cards/named?fuzzy=${ name }`);
+          let response_1 = await fetch(`https://api.scryfall.com/cards/named?fuzzy=${ name }`);
           data = await response_1.json();
           if (response_1.status !== 200) {
             if (data.object === "error" || data.type === "ambiguous") {
-              throw new Error('Multiple different cards match the requested cardname.\nPlease refine your search by adding more words or specifying a set code.');
+              const _url = `https://api.scryfall.com/cards/autocomplete?q=${ name }`;
+              response_1 = await fetch(
+                `https://api.scryfall.com/cards/autocomplete?q=${ name }`
+              ).then(res => res.json());
+              const cards = response_1.data.slice(0, 10);
+
+              // Create decklist object
+              let decklist = {
+                mainboard: cards.map(name => ({ quantity: 1, cardName: name })),
+                sideboard: [],
+              };
+
+              // Get Scryfall card data
+              const collection = await fetch("https://api.scryfall.com/cards/collection", {
+                method: "post",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                  "identifiers": [
+                    ...decklist.mainboard.map(({ cardName }) => ({ "name": cardName.split('/')[0] })),
+                    ...decklist.sideboard.map(({ cardName }) => ({ "name": cardName.split('/')[0] })),
+                  ],
+                }),
+              }).then(res => res.json());
+
+              if (collection.object == 'error') {
+                return {
+                  embeds: [{
+                    ...ERROR_DEFAULTS,
+                    description: 'No card matches were found.'
+                  }],
+                  ephemeral: true
+                };
+              }
+
+              const _cards = collection.data;
+              decklist = formatDeck(
+                _cards,
+                {
+                  mainboard: _cards.map(({ set, collector_number }) => ({
+                    quantity: `${ set.toUpperCase() }#${ collector_number }`
+                  }))
+                },
+                client,//.guilds.resolve(config.emojiGuild),
+              );
+
+              const buffer = await drawDeck(decklist, 5, true);
+
+              return {
+                embeds: [{
+                  ...ERROR_DEFAULTS,
+                  description: [
+                    `[Multiple different cards](${_url}) match the requested cardname.`,
+                    'Please refine your search by adding more words or specifying a set code.',
+                  ].join('\n'),
+                  image: { url: 'attachment://canvas.png' },
+                  footer: {
+                    text: `Found ${_cards?.length} total matches for '${name}'.`
+                  },
+                }],
+                files: [new MessageAttachment(buffer, 'canvas.png')],
+                // Hide buttons if response is only 1 page long.
+                components: response_1.total_cards > 10
+                  ? [new MessageActionRow().addComponents(...buttons)]
+                  : null,
+                ephemeral: true
+              }
             }
             // Handle miscellaneous errors
             throw new Error('The requested card could not be found.');
@@ -415,10 +487,7 @@ const Card = {
         };
       }
     } catch (error) {
-      console.error(
-        chalk.cyan(`[/card]`) +
-        chalk.grey('\n>> ') + chalk.red(`Error: ${error.stack}`)
-      );
+      logError(args, error, __filename);
       return ERROR_MESSAGE('An error occured while fetching card data.', error, interaction);
     }
   },

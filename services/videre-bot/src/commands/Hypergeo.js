@@ -29,7 +29,7 @@ const Hypergeo = {
   async execute({ args }) {
     try {
       // Calculates the greatest common denominator between two numbers
-      const gcd = (givenNumber1, givenNumber2) => {
+      function gcd(givenNumber1, givenNumber2) {
         let greatestCommonDenominator = 1; // Any two numbers' minimum gcd is 1
 
         for (let i = 1; i <= givenNumber1 && i <= givenNumber2; i++) {
@@ -41,7 +41,7 @@ const Hypergeo = {
         return greatestCommonDenominator;
       }
 
-      const ncr = (n, r) => {
+      function ncr(n, r) {
         if (n - r < r) r = n - r;
 
         // Tries to calculate the combination of n and r
@@ -176,10 +176,10 @@ const Hypergeo = {
 
       // Array that contains the user's input from the document
       let userInputs = [
-        (args?.pop_size ? args?.pop_size : 0),
-        (args?.pop_successes ? args?.pop_successes : 0),
-        (args?.sample_size ? args?.sample_size : 0),
-        (args?.desired_successes ? args?.desired_successes : 0)
+        parseInt(args?.pop_size ?? 0),
+        parseInt(args?.pop_successes ?? 0),
+        parseInt(args?.sample_size ?? 0),
+        parseInt(args?.desired_successes ?? 0)
       ];
 
       // Construct a Deck object from the user's input
