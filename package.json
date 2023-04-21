@@ -1,15 +1,9 @@
 {
-  "name": "videre-project",
-  "version": "1.0.0",
-  "homepage": "https://github.com/videre-project/",
-  "author": "Cory Bennett <32466081+Qonfused@users.noreply.github.com>",
-  "license": "MIT",
-  "main": "index.js",
+  "name": "@videre/monorepo",
   "private": true,
-  "engines": {
-    "yarn": ">=1.17.3",
-    "node": ">=14.0.0"
-  },
+  "workspaces": [
+    "packages/*"
+  ],
   "scripts": {
     "dev": "turbo run dev --parallel --no-cache",
     "test": "turbo run test",
@@ -29,13 +23,13 @@
     "prettier": "2.3.2",
     "turbo": "latest"
   },
-  "workspaces": [
-    "packages/*"
-  ],
   "repository": {
     "type": "git",
     "url": "ssh://git@github.com/videre-project/videre-project.git",
     "directory": "."
+  },
+  "engines": {
+    "node": ">=14.15.0"
   },
   "turbo": {
     "baseBranch": "origin/main",
