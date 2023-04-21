@@ -2171,18 +2171,18 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@videre/cli@1.0.0, @videre/cli@^1.0.0, @videre/cli@workspace:packages/cli":
+"@videre/cli@workspace:packages/cli":
   version: 0.0.0-use.local
   resolution: "@videre/cli@workspace:packages/cli"
   languageName: unknown
   linkType: soft
 
-"@videre/database@1.0.0, @videre/database@workspace:packages/database":
+"@videre/database@workspace:packages/database":
   version: 0.0.0-use.local
   resolution: "@videre/database@workspace:packages/database"
   dependencies:
     "@prisma/client": 3.6.0
-    "@videre/cli": ^1.0.0
+    "@videre/cli": "workspace:packages/cli"
     dotenv: ^9.0.2
     postgres: ^1.0.2
     prisma: 3.6.0
@@ -2198,12 +2198,12 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@videre/magic@1.0.0, @videre/magic@workspace:packages/magic":
+"@videre/magic@workspace:packages/magic":
   version: 0.0.0-use.local
   resolution: "@videre/magic@workspace:packages/magic"
   dependencies:
-    "@videre/cli": 1.0.0
-    "@videre/database": 1.0.0
+    "@videre/cli": "workspace:packages/cli"
+    "@videre/database": "workspace:packages/database"
     fetch-h2: ^3.0.1
   languageName: unknown
   linkType: soft
@@ -2212,8 +2212,8 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@videre/querybuilder@workspace:packages/querybuilder"
   dependencies:
-    "@videre/database": 1.0.0
-    "@videre/magic": 1.0.0
+    "@videre/database": "workspace:packages/database"
+    "@videre/magic": "workspace:packages/magic"
     jest: ^27.4.5
   languageName: unknown
   linkType: soft

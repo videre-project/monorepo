@@ -8,8 +8,8 @@
     "build-watch": "swc src -d build -w"
   },
   "dependencies": {
-    "@videre/cli": "1.0.0",
-    "@videre/database": "1.0.0",
+    "@videre/cli": "workspace:packages/cli",
+    "@videre/database": "workspace:packages/database",
     "fetch-h2": "^3.0.1"
   },
   "repository": {

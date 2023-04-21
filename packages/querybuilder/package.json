@@ -10,8 +10,8 @@
     "build-watch": "swc src -d build -w"
   },
   "dependencies": {
-    "@videre/database": "1.0.0",
-    "@videre/magic": "1.0.0"
+    "@videre/database": "workspace:packages/database",
+    "@videre/magic": "workspace:packages/magic"
   },
   "devDependencies": {
     "jest": "^27.4.5"
