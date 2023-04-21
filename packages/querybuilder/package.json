@@ -9,6 +9,18 @@
     "build": "rimraf build && swc src -d build",
     "build-watch": "swc src -d build -w"
   },
+  "dependencies": {
+    "@videre/database": "1.0.0",
+    "@videre/magic": "1.0.0"
+  },
+  "devDependencies": {
+    "jest": "^27.4.5"
+  },
+  "repository": {
+    "type": "git",
+    "url": "ssh://git@github.com/videre-project/videre-project.git",
+    "directory": "packages/querybuilder"
+  },
   "jest": {
     "collectCoverage": true,
     "collectCoverageFrom": [
@@ -21,12 +33,5 @@
     "transform": {
       "^.+\\.js$": "@swc/jest"
     }
-  },
-  "dependencies": {
-    "@videre/database": "1.0.0",
-    "@videre/magic": "1.0.0"
-  },
-  "devDependencies": {
-    "jest": "^27.4.5"
   }
 }

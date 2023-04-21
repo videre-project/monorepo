@@ -11,5 +11,10 @@
     "@videre/cli": "1.0.0",
     "@videre/database": "1.0.0",
     "fetch-h2": "^3.0.1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "ssh://git@github.com/videre-project/videre-project.git",
+    "directory": "packages/magic"
   }
 }

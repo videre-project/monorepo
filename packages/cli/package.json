@@ -6,5 +6,10 @@
   "scripts": {
     "build": "rimraf build && swc src -d build",
     "build-watch": "swc src -d build -w"
+  },
+  "repository": {
+    "type": "git",
+    "url": "ssh://git@github.com/videre-project/videre-project.git",
+    "directory": "packages/cli"
   }
 }

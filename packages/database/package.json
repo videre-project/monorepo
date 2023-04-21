@@ -14,10 +14,15 @@
     "prisma": "3.6.0"
   },
   "dependencies": {
+    "@prisma/client": "3.6.0",
     "@videre/cli": "^1.0.0",
     "dotenv": "^9.0.2",
-    "postgres": "^1.0.2",
-    "@prisma/client": "3.6.0"
+    "postgres": "^1.0.2"
+  },
+  "repository": {
+    "type": "git",
+    "url": "ssh://git@github.com/videre-project/videre-project.git",
+    "directory": "packages/database"
   },
   "prisma": {
     "schema": "bin/prisma/schema.prisma"

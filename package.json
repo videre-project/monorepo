@@ -2,7 +2,6 @@
   "name": "videre-project",
   "version": "1.0.0",
   "homepage": "https://github.com/videre-project/",
-  "repository": "https://github.com/Qonfused/videre-project.git",
   "author": "Cory Bennett <32466081+Qonfused@users.noreply.github.com>",
   "license": "MIT",
   "main": "index.js",
@@ -37,6 +36,11 @@
     "packages/*",
     "services/*"
   ],
+  "repository": {
+    "type": "git",
+    "url": "ssh://git@github.com/videre-project/videre-project.git",
+    "directory": "."
+  },
   "turbo": {
     "baseBranch": "origin/main",
     "pipeline": {
@@ -66,5 +70,6 @@
         "cache": false
       }
     }
-  }
+  },
+  "packageManager": "yarn@3.5.0"
 }

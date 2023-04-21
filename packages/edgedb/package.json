@@ -10,5 +10,10 @@
   "dependencies": {
     "dotenv": "^16.0.0",
     "edgedb": "^0.19.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "ssh://git@github.com/videre-project/videre-project.git",
+    "directory": "packages/edgedb"
   }
 }
