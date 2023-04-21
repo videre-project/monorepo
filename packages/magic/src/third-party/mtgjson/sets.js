@@ -13,7 +13,7 @@ export const getSetData = async ({ set_catalog, card_catalog, filter = false }) 
   }
   const data = [...new Set(set_catalog.data)]
     .map(obj => ({
-      object: 'set',
+      // object: 'set',
       id: obj.code,
       name: obj.name,
       date: obj.releaseDate,

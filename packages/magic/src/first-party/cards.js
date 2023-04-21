@@ -24,7 +24,7 @@ export const formatCardObjects = (self, setData) => {
   return self
     .map(card => pruneObjectKeys({
       // Evergreen Properties
-      object: 'card',
+      // object: 'card',
       uid: card.oracle_id,
       name: card.name,
       colors: card?.colors
@@ -55,40 +55,42 @@ export const formatCardObjects = (self, setData) => {
       supertypes: card?.supertypes,
       types: card?.types,
       subtypes: card?.subtypes,
-      oracle_text: card?.oracle_text
-        || (card.card_faces ? card.card_faces.map(face => face.oracle_text) : null),
+      oracle_text: [
+        card?.oracle_text,
+        ...(card?.card_faces?.map(face => face.oracle_text) || [])
+      ],
       layout: card.layout,
       keywords: card?.keywords,
       // May update per new set release
-      image: {
-        printing: (card?.set || 'N/A').toUpperCase(),
-        url: card?.image_uris?.png
-        || card.card_faces
-          .map(face => face.image_uris.png)
-          .filter((item, pos, self) => self.indexOf(item) == pos),
-        language: (card?.lang || 'N/A').toUpperCase(),
-        high_res: card?.highres_image || false
-      },
-      printings: Object.fromEntries(
-        [...new Set(
-          [...new Set(card?.printings)]
-            .map(_id =>
-              setData
-                .filter(obj => obj.id == _id)
-                ?.[0]?.type
-            ).sort()
-        )].filter(type =>
-          !ignoredSetTypes.includes(type)
-        ).map(type => [type,
-          [...new Set(card?.printings)]
-            .map(_id =>
-              setData
-                .filter(obj => obj.id == _id && obj.type == type)
-                .sort((a, b) => (new Date(a.date) < new Date(b.date) ? 1 : -1))
-                ?.[0]?.id
-            ).filter(Boolean)
-        ])
-      ),
+      scryfall_id: card.id,
+      printings: Object.fromEntries([
+          ['Latest', (card?.set || 'N/A').toUpperCase()],
+          ...[...new Set(
+            // Create unique set of printings (set codes).
+            [...new Set(card?.printings)]
+              .map(_id =>
+                // Map all unique matching set types.
+                setData
+                  .filter(obj => obj.id == _id)
+                  ?.[0]
+                  ?.type
+              ).sort()
+            // Ignore all specialty/extra set types.
+          )].filter(type =>
+            !ignoredSetTypes.includes(type)
+            // Map each unique key-value pair for `type: [sets]`.
+          ).map(type => [type,
+            [...new Set(card?.printings)]
+              .map(_id =>
+                setData
+                  .filter(obj => obj.id == _id && obj.type == type)
+                  // Sort sets by release date in descending order.
+                  .sort((a, b) => (new Date(a.date) < new Date(b.date) ? 1 : -1))
+                  ?.[0]
+                  ?.id
+              ).filter(Boolean)
+          ])
+      ]),
       // May update per B&R announcement (~16:00 UTC)
       legalities: Object.fromEntries(
         FORMATS.map(format => [format, card.legalities[format] || 'not_legal'])
