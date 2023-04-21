@@ -13,9 +13,6 @@
   "scripts": {
     "dev": "turbo run dev --parallel --no-cache",
     "test": "turbo run test",
-    "api": "npm --prefix services/videre-api start",
-    "bot": "npm --prefix services/videre-bot start",
-    "scraper": "npm --prefix services/mtgo-scraper start",
     "build": "turbo run build",
     "database": "npm --prefix packages/database start",
     "prettier": "prettier --write \"./**/*.{ts,js,json,md}\""
@@ -33,8 +30,7 @@
     "turbo": "latest"
   },
   "workspaces": [
-    "packages/*",
-    "services/*"
+    "packages/*"
   ],
   "repository": {
     "type": "git",
