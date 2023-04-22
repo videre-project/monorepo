@@ -15,11 +15,11 @@ export const paramAliases = {
   uids: ['id', 'uid', 'uids', 'event', 'event_id', 'eventID']
 }
 
-export const parseEventParams = (query, uids) => {
+export const parseEventParams = (query, _uids) => {
   // Enumerate and parse arguments from query.
   const format = parseFormats(query);
   const type = parseEventTypes(query);
-  const uids = parseUIDS(query, uids);
+  const uids = parseUIDS(query, _uids);
 
   // Remove duplicates from query parameters.
   const params = removeDuplicates(query);

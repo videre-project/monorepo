@@ -8,7 +8,7 @@ export const toPascalCase = text => text.charAt(0).toUpperCase() + text.slice(1)
 /**
  * Queries database, accepts parameters and array of uids to filter events from.
  */
-export const eventsQuery = async (query, uids) => {
+export const eventsQuery = async (query, _uids) => {
   const {
     format,
     type,
@@ -18,7 +18,7 @@ export const eventsQuery = async (query, uids) => {
     min_date,
     max_date,
     _min_date, _max_date // original (unparsed) args
-  } = parseEventParams(query, uids);
+  } = parseEventParams(query, _uids);
 
   const eventData = await sql.unsafe(`
     SELECT * FROM events
