@@ -31,35 +31,5 @@
   "engines": {
     "node": ">=14.15.0"
   },
-  "turbo": {
-    "baseBranch": "origin/main",
-    "pipeline": {
-      "build": {
-        "outputs": [
-          "dist/**"
-        ],
-        "dependsOn": [
-          "^build"
-        ]
-      },
-      "test": {
-        "outputs": [],
-        "dependsOn": [
-          "build"
-        ]
-      },
-      "test:ci": {
-        "outputs": [
-          "coverage/**"
-        ],
-        "dependsOn": [
-          "build"
-        ]
-      },
-      "dev": {
-        "cache": false
-      }
-    }
-  },
   "packageManager": "yarn@3.5.0"
 }
