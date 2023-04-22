@@ -1,7 +1,7 @@
 export * as CONSTANTS from './constants';
 export * from './formatting';
 
-export * from './prisma';
+// export * from './prisma';
 export * from './postgres';
 export * from './utils';
 
