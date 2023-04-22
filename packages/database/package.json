@@ -8,7 +8,8 @@
     "prisma-pull": "yarn prisma db pull",
     "prisma-generate": "PRISMA_CLIENT_ENGINE_TYPE='dataproxy' yarn prisma generate",
     "build": "rimraf build && swc src -d build",
-    "build-watch": "swc src -d build -w"
+    "build-watch": "swc src -d build -w",
+    "prepack": "run workspace:build \"$(pwd)\""
   },
   "devDependencies": {
     "prisma": "3.6.0"

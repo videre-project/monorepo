@@ -1,6 +1,5 @@
 {
   "name": "@videre/monorepo",
-  "private": true,
   "workspaces": [
     "packages/*"
   ],
@@ -9,7 +8,8 @@
     "test": "turbo run test",
     "build": "turbo run build",
     "database": "npm --prefix packages/database start",
-    "prettier": "prettier --write \"./**/*.{ts,js,json,md}\""
+    "prettier": "prettier --write \"./**/*.{ts,js,json,md}\"",
+    "workspace:build": "(cd \"$0\" && rimraf build && swc src -d build --config-file ../../.swcrc)"
   },
   "devDependencies": {
     "@swc/cli": "^0.1.52",

@@ -5,7 +5,8 @@
   "module": "src",
   "scripts": {
     "build": "rimraf build && swc src -d build",
-    "build-watch": "swc src -d build -w"
+    "build-watch": "swc src -d build -w",
+    "prepack": "run workspace:build \"$(pwd)\""
   },
   "dependencies": {
     "dotenv": "^16.0.0",
