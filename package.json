@@ -9,7 +9,9 @@
     "build": "turbo run build",
     "database": "npm --prefix packages/database start",
     "prettier": "prettier --write \"./**/*.{ts,js,json,md}\"",
-    "workspace:build": "(cd \"$0\" && rimraf build && swc src -d build --config-file ../../.swcrc)"
+    "workspace:swc-build": "(cd \"$0\" && rimraf build && swc src -d build --config-file ../../.swcrc)",
+    "workspace:gh-resolve": "bash ./scripts/yarn-gh-resolve.sh \"$0\"",
+    "workspace:build": "run workspace:swc-build \"$0\" && run workspace:gh-resolve \"$0\""
   },
   "devDependencies": {
     "@swc/cli": "^0.1.52",
