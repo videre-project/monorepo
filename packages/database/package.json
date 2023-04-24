@@ -7,9 +7,9 @@
     "start": "docker-compose -f ./bin/docker/docker-compose.yml up -d",
     "prisma-pull": "yarn prisma db pull",
     "prisma-generate": "PRISMA_CLIENT_ENGINE_TYPE='dataproxy' yarn prisma generate",
-    "build": "rimraf build && swc src -d build",
-    "build-watch": "swc src -d build -w",
-    "prepack": "run workspace:build \"$(pwd)\""
+    "build": "run workspace:build \"$(pwd)",
+    "build-watch": "run workspace:build-watch \"$(pwd)",
+    "prepack": "run workspace:prepack \"$(pwd)\""
   },
   "devDependencies": {
     "prisma": "3.6.0"
