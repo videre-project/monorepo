@@ -15,9 +15,11 @@ if [[ $PACKAGE_JSON =~ .*'"name": "@videre/'.* ]]; then
       WORKSPACE="$(sed -e 's/.*"\(.*\)":.*/\1/' <<< "$ln")"
       GIT_PROTOCOL="videre-project/videre-project#workspace=$WORKSPACE"
       REPLACE="$(sed -e "s/\(.*\)\"workspace:.*\"\(.*\)/\1\"${GIT_PROTOCOL//\//\\/}\"\2/" <<< "$ln")"
-      MODIFIED_JSON="$(sed "s|^.*$ln.*$|$REPLACE|" <<< "$PACKAGE_JSON")"
+      PACKAGE_JSON="$(sed "s|^.*$ln.*$|$REPLACE|" <<< "$PACKAGE_JSON")"
     else continue; fi
   done <<< "$PACKAGE_JSON"
 fi
 
-if [[ -n $MODIFIED_JSON ]]; then echo "$MODIFIED_JSON" > "$1/package.json"; fi
+if [[ -n $PACKAGE_JSON && "$PACKAGE_JSON" != "$(cat "$1/package.json")" ]]; then
+  echo "$PACKAGE_JSON" > "$1/package.json"
+fi
