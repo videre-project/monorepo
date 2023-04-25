@@ -11,8 +11,8 @@
     "prepack": "run workspace:prepack \"$(pwd)\""
   },
   "dependencies": {
-    "@videre/database": "workspace:packages/database",
-    "@videre/magic": "workspace:packages/magic"
+    "@videre/database": "workspace:^",
+    "@videre/magic": "workspace:^"
   },
   "devDependencies": {
     "jest": "^27.4.5"
