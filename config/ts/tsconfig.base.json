@@ -14,6 +14,6 @@
   },
   "references": [
     { "path": "./packages/@videre-js" },
-    { "path": "./packages/@videre-nodejs" },
+    { "path": "./packages/@videre-nodejs" }
   ]
 }
