@@ -1,4 +1,13 @@
+#!/usr/bin/env python
+
+## @file
+# Copyright (c) 2023, The Videre Project Authors. All rights reserved.
+# SPDX-License-Identifier: Apache-2.0
+##
+
 import platform, subprocess, sys
+
+
 python_path = subprocess.check_output("which python", shell=True).strip()
 python_path = python_path.decode('utf-8')
 

@@ -1,13 +1,21 @@
+#!/usr/bin/env node
+
+/* @file
+ * Copyright (c) 2023, The Videre Project Authors. All rights reserved.
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+
 // Check for ES6 Support
 var supportsES6 = function() {
-    try {
-      new Function("(a = 0) => a");
-      return 'True';
-    }
-    catch (err) {
-      return 'False';
-    }
-  }();
+  try {
+    new Function("(a = 0) => a");
+    return 'True';
+  }
+  catch (err) {
+    return 'False';
+  }
+}();
 
 const release_artifacts = process.argv[3].split(', ')
 

@@ -1,5 +1,9 @@
-#!/usr/bin/env bash
-# coding: utf-8
+#!/usr/bin/env python
+
+## @file
+# Copyright (c) 2023, The Videre Project Authors. All rights reserved.
+# SPDX-License-Identifier: Apache-2.0
+##
 
 import platform, sys
 import re

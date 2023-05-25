@@ -1,9 +1,15 @@
 #!/usr/bin/env bash
 
-# Shell script to collect various device and dev info (dumped to ./scripts/logs by default).
+## @file
+# Bash script to collect device and environment info (dumped to ./scripts/logs).
+#
+# Copyright (c) 2023, The Videre Project Authors. All rights reserved.
+# SPDX-License-Identifier: Apache-2.0
+##
 
-# This script must be in the tools directory when it runs because it uses the
-# script source file path to determine directories to work in.
+# Change CWD for imports
+__PWD__=$(pwd); cd "$( dirname "${BASH_SOURCE[0]}" )"
+
 
 set -u # Check for undefined variables
 DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" &> /dev/null && (pwd -W 2> /dev/null || pwd))
@@ -74,11 +80,11 @@ time {
     if [ "${VERBOSE}" -gt 0 ]; then echo -e "=== Python ===\nFound python3 binary at '${python_bin_path}'."; fi
 
     # Check OS info w/ Python
-    ${python_bin_path} "${DIR}/internal/check-os.py" 2>&1 >> "${OUTPUT_FILE}"
+    ${python_bin_path} "${DIR}/lib/check-os.py" 2>&1 >> "${OUTPUT_FILE}"
     if [ "${VERBOSE}" -gt 0 ]; then echo "--> OS info saved to '${OUTPUT_FILE}'."; fi
 
     # Check Python version and build info
-    ${python_bin_path} "${DIR}/internal/check-python.py" 2>&1 >> "${OUTPUT_FILE}"
+    ${python_bin_path} "${DIR}/lib/check-python.py" 2>&1 >> "${OUTPUT_FILE}"
     if [ "${VERBOSE}" -gt 0 ]; then echo "--> Python version and build info saved to '${OUTPUT_FILE}'."; fi
 
     # Cleanup: Remove all *.pyc/*.pyo and __pycache__ directories recursively.
@@ -119,7 +125,7 @@ time {
     if [ "${VERBOSE}" -gt 0 ]; then echo -e "\nFound V8 Engine.\n└── Version: ${v8_ver}."; fi
 
     # Check NodeJS version and build info
-    node "${DIR}/internal/check-node.js" "${v8_ver}" "${release_meta}" "${commit_sha:0:8}" 2>&1 >> "${OUTPUT_FILE}"
+    node "${DIR}/lib/check-node.cjs" "${v8_ver}" "${release_meta}" "${commit_sha:0:8}" 2>&1 >> "${OUTPUT_FILE}"
     if [ "${VERBOSE}" -gt 0 ]; then echo -e "\n--> NodeJS version and build info saved to '${OUTPUT_FILE}'.\n"; fi
 
     # # Check for environment features, etc.

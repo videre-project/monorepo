@@ -3,9 +3,10 @@
 ## @file
 # Replaces workspace links w/ git protocol references.
 #
-# Copyright (c) 2023, Cory Bennett. All rights reserved.
+# Copyright (c) 2023, The Videre Project Authors. All rights reserved.
 # SPDX-License-Identifier: BSD-3-Clause
 ##
+
 
 PACKAGE_JSON="$(cat "$1/package.json")"
 
