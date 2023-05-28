@@ -17,6 +17,25 @@ export interface Filters {
 };
 
 /**
+ * Returns a string of file extensions patterns.
+ * @param args An array of `Pattern` or `Pattern[]` file extensions.
+ * @returns A concatenated string of file extension patterns.
+ */
+export function mergeFileExtensions(...args: Array<Pattern | Pattern[]>) {
+  return Array.from(new Set(args.flat()
+      .reduce((acc: Set<string>, s: Pattern) => {
+        const pattern = (typeof s === 'string' && s
+            // Allow for consuming regular expressions.
+            || s?.toString().replace(/\/\\|\$\//g,''))
+          // Remove extension delimiter
+          .replace(/^./, '');
+        return acc.has(pattern) ? acc : acc.add(pattern);
+      }, new Set())))
+    .sort((a: string, b: string) => a.length - b.length)
+    .reduce((acc: string, s: string) => acc.length ? `${acc}|${s}` : s, '')
+};
+
+/**
  * Evaluates a string against include and exclude regex filters.
  * @param text Text to evaluate against the filter.
  * @param filters Include and exclude filters to apply.
@@ -53,8 +72,7 @@ export function evaluateFilters(text: string, filters: Filters) {
  */
 export async function evaluateFn(fn: Function, ...args: any) {
   const output = fn(...args);
-  // return (output instanceof Promise) ? await output : output;
-  return output;
+  return (output instanceof Promise) ? await output : output;
 };
 
 
