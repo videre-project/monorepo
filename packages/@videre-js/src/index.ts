@@ -3,5 +3,4 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-export * from './formatting';
-export * from './sorting';
+export * from './methods';

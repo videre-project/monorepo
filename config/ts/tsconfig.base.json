@@ -2,6 +2,7 @@
   "compilerOptions": {
     "target": "es5",
     "module": "commonjs",
+    "allowJs": true,
     "declaration": true,
     "declarationMap": true,
     "incremental": true,
@@ -13,7 +14,7 @@
     }
   },
   "references": [
-    { "path": "./packages/@videre-js" },
-    { "path": "./packages/@videre-nodejs" }
+    { "path": "../../packages/@videre-js" },
+    { "path": "../../packages/@videre-nodejs" }
   ]
 }

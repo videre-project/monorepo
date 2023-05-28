@@ -70,16 +70,23 @@ export function removeDuplicateKeys(object: object,
  * @param sources Objects() to merge properties from.
  * @returns Mutated target object.
  */
-export function deepAssign(target: object, ...sources: object[]) {
+export function deepAssign(target: any, ...sources: any[]) {
   for (const source of sources) {
     for (let k in source) {
-      const key = k as keyof typeof source;
-      let vs = source[key], vt = target[key];
-      if (Object(vs) == vs && Object(vt) === vt) {
-        target[key] = deepAssign(vt, vs) as keyof typeof target;
-        continue;
+      let vs = source[k], vt = target[k];
+      // If at least the target is an array.
+      if (Array.isArray(vt)) {
+        target[k] = vt.concat(vs) as typeof target[typeof k];
+      // If only the source is an array.
+      } else if (Array.isArray(vs)) {
+        target[k] = vs.concat(vt) as typeof target[typeof k];
+      // If both the target and source are objects.
+      } else if (Object(vs) == vs && Object(vt) === vt) {
+        target[k] = deepAssign(vt, vs);
+      // Overwrite the target.
+      } else {
+        target[k] = source[k];
       }
-      target[key] = source[key];
     }
   }
   return target;

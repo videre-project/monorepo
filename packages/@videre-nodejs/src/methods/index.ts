@@ -5,6 +5,5 @@
 
 export * from './binary-extract';
 export * from './cli';
-export * from './lz4';
-
-export * from './async';
+export * from './compression'
+export * from './filesystem';

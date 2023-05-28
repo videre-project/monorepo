@@ -1,0 +1,18 @@
+{
+  "name": "config-jest",
+  "version": "1.0.0",
+  "scripts": {
+    "start": "(cd \"$0\" && yarn run -T jest --config jest.config.cjs)",
+    "watch": "(cd \"$0\" && yarn run -T jest --config jest.config.cjs --watch)",
+    "clean": "(cd \"$0\" && yarn run -T jest --clearCache)"
+  },
+  "dependencies": {
+    "@videre/js": "workspace:^",
+    "@videre/nodejs": "workspace:^"
+  },
+  "repository": {
+    "type": "git",
+    "url": "ssh://git@github.com/videre-project/videre-project.git",
+    "directory": "config/jest"
+  }
+}

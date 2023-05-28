@@ -31,7 +31,7 @@ export function readLz4Json(filepath: string, serialize=true): JSON {
  * @param filepath 
  * @returns 
  */
-export function writeLz4Json(data: JSON, filepath: string) {
+export function writeLz4Json(data: object | JSON, filepath: string) {
   // Write data with lz4 compression
   const stringified = JSON.stringify(data);
   writeLz4Sync(filepath, Buffer.from(stringified));
@@ -40,6 +40,8 @@ export function writeLz4Json(data: JSON, filepath: string) {
   const compressed_size = statSync(filepath).size;
   const uncompressed_size = Buffer.byteLength(stringified);
   const compression_ratio = uncompressed_size / compressed_size;
+  
+  // const max_time = uncompressed_size * (500 * 2**20); // < 500 MB/s
   const decompression_time = decompress_benchmark(filepath);
 
   return {

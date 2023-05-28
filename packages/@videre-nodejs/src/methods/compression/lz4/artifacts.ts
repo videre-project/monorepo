@@ -14,7 +14,7 @@ import { writeLz4Json } from './json';
 /**
  * Read catalog file for a given datastore collection type.
  */
-export function readCatalog(filepath: string): JSON {
+export function readCatalog(filepath: string): object | JSON {
   const raw = readFileSync(filepath);
   // @ts-ignore - JSON.parse() supports parsing `Buffer` types.
   try { return JSON.parse(raw); } catch (e) { return {}; }
@@ -23,10 +23,10 @@ export function readCatalog(filepath: string): JSON {
 /**
  * Write a collection datastore to disk using lz4 compression.
  */
-export function writeCollection(data: JSON, filepath: string,
-                                metadata={ timestamp: new Date }) {
+export function writeCollection(data: object | JSON, filepath: string,
+                                metadata={ timestamp: new Date() }) {
   // Write data with lz4 compression, returning compression details
-  const lz4 = writeLz4Json(data, filepath);
+  const lz4 = writeLz4Json(data, filepath + '.collection.lz4');
 
   // Get hash sum of buffered json
   const hashSum = createHash('sha256');
@@ -40,7 +40,7 @@ export function writeCollection(data: JSON, filepath: string,
     compression: { ...lz4, sha256: hashSum.digest('hex') },
     details
   };
-  writeFileSync(filepath, JSON.stringify(catalog));
+  writeFileSync(filepath + '.catalog.json', JSON.stringify(catalog));
 
   return catalog;
 };

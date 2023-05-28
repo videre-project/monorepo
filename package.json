@@ -1,29 +1,20 @@
 {
   "name": "@videre/monorepo",
   "workspaces": [
+    "config/*",
     "packages/*"
   ],
   "scripts": {
-    "dev": "turbo run dev --parallel --no-cache",
-    "test": "turbo run test",
-    "build": "turbo run build",
-    "database": "npm --prefix packages/database start",
-    "prettier": "prettier --write \"./**/*.{ts,js,json,md}\"",
-    "workspace:js:build": "(cd \"$0\" && rimraf build && swc src -d build --config-file ../../config/js/.swcrc)",
-    "workspace:js:build-watch": "(cd \"$0\" && rimraf build && swc src -d build -w ---config-file ../../config/js/.swcrc)",
-    "workspace:js:prepack": "run workspace:js:build \"$0\" && bash ./scripts/yarn-gh-resolve.sh \"$0\""
+    "g:workspace": "bash .yarn/scripts/yarn-g-runner.sh \"${@}\"",
+    "g:config": "bash .yarn/scripts/yarn-g-runner.sh \"config-${@}\"",
+    "yarn:gh-resolve": "bash .yarn/scripts/yarn-gh-resolve.sh \"$0\""
   },
   "devDependencies": {
-    "@swc/cli": "^0.1.52",
-    "@swc/core": "^1.2.117",
-    "@swc/jest": "^0.2.15",
-    "chokidar": "^3.5.2",
-    "eslint": "^8.8.0",
-    "eslint-config-google": "^0.14.0",
-    "eslint-plugin-import": "^2.25.4",
-    "lerna": "^4.0.0",
-    "prettier": "2.3.2",
-    "turbo": "latest"
+    "@types/jest": "^29.5.1",
+    "@types/node": "^20.2.3",
+    "jest": "^29.5.0",
+    "ts-jest": "^29.1.0",
+    "typescript": "^5.0.4"
   },
   "repository": {
     "type": "git",

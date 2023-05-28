@@ -12,13 +12,13 @@ import { isMatch, findEnd } from './utils';
 describe('isMatch', () => {
   const buffer = Buffer.from('"keyA": 1, "keyB": "2", "keyC');
   it('correctly matches an object key', () => {
-    const output1 = isMatch(buffer, 1, [...'keyA'].map(char));
+    const output1 = isMatch(buffer, 1, 'keyA'.split('').map(char));
     expect(output1).toBe(true);
-    const output2 = isMatch(buffer, 12, [...'keyB'].map(char));
+    const output2 = isMatch(buffer, 12, 'keyB'.split('').map(char));
     expect(output2).toBe(true);
   });
   it('does not match an incomplete object key', () => {
-    const output = isMatch(buffer, 1, [...'keyC'].map(char));
+    const output = isMatch(buffer, 1, 'keyC'.split('').map(char));
     expect(output).toBe(false);
   });
 });

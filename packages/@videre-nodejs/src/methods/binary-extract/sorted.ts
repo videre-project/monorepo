@@ -23,7 +23,7 @@ export default function extract_key(buf: Buffer, keys: string[] | string,
   if (Array.isArray(keys)) { keys = keys.sort() } else keys = [keys];
 
   // Converts keys to an array of char codes.
-  const chars = keys.map(key => [...key].map(char));
+  const chars = keys.map(key => key.split('').map(char)); // es2021 - [...key]
 
   // This is intended to be used as part of flatstorage optimizations on
   // immutable filesystems, and is included in this method for convenience.

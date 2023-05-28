@@ -1,8 +1,9 @@
 {
   "extends": "../../config/ts/tsconfig.base.json",
   "compilerOptions": {
-    "outDir": "./build",
-    "downlevelIteration": true
+    "rootDir": "src",
+    "outDir": "build",
+    "tsBuildInfoFile": "build/tsconfig.tsbuildinfo"
   },
   "include": ["src"],
   "exclude": ["node_modules", "**/*.test.ts"]
