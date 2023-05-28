@@ -1632,9 +1632,9 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"config-ts@workspace:config/ts":
+"config-tsc@workspace:config/tsc":
   version: 0.0.0-use.local
-  resolution: "config-ts@workspace:config/ts"
+  resolution: "config-tsc@workspace:config/tsc"
   languageName: unknown
   linkType: soft
 

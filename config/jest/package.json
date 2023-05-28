@@ -2,9 +2,10 @@
   "name": "config-jest",
   "version": "1.0.0",
   "scripts": {
-    "start": "(cd \"$0\" && yarn run -T jest --config jest.config.cjs)",
-    "watch": "(cd \"$0\" && yarn run -T jest --config jest.config.cjs --watch)",
-    "clean": "(cd \"$0\" && yarn run -T jest --clearCache)"
+    "jest": "(cd \"$0\" && yarn run -T jest --config jest.config.cjs $1)",
+    "start": "run jest \"$0\" \"$1\"",
+    "watch": "run jest \"$0\" \"--watch $1\"",
+    "clean": "run jest \"$0\" \"--clearCache $1\""
   },
   "dependencies": {
     "@videre/js": "workspace:^",

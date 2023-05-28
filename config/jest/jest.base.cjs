@@ -27,7 +27,7 @@ function baseConfig({ plugins, config, ...options }) {
     }
   }
 
-  const tsconfig = require(path.join(__dirname, '../ts/tsconfig.cjs'))()
+  const tsconfig = require(path.join(__dirname, '../tsc/tsconfig.cjs'))()
   // Add `moduleNameMapper` properties from tsconfig `paths`.
   if (plugins?.ts_jest && tsconfig?.compilerOptions?.paths) {
     config['moduleNameMapper'] = plugins.ts_jest.pathsToModuleNameMapper(
