@@ -11,8 +11,7 @@ getKey() { ltrunc="${2#*\"$1\":\"}"; value="${ltrunc%%\"*}"; echo "$value"; }
 
 
 while read -r workspace; do
-  if [[ "$1" == "$(getKey name     \"$workspace\")" ]]; then exit 0; fi
-  # if [[ "$1" == "$(getKey location \"$workspace\")" ]]; then exit 0; fi
+  location="$(getKey location \"$workspace\")"
+  name="$(getKey name \"$workspace\")"
+  if [[ "$1" == "$name" ]]; then echo "$location"; fi
 done <<< "$(yarn workspaces list --no-private --json)"
-
-echo "Workspace \"$1\" was not found."; exit 1;
