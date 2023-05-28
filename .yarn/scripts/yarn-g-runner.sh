@@ -34,28 +34,39 @@ if [[ -z "$PROJECT_DIR" ]]; then yarn "$@" || exit 1; else
     const chalk = require('chalk')
 
     function quote(str) {
-      return chalk.green(\`\\\"\${str}\\\"\`)
+      return chalk.green(str)
         // Unfocus escaped quotes
-        .replaceAll('\\\\\"', chalk.dim('\\\"'))
+        .replaceAll('\\\\\"', chalk.bold.dim(\`\'\`))
     }
-    function emph(str) { return chalk.hex('#f86d67').bold(str) }
+    function string(str) {
+      return quote(\`\\\"\${str}\\\"\`)
+      }
+    function emph(str) {
+      return chalk.hex('#f86d67').bold(str)
+    }
 
-    const pkg = require(path.join('$__PWD__',
-      '$(bash ./lib/check-workspace.sh "$WORKSPACE")', 'package.json'))
-    const SCRIPT = JSON.stringify(pkg.scripts['$SCRIPT_NAME']).slice(1, -1)
-      // Format script arguments
-      .replaceAll('\$0', emph('\$0'))
-      .replaceAll('\$1', emph('\$1'))
+    const pkg = require(path.join('$__PWD__', '$PROJECT_DIR', 'package.json'))
+    function formatScript(name) {
+      return JSON.stringify(pkg.scripts[name]).slice(1, -1)
+        // Format script arguments
+        .replaceAll('\$0', emph('\$0'))
+        .replaceAll('\$1', emph('\$1'))
+    }
 
     const WORKSPACE = chalk.bold.cyan('[$WORKSPACE]')
     const SCRIPT_NAME = chalk.bold(quote('$SCRIPT_NAME'))
+    const SCRIPT = formatScript('$SCRIPT_NAME')
+      // Format references to other workspace scripts
+      .replace(new RegExp(\`^run (\${Object.keys(pkg.scripts).join('|')}) \`),
+        (s) => quote(formatScript(s.slice(4,-1))) + string('\n                '
+                  + chalk.grey.bold(' <<< ')))
 
     console.log(chalk.grey('\n' + chalk.bold.cyan('[$WORKSPACE]'),
-      'Executing',chalk.bold(quote('$SCRIPT_NAME')),'script with',emph('args:')))
+      'Executing',chalk.bold(string('$SCRIPT_NAME')),'script with',emph('args:')))
     printMessage([
-      \`\${chalk.bold('--- Script ---')} \${quote(SCRIPT)}\`,
-      \`\${emph(' Default (\$0):')} \${quote('$DEFAULT_ARGS')}\`,
-      \`\${emph('    Args (\$1):')} \${quote('$SCRIPT_ARGS')}\`,
+      ...(chalk.bold('--- Script --- ') + string(SCRIPT)).split('\n'),
+      \`\${emph(' Default (\$0):')} \${string('$DEFAULT_ARGS')}\`,
+      \`\${emph('    Args (\$1):')} \${string('$SCRIPT_ARGS')}\`,
     ], { color: 'grey', borderColor: 'grey', marginBottom: 1 })"
 
   # Executes workspace command with the following arguments:
