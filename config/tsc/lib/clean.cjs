@@ -9,9 +9,9 @@ const path = require('path')
 const fs = require('fs')
 
 
-const cwd = process.argv[2];
+const cwd = process.argv[2]
 const tsconfig = require(path.join(__dirname, '../tsconfig.cjs'))(
   path.join(cwd, 'tsconfig.json'))
 
-const outDir = tsconfig?.outDir || path.join(cwd, 'build');
+const outDir = tsconfig?.outDir || path.join(cwd, 'build')
 if (fs.existsSync(outDir)) fs.rmSync(outDir, { recursive: true })

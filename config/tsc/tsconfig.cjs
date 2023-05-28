@@ -12,7 +12,8 @@ const { deepAssign }  = require('@videre/js')
 
 
 function tsconfig(filepath=path.join(process.cwd(), 'tsconfig.json')) {
-  if (!fs.existsSync(filepath)) throw new Error(`tsconfig.json not found at ${filepath}`)
+  if (!fs.existsSync(filepath))
+    throw new Error(`\`tsconfig.json\` not found at ${filepath}`)
 
   let config = require(filepath)
   // Merge properties from specified `extends` tsconfig.
@@ -21,7 +22,7 @@ function tsconfig(filepath=path.join(process.cwd(), 'tsconfig.json')) {
     config = deepAssign(config, require(extendedConfig))
   }
 
-  return config;
+  return config
 }
 
 
