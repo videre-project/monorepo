@@ -3,4 +3,6 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-export * from './methods';
+export * from './async';
+export * from './formatting';
+export * from './sorting';
