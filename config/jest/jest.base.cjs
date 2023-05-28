@@ -10,7 +10,7 @@ const path = require('path')
 const { deepAssign }  = require('@videre/js')
 
 
-function baseConfig({ plugins, config, ...options }) {
+function baseConfig({ config, plugins, ...options }) {
   config = deepAssign({
     testEnvironment: 'node',
     modulePathIgnorePatterns: [
@@ -19,21 +19,26 @@ function baseConfig({ plugins, config, ...options }) {
     modulePaths: ['<rootDir>']
   }, config)
 
-  // Add custom jest hooks for custom setup + teardown scripts.
-  if (options?.hooks) {
-    for (let hook in options?.hooks) {
-      if (options.hooks.hasOwnProperty(hook))
-        config[hook] = path.join(__dirname, 'jest.hooks.ts')
+  // Typescript options require the `ts-jest` plugin.
+  if (plugins?.ts_jest) {
+    const tsconfig = require(path.join(__dirname, '../tsc/tsconfig.cjs'))()
+    // Add `moduleNameMapper` properties from tsconfig `paths`.
+    if (tsconfig?.compilerOptions?.paths) {
+      config['moduleNameMapper'] = plugins.ts_jest.pathsToModuleNameMapper(
+        tsconfig.compilerOptions.paths,
+        { prefix: '<rootDir>' }
+      )
     }
-  }
-
-  const tsconfig = require(path.join(__dirname, '../tsc/tsconfig.cjs'))()
-  // Add `moduleNameMapper` properties from tsconfig `paths`.
-  if (plugins?.ts_jest && tsconfig?.compilerOptions?.paths) {
-    config['moduleNameMapper'] = plugins.ts_jest.pathsToModuleNameMapper(
-      tsconfig.compilerOptions.paths,
-      { prefix: '<rootDir>' }
-    )
+    // Add controller script for `globalSetup` + `globalTeardown` hooks.
+    if (options?.hooks
+        && ('globalConfig' in options.hooks
+         || 'globalTeardown' in options.hooks)) { 
+      for (let hook in options?.hooks) {
+        // Only add controller if hook does not already exist.
+        if (!config.hasOwnProperty(hook))
+          config[hook] = path.join(__dirname, 'jest.hooks.ts')
+      }
+    }
   }
 
   return new Proxy(config, {
