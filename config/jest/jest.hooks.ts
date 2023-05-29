@@ -21,7 +21,9 @@ export interface Hooks { globalSetup?: Filters, globalTeardown?: Filters };
 export default async (globalConfig: Config.GlobalConfig, projectConfig: Config.ProjectConfig) => {
   const rootDir = globalConfig.rootDir;
   
-  const jestConfig = await import(join(rootDir, 'jest.config.cjs'))
+  // Use `require` to load the Jest config with the Proxy traps.
+  const jestConfig = require(join(rootDir, 'jest.config.cjs'));
+
   const hooks: Hooks = jestConfig.options.hooks;
   const ts_jest = jestConfig.plugins.ts_jest;
 
