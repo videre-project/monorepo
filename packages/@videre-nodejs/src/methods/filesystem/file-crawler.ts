@@ -9,6 +9,9 @@ import { join } from 'path';
 import { readdirSync, lstatSync } from 'fs';
 
 
+import { evaluateFn } from '@videre/js';
+
+
 type Pattern = string | RegExp;
 
 export interface Filters {
@@ -25,7 +28,7 @@ export function mergeFileExtensions(...args: Array<Pattern | Pattern[]>) {
   return Array.from(new Set(args.flat()
       .reduce((acc: Set<string>, s: Pattern) => {
         const pattern = (typeof s === 'string' && s
-            // Allow for consuming regular expressions.
+            // Allow for consuming regular expressions
             || s?.toString().replace(/\/\\|\$\//g,''))
           // Remove extension delimiter
           .replace(/^./, '');
@@ -65,18 +68,6 @@ export function evaluateFilters(text: string, filters: Filters) {
 };
 
 /**
- * Evaluates an syncronous or asyncronous function.
- * @param fn Input function to evaluate.
- * @param args Input arguments to pass to the function.
- * @returns Function output.
- */
-export async function evaluateFn(fn: Function, ...args: any) {
-  const output = fn(...args);
-  return (output instanceof Promise) ? await output : output;
-};
-
-
-/**
  * Recursively traverse across a directory and run a callback on each file.
  * @param rootDir Base directory to start traversing from.
  * @param filter Regex filter to apply to each file syncronously.
@@ -89,8 +80,10 @@ export async function crawler(rootDir: string, filters: Filters, callback: Funct
     const filename = join(rootDir, files[i]);
     try {
       if (lstatSync(filename).isDirectory()) {
+        // Recurse into sub-directory
         await crawler(filename, filters, callback);
       } else if (evaluateFilters(filename, filters)) {
+        // Run callback on filename
         await evaluateFn(callback, filename);
       }
     } catch (e) {}

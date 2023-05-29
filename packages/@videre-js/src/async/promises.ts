@@ -11,8 +11,19 @@
  * @param ms Number of milliseconds to wait. Defaults to 100.
  * @returns A promise that resolves after the specified amount of time.
  */
-export function setDelay(ms: number=100) {
+export async function setDelay(ms: number=100) {
   return new Promise(res => setTimeout(res, ms));
+};
+
+/**
+ * Evaluates either an syncronous or asyncronous function.
+ * @param fn Input function to evaluate.
+ * @param args Input arguments to pass to the function.
+ * @returns Function output.
+ */
+export async function evaluateFn(fn: Function, ...args: any) {
+  const output = fn(...args);
+  return (output instanceof Promise) ? await output : output;
 };
 
 /**
@@ -22,15 +33,15 @@ export function setDelay(ms: number=100) {
  * @param step Delay between each check. Defaults to 100ms.
  * @returns A promise that resolves when the callback returns true or the timeout expires.
  */
-export function waitUntil(callback: Function, timeout=5*1e3, step=100): Promise<void> {
+export async function waitUntil(callback: Function, timeout=5*1e3, step=100): Promise<void> {
   let elapsedTime = 0;
   return new Promise((resolve, reject) => {
-    const interval = setInterval(() => {
+    const interval = setInterval(async () => {
       elapsedTime += step;
       if (elapsedTime >= timeout) {
         clearInterval(interval);
         reject(new Error(`Exceeded ${timeout} ms waiting for ${callback.name}`));
-      } else if (callback()) {
+      } else if (await evaluateFn(callback)) {
         clearInterval(interval);
         resolve();
       }
