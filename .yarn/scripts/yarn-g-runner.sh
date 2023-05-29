@@ -18,24 +18,39 @@ if [[ -z "$PROJECT_DIR" ]]; then yarn "$@" || exit 1; else
   OFFSET=2
   # Parse optional flag arguments
   for i in "$@"; do
-    if [[ ! "${@: $OFFSET:1}" =~ ^--?[a-z|A-Z|0-9|-|_] ]]; then break
     # (-d|--default) Passes default arguments to script
-    elif [[ "${@: $OFFSET:1}" =~ ^-(d|-default)$ ]]; then
+    if [[ "${@: $OFFSET:1}" =~ ^-(d|-default)$ ]]; then
       i=0; for var in "${@: $OFFSET+1:1}"; do
         if [[ "$var" == "--" ]]; then break; else i=$((i+1)); fi
       done
       DEFAULT_ARGS="${@: $OFFSET+1:$i}"; ((OFFSET+=i+2))
     # (-v|--verbose) Enables verbose script tracing
     elif [[ "${@: $OFFSET:1}" =~ ^-(v|-verbose)$ ]]; then
-      VERBOSE_MODE=true; ((OFFSET+=1))
+      VERBOSE_MODE="${@: $OFFSET:1}"; ((OFFSET+=1))
+    else
+      # Required arguments to pass to script
+      SCRIPT_NAME="${@: $(($OFFSET)):1}"
+      SCRIPT_ARGS="${@: $(($OFFSET+1))}"
+      break
     fi
   done
 
-  # Required arguments to pass to script
-  SCRIPT_NAME="${@: $(($OFFSET)):1}"
-  SCRIPT_ARGS="${@: $(($OFFSET+1))}"
-
-  node -e "(/* blocks bash process - grants top-level await */ async () => {
+  # Attempt to correct script args if no script name is provided explicitly
+  DEFAULT="$(node -e "(async () => {
+    const path = require('path')
+    const pkg = require(path.join('$__PWD__', '$PROJECT_DIR', 'package.json'))
+    if (!pkg.scripts[\`$SCRIPT_NAME\`])
+      console.log(\`$WORKSPACE\`
+        // Attempt to find base package name from workspace/namespace
+        .replace(/^(config|@videre|@[a-z|A-Z|0-9|\-|_]+)[\-|\/]/g,''))
+  })();")"
+  if [[ -n $DEFAULT ]]; then
+    SCRIPT_ARGS="$(node -e "console.log(\`$SCRIPT_NAME $SCRIPT_ARGS\`.trim())")"
+    SCRIPT_NAME="$DEFAULT"
+  fi
+  
+  # Log executed workspace script with optional verbose tracing
+  node -e "(async () => {
     const path = require('path')
     const printMessage = require('print-message')
     // Requires ESM or top-level await
