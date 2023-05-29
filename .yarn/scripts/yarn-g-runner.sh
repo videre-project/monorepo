@@ -28,46 +28,49 @@ if [[ -z "$PROJECT_DIR" ]]; then yarn "$@" || exit 1; else
   SCRIPT_ARGS="${@: $(($OFFSET+1))}"
 
   # Prints script arguments to console
-  node -e "
+  node -e "(/* blocks bash process - grants top-level await */ async () => {
     const path = require('path')
     const printMessage = require('print-message')
-    const chalk = require('chalk')
+    // Requires ESM or top-level await
+    const chalk = await import('chalk').then(module => module.default)
 
-    function quote(str) {
-      return chalk.green(str)
-        // Unfocus escaped quotes
-        .replaceAll('\\\\\"', chalk.bold.dim(\`\'\`))
-    }
-    function string(str) {
-      return quote(\`\\\"\${str}\\\"\`)
-      }
-    function emph(str) {
-      return chalk.hex('#f86d67').bold(str)
-    }
+    // chalkjs formatting utilities
+    const unemph = (str) => chalk.grey(str)
+    const emph = (str) => chalk.hex(/* red */ '#f86d67').bold(str)
+    const string = (str) => quote(\`\\\"\${str}\\\"\`)
+    const quote = (str) => chalk.green(str)
+      // Unfocus escaped quotes
+      .replaceAll('\\\\\"', chalk.bold.dim(\`\'\`))
 
+    // package.json script formatting utilities
     const pkg = require(path.join('$__PWD__', '$PROJECT_DIR', 'package.json'))
+    const pad = (num) => ''.padStart(num,' ')
     function formatScript(name) {
       return JSON.stringify(pkg.scripts[name]).slice(1, -1)
+        // Format script piping / chaining
+        .replaceAll(/ [\\<|\\>|\\&|\\|]+ /g, unemph)
         // Format script arguments
-        .replaceAll('\$0', emph('\$0'))
-        .replaceAll('\$1', emph('\$1'))
+        .replaceAll(/\\\$[0-9|@]+/g, emph)
     }
 
-    const WORKSPACE = chalk.bold.cyan('[$WORKSPACE]')
-    const SCRIPT_NAME = chalk.bold(quote('$SCRIPT_NAME'))
+    // Formatted strings
+    const WORKSPACE = chalk.cyan.bold('[$WORKSPACE]')
+    const SCRIPT_NAME = chalk.bold(string('$SCRIPT_NAME'))
     const SCRIPT = formatScript('$SCRIPT_NAME')
       // Format references to other workspace scripts
       .replace(new RegExp(\`^run (\${Object.keys(pkg.scripts).join('|')}) \`),
-        (s) => quote(formatScript(s.slice(4,-1))) + string('\n                '
-                  + chalk.grey.bold(' <<< ')))
+        (s) => quote(formatScript(s.slice(4,-1)))
+            // Split script chaining with newline
+             + string(\`\n\${pad(16) + chalk.grey.bold(' <<< ')}\`))
 
-    console.log(chalk.grey('\n' + chalk.bold.cyan('[$WORKSPACE]'),
-      'Executing',chalk.bold(string('$SCRIPT_NAME')),'script with',emph('args:')))
-    printMessage([
+    console.log(chalk.grey(
+      \`\n\${WORKSPACE} Executing \${SCRIPT_NAME} script with \${emph('args')}:\`
+    )); printMessage([
       ...(chalk.bold('--- Script --- ') + string(SCRIPT)).split('\n'),
-      \`\${emph(' Default (\$0):')} \${string('$DEFAULT_ARGS')}\`,
-      \`\${emph('    Args (\$1):')} \${string('$SCRIPT_ARGS')}\`,
-    ], { color: 'grey', borderColor: 'grey', marginBottom: 1 })"
+      \`\${emph(' Default (\$0)')}: \${string('$DEFAULT_ARGS')}\`,
+      \`\${emph('    Args (\$1)')}: \${string('$SCRIPT_ARGS')}\`,
+    ], { color: 'grey', borderColor: 'grey', marginBottom: 1 })
+  })();"
 
   # Executes workspace command with the following arguments:
   #   $0: Default argument(s) (empty by default)
