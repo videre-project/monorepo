@@ -4,7 +4,7 @@
 # Replaces workspace links w/ git protocol references.
 #
 # Copyright (c) 2023, The Videre Project Authors. All rights reserved.
-# SPDX-License-Identifier: BSD-3-Clause
+# SPDX-License-Identifier: Apache-2.0
 ##
 
 

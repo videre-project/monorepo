@@ -1,5 +1,5 @@
 /* @file
- * Base Jest configuration file for Typescript projects.
+ * Base Jest configuration file for Javascript and Typescript projects.
  *
  * Copyright (c) 2023, The Videre Project Authors. All rights reserved.
  * SPDX-License-Identifier: Apache-2.0

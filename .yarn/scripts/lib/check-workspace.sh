@@ -4,7 +4,7 @@
 # Checks for whether a given workspace exists.
 #
 # Copyright (c) 2023, The Videre Project Authors. All rights reserved.
-# SPDX-License-Identifier: BSD-3-Clause
+# SPDX-License-Identifier: Apache-2.0
 ##
 
 getKey() { ltrunc="${2#*\"$1\":\"}"; value="${ltrunc%%\"*}"; echo "$value"; }
