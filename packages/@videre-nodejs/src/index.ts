@@ -4,6 +4,7 @@
 */
 
 export * from './benchmark';
+export * from './cli';
 export * from './methods';
 export * from './runtime';
 export * from './v8';

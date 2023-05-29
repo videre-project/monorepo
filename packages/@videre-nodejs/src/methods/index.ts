@@ -4,6 +4,5 @@
 */
 
 export * from './binary-extract';
-export * from './cli';
 export * from './compression'
 export * from './filesystem';
