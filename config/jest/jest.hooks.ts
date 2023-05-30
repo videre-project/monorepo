@@ -7,8 +7,8 @@
 
 import { join } from 'path';
 
-import { deepAssign } from '@videre/js';
-import { Filters, mergeFileExtensions, evaluateFn, crawler } from '@videre/nodejs';
+import { deepAssign, evaluateFn } from '@videre/js';
+import { Filters, mergeFileExtensions, crawler } from '@videre/nodejs';
 
 import type { Config } from '@jest/types';
 
@@ -46,7 +46,7 @@ export default async (globalConfig: Config.GlobalConfig, projectConfig: Config.P
         ts_jest.TS_EXT_TO_TREAT_AS_ESM,
         ts_jest.JS_EXT_TO_TREAT_AS_ESM,
         /**
-         * Extensions supported by `import()`
+         * Additional extensions supported by `import()`
          */
         ['cjs', 'mjs'],
       )})$`
