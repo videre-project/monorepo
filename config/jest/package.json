@@ -2,7 +2,7 @@
   "name": "config-jest",
   "version": "1.0.0",
   "scripts": {
-    "jest": "(cd \"$0\" && yarn run -T jest --config jest.config.cjs $1)",
+    "jest": "(cd \"$0\" && yarn run -T jest $1)",
     "watch": "run jest \"$0\" \"--watch $1\"",
     "clean": "run jest \"$0\" \"--clearCache $1\""
   },
