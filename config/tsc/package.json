@@ -4,6 +4,7 @@
   "scripts": {
     "tsc": "(cd \"$0\" && yarn run -T tsc $1)",
     "watch": "run tsc \"$0\" \"-w $1\"",
+    "force": "run tsc \"$0\" \"-b --force $1\"",
     "clean": "run tsc \"$0\" \"-b --clean $1\" && node lib/clean.cjs \"$0\"",
     "prepack": "run build \"$0\" \"$1\" && run yarn:gh-resolve \"$0\""
   },
