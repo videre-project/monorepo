@@ -10,16 +10,20 @@ const fs = require('fs')
 
 const { deepAssign }  = require('@videre/js')
 
+const ts = require('typescript')
+
 
 function tsconfig(filepath=path.join(process.cwd(), 'tsconfig.json')) {
-  if (!fs.existsSync(filepath))
-    throw new Error(`\`tsconfig.json\` not found at ${filepath}`)
+  const pwd = path.dirname(filepath)
+  if (!fs.existsSync(filepath)) {
+    filepath = ts.findConfigFile(pwd, ts.sys.fileExists, 'tsconfig.json')
+    if (!filepath) throw new Error(`\`tsconfig.json\` not found at ${filepath}`)
+  }
 
-  let config = require(filepath)
-  // Merge properties from specified `extends` tsconfig.
+  let config = ts.readConfigFile(filepath, ts.sys.readFile).config
+  // Recurse and merge properties from specified `extends` tsconfig.
   if (config?.extends) {
-    const extendedConfig = path.join(path.dirname(filepath), config.extends)
-    config = deepAssign(config, require(extendedConfig))
+    config = deepAssign(config, tsconfig(path.join(pwd, config.extends)))
   }
 
   return config
