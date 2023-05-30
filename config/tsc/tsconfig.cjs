@@ -20,6 +20,7 @@ function tsconfig(filepath=path.join(process.cwd(), 'tsconfig.json')) {
     if (!filepath) throw new Error(`\`tsconfig.json\` not found at ${filepath}`)
   }
 
+  /** @type {ts.TsConfigSourceFile} */
   let config = ts.readConfigFile(filepath, ts.sys.readFile).config
   // Recurse and merge properties from specified `extends` tsconfig.
   if (config?.extends) {
