@@ -1,20 +1,47 @@
 {
   "compilerOptions": {
-    "target": "es5",
-    "module": "commonjs",
-    "skipLibCheck": true,
-    "esModuleInterop": true,
-    "allowSyntheticDefaultImports": true,
-    "allowJs": true,
-    "declaration": true,
-    "declarationMap": true,
-    "incremental": true,
-    "composite": true,
-    "strict": true,
-    "baseUrl": ".",
-    "paths": {
-      "@/*": ["./src/*"]
-    }
+    /* Basic Compatibility and Optimizations */
+    "target": "es2020",                    /* Specify ECMAScript target version: 'ES3' (default), 'ES5', 'ES6'/'ES2015', 'ES2016', 'ES2017', etc. */
+    "module": "commonjs",                  /* Specify module code generation: 'commonjs', 'amd', 'system', 'umd' or 'es2015'. */
+    "lib": [],                             /* Specify library files to be included in the compilation:  */
+    "allowJs": true,                       /* Allow JavaScript files to be compiled. */
+    "checkJs": true,                       /* Enables TypeScript reporting for errors in '.js' files. */
+    "removeComments": true,                /* Removes comments preserved in generated '.js' output to reduce build size. */
+    "importHelpers": true,                 /* Import emit helpers from 'tslib' to avoid downleveling code duplication. */
+    "isolatedModules": true,               /* Transpile each file as a separate module (similar to 'ts.transpileModule'). */
+    "composite": true,                     /* 
+
+    /* Strict Type-Checking Options */
+    "strict": true,                        /* Enable all strict type-checking options. */
+    "noImplicitAny": true,                 /* Raise error on expressions and declarations with an implied 'any' type. */
+    "strictNullChecks": true,              /* Enable strict null checks. */
+    "noImplicitThis": true,                /* Raise error on 'this' expressions with an implied 'any' type. */
+    "alwaysStrict": true,                  /* Parse in strict mode and emit "use strict" for each source file. */
+
+    /* Linter Checks */
+    "noUnusedLocals": true,                /* Report errors on unused locals. */
+    "noUnusedParameters": true,            /* Report errors on unused parameters. */
+    "noImplicitReturns": true,             /* Report error when not all code paths in function return a value. */
+    "noFallthroughCasesInSwitch": true,    /* Report errors for fallthrough cases in switch statement. */
+
+    /* Module Resolution Options */
+    "moduleResolution": "node",            /* Specify module resolution strategy: 'node' (Node.js) or 'classic' (TypeScript pre-1.6). */
+    "baseUrl": "./",                       /* Base directory to resolve non-absolute module names. */
+    "paths": {},                           /* A series of entries which re-map imports to lookup locations relative to the 'baseUrl'. */
+    // "rootDirs": [],                        /* List of root folders whose combined content represents the structure of the project at runtime. */
+    // "typeRoots": [],                       /* List of folders to include type definitions from. */
+    // "types": [],                           /* Type declaration files to be included in compilation. */
+    "esModuleInterop": true,               /* Fixes a ES6-spec issue with handling CommonJS/AMD/UMD modules as ES6 modules. */
+    "allowSyntheticDefaultImports": true,  /* Allow default imports from modules with no default export. This does not affect code emit, just typechecking. */
+
+    /* Source Map Options */
+    "sourceMap": true,                     /* Generates corresponding '.map' file. */
+    "declaration": true,                   /* Generates corresponding '.d.ts' file. */
+    "declarationMap": true,                /* Generates corresponding '.d.ts.map' files to map definitions back to TypeScript source files. */
+
+    /* Experimental Options */                
+    "experimentalDecorators": true,        /* Enables experimental support for ES7 decorators. */
+    "emitDecoratorMetadata": true          /* Enables experimental support for emitting type metadata for decorators. */
   },
   "references": [
     { "path": "../../packages/@videre-js" },
