@@ -32,7 +32,7 @@ export default function extract_key(buf: Buffer, keys: string[] | string,
     // Use __sortIndex__ attr to skip unnecessary buffer scans in sorted arrays.
     const sortIndex = extract_key(buf, '__sortIndex__', false);
     // Create key index for jumping across buffer regions in memory
-    keys.forEach((k,j) => { key_idx[j] = sortIndex[''+chars[j][0]][0]; });
+    keys.forEach((_,j) => { key_idx[j] = sortIndex[''+chars[j][0]][0]; });
   };
   
   // index of key search

@@ -3,9 +3,9 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { existsSync, statSync } from 'fs';
+import { existsSync } from 'fs';
 
-import { setDelay, waitUntil } from '@videre/js';
+import { waitUntil } from '@videre/js';
 
 import { describe, it, expect } from '@jest/globals';
 

@@ -5,11 +5,11 @@
 
 import { waitUntil } from '@videre/js';
 
-import { describe, it, expect } from '@jest/globals';
+import { describe, /*it, expect*/ } from '@jest/globals';
 
-import { evaluateFn } from '@videre/js';
+// import { evaluateFn } from '@videre/js';
 
-import { Filters, crawler } from './file-crawler';
+// import { Filters, crawler } from './file-crawler';
 
 describe('decompress_benchmark', () => {
   test('de-op test', async () => await waitUntil(() => true));

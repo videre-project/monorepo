@@ -40,4 +40,6 @@ export function findEnd(buf: Buffer, start: number): (number | undefined) {
       return i + Number((s == obrace || s == obracket) && 1);
     };
   };
+  // Return `undefined` if no end is found.
+  return undefined;
 };
