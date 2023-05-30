@@ -8,6 +8,9 @@
     "clean": "run tsc \"$0\" \"-b --clean $1\" && node lib/clean.cjs \"$0\"",
     "prepack": "run build \"$0\" \"$1\" && run yarn:gh-resolve \"$0\""
   },
+  "dependencies": {
+    "@videre/js": "workspace:^"
+  },
   "repository": {
     "type": "git",
     "url": "ssh://git@github.com/videre-project/videre-project.git",

@@ -1644,6 +1644,8 @@ __metadata:
 "config-tsc@workspace:config/tsc":
   version: 0.0.0-use.local
   resolution: "config-tsc@workspace:config/tsc"
+  dependencies:
+    "@videre/js": "workspace:^"
   languageName: unknown
   linkType: soft
 
