@@ -9,7 +9,7 @@
     "removeComments": true,                /* Removes comments preserved in generated '.js' output to reduce build size. */
     "importHelpers": true,                 /* Import emit helpers from 'tslib' to avoid downleveling code duplication. */
     "isolatedModules": true,               /* Transpile each file as a separate module (similar to 'ts.transpileModule'). */
-    "composite": true,                     /* 
+    "incremental": true,                   /* Enables incremental compilation by saving the project graph to a '.tsbuildinfo' file. */
 
     /* Strict Type-Checking Options */
     "strict": true,                        /* Enable all strict type-checking options. */
@@ -27,7 +27,9 @@
     /* Module Resolution Options */
     "moduleResolution": "node",            /* Specify module resolution strategy: 'node' (Node.js) or 'classic' (TypeScript pre-1.6). */
     "baseUrl": "./",                       /* Base directory to resolve non-absolute module names. */
-    "paths": {},                           /* A series of entries which re-map imports to lookup locations relative to the 'baseUrl'. */
+    "paths": {                             /* A series of entries which re-map imports to lookup locations relative to the 'baseUrl'. */
+      "@/*": ["./src/*"]
+    },
     // "rootDirs": [],                        /* List of root folders whose combined content represents the structure of the project at runtime. */
     // "typeRoots": [],                       /* List of folders to include type definitions from. */
     // "types": [],                           /* Type declaration files to be included in compilation. */

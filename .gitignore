@@ -1,27 +1,5 @@
 **/.DS_Store
 
-# Logs
-logs
-*.log
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-
-# Script cache
-**/__pycache__
-
-# Dependency directories
-node_modules/
-
-# Optional eslint cache
-.eslintcache
-
-# Yarn Integrity file
-.yarn-integrity
-
-# dotenv environment variables file
-.env
-
 # Yarn
 .yarn/*
 !.yarn/releases
@@ -30,6 +8,23 @@ node_modules/
 !.yarn/sdks
 !.yarn/versions
 
+# Yarn Integrity file
+.yarn-integrity
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Dependency directories
+node_modules/
+
+# dotenv environment variables file
+.env
+
+# Build output
 build/
 dist/
-.turbo
+**/*.tsbuildinfo
