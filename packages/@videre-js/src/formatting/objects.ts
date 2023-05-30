@@ -74,8 +74,11 @@ export function deepAssign(target: any, ...sources: any[]) {
   for (const source of sources) {
     for (let k in source) {
       let vs = source[k], vt = target[k];
+      // Trivialize branching if either value is null or undefined
+      if (vs == null || vt == null) {
+        if (vs != null) target[k] = vs; continue
       // If at least the target is an array.
-      if (Array.isArray(vt)) {
+      } else if (Array.isArray(vt)) {
         target[k] = vt.concat(vs) as typeof target[typeof k];
       // If only the source is an array.
       } else if (Array.isArray(vs)) {
