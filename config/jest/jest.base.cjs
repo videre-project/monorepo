@@ -10,6 +10,7 @@ const path = require('path')
 const { deepAssign }  = require('@videre/js')
 
 
+/** @returns {import('jest').Config} */
 function baseConfig({ config, plugins, ...options }) {
   config = deepAssign({
     testEnvironment: 'node',

@@ -59,7 +59,7 @@ export default async (globalConfig: Config.GlobalConfig, projectConfig: Config.P
         .filter(([k,]) => /[i|I]+gnorePatterns$/i.test(k))
         .flatMap(([,v]) => v as string | string[])
         .reduce((acc: Set<string>, s: string) =>
-          acc.has(s) ? acc : acc.add(s), new Set()) as Set<string>),
+          acc.has(s) ? acc : acc.add(s), new Set())),
     )
   }, hooks[name]);
 
