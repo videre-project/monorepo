@@ -6,7 +6,7 @@
   ],
   "scripts": {
     "g:workspace": "bash .yarn/scripts/yarn-g-runner.sh \"${@}\"",
-    "g:config": "bash .yarn/scripts/yarn-g-runner.sh \"config-${@}\"",
+    "g:config": "run g:workspace \"config-${@}\"",
     "yarn:gh-resolve": "bash .yarn/scripts/yarn-gh-resolve.sh \"$0\""
   },
   "devDependencies": {
