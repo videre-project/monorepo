@@ -87,12 +87,12 @@ if [[ -z "$PROJECT_DIR" ]]; then yarn "$@" || exit 1; else
               + string(\`\n\${pad(16) + chalk.grey.bold(' <<< ')}\`))
       }
 
-      require('print-message')([
+      console.log([
         ...(chalk.bold('--- Script --- ')
           + string(formatScript('$SCRIPT_NAME'))).split('\n'),
         \`\${emph(' Default (\$0)')}: \${string('$DEFAULT_ARGS')}\`,
         \`\${emph('    Args (\$1)')}: \${string('$SCRIPT_ARGS')}\`,
-      ], { color: 'grey', borderColor: 'grey', marginBottom: 1 })
+      ].reduce((acc, lnd) => acc + chalk.grey(lnd) + '\n', ''))
     }
   })();"
 
