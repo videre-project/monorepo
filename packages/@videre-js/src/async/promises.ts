@@ -8,11 +8,32 @@
 
 /**
  * Creates a promise that resolves after a specified amount of milliseconds.
- * @param ms Number of milliseconds to wait. Defaults to 100.
+ * @param ms Total number of milliseconds to wait. Defaults to 100.
+ * @param step Number of milliseconds per iteration. Defaults to 5.
  * @returns A promise that resolves after the specified amount of time.
  */
-export async function setDelay(ms: number=100) {
-  return new Promise(res => setTimeout(res, ms));
+export async function setDelay(ms: number=100, step: number=5) {
+  const startTime = performance.now();
+  const isExpired = (e: number) => (performance.now() - startTime) + e > ms;
+  let times: number[] = [];
+  for (let i = 0; !isExpired(ms * (1-0.9972)); i++) {
+    const duration = (performance.now() - startTime);
+    const drift = i*step - duration;
+    if (drift > step) i+=Math.floor(drift / step);
+    times.push(drift % step);
+    
+    // Calculate standard deviation of corrected drift times
+    const n = times.length;
+    const mean = times.reduce((a, b) => a + b) / n;
+    const std = Math.sqrt(
+      times
+        .map(x => Math.pow(x - mean, 2))
+        .reduce((a, b) => a + b) / n
+    );
+    if (isExpired(std - (ms * (1-0.9972)))) return;
+
+    await new Promise(res => setTimeout(res, step - std));
+  };
 };
 
 /**
