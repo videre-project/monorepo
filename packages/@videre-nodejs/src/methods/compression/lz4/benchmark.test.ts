@@ -7,7 +7,7 @@ import { existsSync } from 'fs';
 
 import { waitUntil } from '@videre/js';
 
-import { describe, it, expect } from '@jest/globals';
+import { describe, test, it, expect } from '@jest/globals';
 
 import { filepath } from './__mock__';
 import { decompress_benchmark } from './benchmark';

@@ -7,7 +7,7 @@ import { existsSync } from 'fs';
 
 import { waitUntil } from '@videre/js';
 
-import { describe, it, expect } from '@jest/globals';
+import { describe, test, it, expect } from '@jest/globals';
 
 import { filepath, json } from './__mock__';
 import { readCatalog } from './artifacts';
