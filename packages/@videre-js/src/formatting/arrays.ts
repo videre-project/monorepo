@@ -7,19 +7,19 @@
 
 
 /**
- * Takes an Array and a grouping function, returning a Map of the array
- * grouped by the input grouping function.
- * @param list 
- * @param keyGetter 
- * @returns 
+ * Returns a Map of the array grouped by the result of applying the input
+ * grouping function to each element of the input array.
+ * @param list An array of any type to group.
+ * @param keyGetter Input grouping function.
+ * @returns A map of arrays grouped by the result of applying the `keyGetter`.
  */
-export function groupBy(list: string[], keyGetter: (s: string) => string) {
+export function groupBy(list: any[], keyGetter: (s: any) => any) {
   const map = new Map();
-  for (let item in list) {
+  list.forEach((item) => {
     const key = keyGetter(item);
     const collection = map.get(key);
     if (!collection) map.set(key, [item]);
     else collection.push(item);
-  };
+  });
   return map;
 };
