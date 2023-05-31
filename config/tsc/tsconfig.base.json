@@ -3,7 +3,7 @@
     /* Basic Compatibility and Optimizations */
     "target": "es2020",                    /* Specify ECMAScript target version: 'ES3' (default), 'ES5', 'ES6'/'ES2015', 'ES2016', 'ES2017', etc. */
     "module": "commonjs",                  /* Specify module code generation: 'commonjs', 'amd', 'system', 'umd' or 'es2015'. */
-    "lib": [],                             /* Specify library files to be included in the compilation:  */
+    "lib": ["es2020", "dom"],              /* Specify library files to be included in the compilation:  */
     "allowJs": true,                       /* Allow JavaScript files to be compiled. */
     "checkJs": true,                       /* Enables TypeScript reporting for errors in '.js' files. */
     "removeComments": true,                /* Removes comments preserved in generated '.js' output to reduce build size. */
