@@ -1,0 +1,24 @@
+{
+  "name": "serverless-binary-pack",
+  "version": "1.0.0",
+  "main": "build",
+  "module": "src",
+  "scripts": {
+    "jest": "run g:config jest -d \"$(pwd)\" -- \"$@\"",
+    "tsc": "run g:config tsc -d \"$(pwd)\" -- \"$@\""
+  },
+  "dependencies": {
+    "@videre/js": "workspace:^",
+    "brotli": "^1.3.3",
+    "tar-fs": "^2.1.1"
+  },
+  "devDependencies": {
+    "@types/brotli": "^1.3.1",
+    "@types/tar-fs": "^2.0.1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "ssh://git@github.com/videre-project/videre-project.git",
+    "directory": "packages/serverless-binary-pack"
+  }
+}
