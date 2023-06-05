@@ -24,6 +24,9 @@ if [[ -z "$PROJECT_DIR" ]]; then yarn "$@" || exit 1; else
       done
       DEFAULT_ARGS="${@: $OFFSET+1:$i}"; ((OFFSET+=i+2))
     # (-v|--verbose) Enables verbose script tracing
+    elif [[ "$arg" =~ ^-(q|-quiet)$ ]]; then
+      QUIET_MODE="$arg"; ((OFFSET+=1))
+    # (-v|--verbose) Enables verbose script tracing
     elif [[ "$arg" =~ ^-(v|-verbose)$ ]]; then
       VERBOSE_MODE="$arg"; ((OFFSET+=1))
     else
@@ -49,7 +52,7 @@ if [[ -z "$PROJECT_DIR" ]]; then yarn "$@" || exit 1; else
   fi
   
   # Log executed workspace script with optional verbose tracing
-  node -e "(async () => {
+  if [[ -z $QUIET_MODE ]]; then node -e "(async () => {
     const path = require('path')
     // Requires ESM or top-level await
     const chalk = await import('chalk').then(module => module.default)
@@ -94,7 +97,7 @@ if [[ -z "$PROJECT_DIR" ]]; then yarn "$@" || exit 1; else
         \`\${emph('    Args (\$1)')}: \${string('$SCRIPT_ARGS')}\`,
       ].reduce((acc, lnd) => acc + chalk.grey(lnd) + '\n', ''))
     }
-  })();"
+  })();"; fi
 
   # Executes workspace command with the following arguments:
   #   $0: Default argument(s) (empty by default)
