@@ -23,7 +23,7 @@ if [[ -z "$PROJECT_DIR" ]]; then yarn "$@" || exit 1; else
         if [[ "$var" == "--" ]]; then break; else i=$((i+1)); fi
       done
       DEFAULT_ARGS="${@: $OFFSET+1:$i}"; ((OFFSET+=i+2))
-    # (-v|--verbose) Enables verbose script tracing
+    # (-q|--quiet) Disables script output
     elif [[ "$arg" =~ ^-(q|-quiet)$ ]]; then
       QUIET_MODE="$arg"; ((OFFSET+=1))
     # (-v|--verbose) Enables verbose script tracing
@@ -36,6 +36,12 @@ if [[ -z "$PROJECT_DIR" ]]; then yarn "$@" || exit 1; else
       break
     fi
   done
+
+  # Override default argument for config workspaces
+  if [[ "$WORKSPACE" =~ ^config-.* ]]; then
+    location="$(bash ./lib/check-workspace.sh "$DEFAULT_ARGS")" && cd "$__PWD__"
+    DEFAULT_ARGS="$(realpath "$location")"
+  fi
 
   # Correct runner args if no script name is provided explicitly
   DEFAULT="$(node -e "(async () => {
