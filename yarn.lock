@@ -1061,15 +1061,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/brotli@npm:^1.3.1":
-  version: 1.3.1
-  resolution: "@types/brotli@npm:1.3.1"
-  dependencies:
-    "@types/node": "*"
-  checksum: 40ef51b1525f8f65e6ba7044164638d92388424ce387d5e656ef20620274f6e48826a93fd678b7cb52dc145f07d4480d6cfc4fc7a05c76aaeea3ebc8cb964ba1
-  languageName: node
-  linkType: hard
-
 "@types/graceful-fs@npm:^4.1.3":
   version: 4.1.6
   resolution: "@types/graceful-fs@npm:4.1.6"
@@ -1111,6 +1102,15 @@ __metadata:
     expect: ^29.0.0
     pretty-format: ^29.0.0
   checksum: 0a22491dec86333c0e92b897be2c809c922a7b2b0aa5604ac369810d6b2360908b4a3f2c6892e8a237a54fa1f10ecefe0e823ec5fcb7915195af4dfe88d2197e
+  languageName: node
+  linkType: hard
+
+"@types/multistream@npm:^4.1.0":
+  version: 4.1.0
+  resolution: "@types/multistream@npm:4.1.0"
+  dependencies:
+    "@types/node": "*"
+  checksum: 46c98844e65ccec4fa135bff3e0b3896156409b1149e489c9882cdf3662dfe7cd5ba6c09aaf4a97610fb407ae820b61764041e5cc8ce8a7aeaab385be3bb8b33
   languageName: node
   linkType: hard
 
@@ -1403,7 +1403,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"base64-js@npm:^1.1.2, base64-js@npm:^1.3.1":
+"base64-js@npm:^1.3.1":
   version: 1.5.1
   resolution: "base64-js@npm:1.5.1"
   checksum: 669632eb3745404c2f822a18fc3a0122d2f9a7a13f7fb8b5823ee19d1d2ff9ee5b52c53367176ea4ad093c332fd5ab4bd0ebae5a8e27917a4105a4cfc86b1005
@@ -1446,15 +1446,6 @@ __metadata:
   dependencies:
     fill-range: ^7.0.1
   checksum: e2a8e769a863f3d4ee887b5fe21f63193a891c68b612ddb4b68d82d1b5f3ff9073af066c343e9867a393fe4c2555dcb33e89b937195feb9c1613d259edfcd459
-  languageName: node
-  linkType: hard
-
-"brotli@npm:^1.3.3":
-  version: 1.3.3
-  resolution: "brotli@npm:1.3.3"
-  dependencies:
-    base64-js: ^1.1.2
-  checksum: 2c97329f4ccb8e4332cedd2f63b85c2e15ffb305b1cbf046df86201434caf93cb7992ca73c0f7053b6a1417f595069ec7783c26e01510cefc10035a0f466e594
   languageName: node
   linkType: hard
 
@@ -3165,6 +3156,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"multistream@npm:^4.1.0":
+  version: 4.1.0
+  resolution: "multistream@npm:4.1.0"
+  dependencies:
+    once: ^1.4.0
+    readable-stream: ^3.6.0
+  checksum: 305c49a1aadcb7f63f64d8ca2bb6e7852e5f7dba94c7329e9a72ce53cd0046686b71668dc1adbf123f17d2dd107765fc946e64c36a26b15c470a3146ea3bc923
+  languageName: node
+  linkType: hard
+
 "natural-compare@npm:^1.4.0":
   version: 1.4.0
   resolution: "natural-compare@npm:1.4.0"
@@ -3579,10 +3580,9 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "serverless-binary-pack@workspace:packages/serverless-binary-pack"
   dependencies:
-    "@types/brotli": ^1.3.1
+    "@types/multistream": ^4.1.0
     "@types/tar-fs": ^2.0.1
-    "@videre/js": "workspace:^"
-    brotli: ^1.3.3
+    multistream: ^4.1.0
     tar-fs: ^2.1.1
   languageName: unknown
   linkType: soft

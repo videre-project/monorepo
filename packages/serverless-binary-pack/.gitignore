@@ -1,2 +1,2 @@
-tests/bin/*
-!tests/bin/chromium.br
+bin/*
+!bin/chromium.br

@@ -3,7 +3,7 @@
   "compilerOptions": {
     "rootDir": "src",
     "outDir": "build",
-    "types": ["node", "brotli", "tar-fs"]
+    "types": ["node", "multistream", "tar-fs"]
   },
   "include": ["src"],
   "exclude": ["node_modules", "**/bin", "**/*.test.ts"]
