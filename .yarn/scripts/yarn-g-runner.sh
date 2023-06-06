@@ -19,10 +19,16 @@ if [[ -z "$PROJECT_DIR" ]]; then yarn "$@" || exit 1; else
   OFFSET=2; for i in "$@"; do arg="${@: $OFFSET:1}"
     # (-d|--default) Passes default arguments to script
     if [[ "$arg" =~ ^-(d|-default)$ ]]; then
-      i=0; for var in "${@: $OFFSET+1:1}"; do
-        if [[ "$var" == "--" ]]; then break; else i=$((i+1)); fi
-      done
-      DEFAULT_ARGS="${@: $OFFSET+1:$i}"; ((OFFSET+=i+2))
+      # Parse multiple default arguments if passed before '--'
+      if [[ "$@" =~ " -- " ]]; then
+        i=0; for var in "${@: $OFFSET+1:1}"; do
+          if [[ "$var" == "--" ]]; then break; else i=$((i+1)); fi
+        done
+        DEFAULT_ARGS="${@: $OFFSET+1:$i}"; ((OFFSET+=i+2))
+      # Parse single default argument
+      else
+        DEFAULT_ARGS="${@: $OFFSET+1:1}"; ((OFFSET+=2))
+      fi
     # (-q|--quiet) Disables script output
     elif [[ "$arg" =~ ^-(q|-quiet)$ ]]; then
       QUIET_MODE="$arg"; ((OFFSET+=1))
@@ -40,7 +46,7 @@ if [[ -z "$PROJECT_DIR" ]]; then yarn "$@" || exit 1; else
   # Override default argument for config workspaces
   if [[ "$WORKSPACE" =~ ^config-.* ]]; then
     location="$(bash ./lib/check-workspace.sh "$DEFAULT_ARGS")" && cd "$__PWD__"
-    DEFAULT_ARGS="$(realpath "$location")"
+    if [[ -n "$location" ]]; then DEFAULT_ARGS="$(realpath "$location")"; fi
   fi
 
   # Correct runner args if no script name is provided explicitly

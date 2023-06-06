@@ -4,8 +4,8 @@
   "main": "build",
   "module": "src",
   "scripts": {
-    "jest": "run g:config jest -d \"$(pwd)\" -- \"$@\"",
-    "tsc": "run g:config tsc -d \"$(pwd)\" -- \"$@\""
+    "jest": "run g:config jest -d \"$(pwd)\" \"$@\"",
+    "tsc": "run g:config tsc -d \"$(pwd)\" \"$@\""
   },
   "repository": {
     "type": "git",
