@@ -1,0 +1,27 @@
+{
+  "name": "serverless-puppeteer",
+  "version": "1.0.0",
+  "main": "build",
+  "module": "src",
+  "scripts": {
+    "jest": "run g:config jest -d \"$(pwd)\" \"$@\"",
+    "tsc": "run g:config tsc -d \"$(pwd)\" \"$@\""
+  },
+  "dependencies": {
+    "puppeteer-core": "^20.5.0",
+    "puppeteer-extra": "^3.3.6",
+    "puppeteer-extra-plugin-stealth": "^2.11.2",
+    "serverless-binary-pack": "workspace:^"
+  },
+  "devDependencies": {
+    "@types/puppeteer": "^7.0.4"
+  },
+  "repository": {
+    "type": "git",
+    "url": "ssh://git@github.com/videre-project/videre-project.git",
+    "directory": "packages/serverless-puppeteer"
+  },
+  "engines": {
+    "node": ">= 16"
+  }
+}

@@ -3576,7 +3576,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"serverless-binary-pack@workspace:packages/serverless-binary-pack":
+"serverless-binary-pack@workspace:^, serverless-binary-pack@workspace:packages/serverless-binary-pack":
   version: 0.0.0-use.local
   resolution: "serverless-binary-pack@workspace:packages/serverless-binary-pack"
   dependencies:
@@ -3584,6 +3584,18 @@ __metadata:
     "@types/tar-fs": ^2.0.1
     multistream: ^4.1.0
     tar-fs: ^2.1.1
+  languageName: unknown
+  linkType: soft
+
+"serverless-puppeteer@workspace:packages/serverless-puppeteer":
+  version: 0.0.0-use.local
+  resolution: "serverless-puppeteer@workspace:packages/serverless-puppeteer"
+  dependencies:
+    "@types/puppeteer": ^7.0.4
+    puppeteer-core: ^20.5.0
+    puppeteer-extra: ^3.3.6
+    puppeteer-extra-plugin-stealth: ^2.11.2
+    serverless-binary-pack: "workspace:^"
   languageName: unknown
   linkType: soft
 
@@ -3992,6 +4004,29 @@ __metadata:
   languageName: node
   linkType: hard
 
+"videre-bot@workspace:services/@videre-bot":
+  version: 0.0.0-use.local
+  resolution: "videre-bot@workspace:services/@videre-bot"
+  languageName: unknown
+  linkType: soft
+
+"videre-graphql@workspace:services/@videre-graphql":
+  version: 0.0.0-use.local
+  resolution: "videre-graphql@workspace:services/@videre-graphql"
+  languageName: unknown
+  linkType: soft
+
+"videre-ml@workspace:services/@videre-ml":
+  version: 0.0.0-use.local
+  resolution: "videre-ml@workspace:services/@videre-ml"
+  languageName: unknown
+  linkType: soft
+
+"videre-website@workspace:services/serverless-data-api":
+  version: 0.0.0-use.local
+  resolution: "videre-website@workspace:services/serverless-data-api"
+  languageName: unknown
+  linkType: soft
 "walker@npm:^1.0.8":
   version: 1.0.8
   resolution: "walker@npm:1.0.8"

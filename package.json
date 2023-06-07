@@ -2,7 +2,8 @@
   "name": "@videre/monorepo",
   "workspaces": [
     "config/*",
-    "packages/*"
+    "packages/*",
+    "services/*"
   ],
   "scripts": {
     "g:workspace": "bash .yarn/scripts/yarn-g-runner.sh \"${@}\"",
