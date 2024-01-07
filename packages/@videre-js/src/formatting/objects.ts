@@ -49,18 +49,17 @@ export function pruneUndefinedKeys(object: object, excludeNull=false): object {
  * @returns Pruned object.
  * @example removeDuplicateKeys({ a: 1, b: 2, a: 3, c: 4 }) -> { a: 3, b: 2, c: 4 }
  */
-export function removeDuplicateKeys(object: object,
-                                    ignoreArrays=false): object {
-  return Object.keys(object)
-    .map(k => {
-      const key = k as keyof typeof object;
-      const value = object[key];
-      return {
-        [key]: typeof value === 'object'
-          ? Array.isArray(value) ? (ignoreArrays && value?.[0] || value) : []
-          : value
-      };
-    }).reduce((r, c) => Object.assign(r, c), {});
+export function removeDuplicateKeys(
+  object: { [key: string]: any },
+  ignoreArrays=false
+): object {
+  return Object.keys(object).reduce((result, key) => {
+    const value = object[key as keyof typeof object];
+    result[key] = typeof value === 'object'
+      ? Array.isArray(value) ? (ignoreArrays && value?.[0] || value) : []
+      : value;
+    return result;
+  }, {} as typeof object);
 };
 
 // This needs to be kept in sync with scripts/lib/json-utils.cjs.

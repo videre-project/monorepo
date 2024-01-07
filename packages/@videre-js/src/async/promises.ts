@@ -54,7 +54,7 @@ export async function evaluateFn(fn: Function, ...args: any) {
  * @param step Delay between each check. Defaults to 100ms.
  * @returns A promise that resolves when the callback returns true or the timeout expires.
  */
-export async function waitUntil(callback: Function, timeout=5*1e3, step=100): Promise<void> {
+export async function waitUntil(callback: Function, timeout=5e3, step=100): Promise<void> {
   let elapsedTime = 0;
   return new Promise((resolve, reject) => {
     const interval = setInterval(async () => {
