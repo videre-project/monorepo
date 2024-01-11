@@ -35,7 +35,7 @@ export type IProxy = IRequest;
  * A middleware that hoists request parameters and query args, adding any
  * parameter defaults if they don't exist.
  */
-export const withParams = (req: IRequest, { params }: Context): void => {
+export const withParams = (req: IRequest, { params }: Context, ..._: any[]) => {
   req.proxy = new Proxy(req.proxy || req, {
     get: (obj, prop) => obj[prop] !== undefined
       ? obj[prop].bind?.(req) || obj[prop]
@@ -55,7 +55,7 @@ export const withParams = (req: IRequest, { params }: Context): void => {
  * @returns A middleware that filters the request parameters.
  */
 export const useParams = (params: string[]) => {
-  return (ctx: Context) => {
+  return (req: Request, ctx: Context, ..._: any[]) => {
     ctx.params = new Proxy(ctx.params, {
       get: (obj, prop) =>
         params.includes(prop as string)

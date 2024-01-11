@@ -6,18 +6,14 @@
 import { Router } from 'itty-router';
 
 import { withParams } from '@/parameters';
-import { Format, withValidation } from '@/validation';
 
 import matchups from './matchups';
 import metagame from './metagame';
 
 
 const router = Router({ base: '/api' })
-  // Add validation middleware for common query params
+  // Add middleware for mapping request parameters
   .all('*', withParams)
-  .all('*', withValidation({
-    format: Format
-  }))
   // Add API routes
   .all('/matchups/*', matchups.handle)
   .all('/metagame/*', metagame.handle);

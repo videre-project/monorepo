@@ -3,22 +3,27 @@
  * SPDX-License-Identifier: Apache-2.0
 */
 
-import { error, Router } from 'itty-router';
+import { Router } from 'itty-router';
 
 import { withPostgres } from '@/db/postgres';
 import { getPresence, getWinrates } from '@/db/queries';
-import { useParams } from '@/parameters';
+import {
+  FormatValidator,
+  DateValidator,
+  NumberValidator
+} from '@/db/validators';
+import { Required, Optional, withValidation } from '@/validation';
 
 
 const router = Router({ base: '/api/metagame' })
-  .all('*', useParams([
-    'format',
-    'min_date',
-    'max_date',
-    'limit'
-  ]))
-  .get('/', () => error(400, 'No format specified'))
-  .get('/:format', withPostgres,
+  .get('/:format?',
+    withValidation({
+      format:   Required(FormatValidator),
+      min_date: Optional(DateValidator),
+      max_date: Optional(DateValidator),
+      limit:    Optional(NumberValidator)
+    }),
+    withPostgres,
     async ({ proxy }, { sql }) => {
       const presence = getPresence(sql, proxy);
       const winrates = getWinrates(sql, proxy);

@@ -7,19 +7,23 @@ import { error, Router } from 'itty-router';
 
 import { withPostgres } from '@/db/postgres';
 import { getMatchupMatrix } from '@/db/queries';
-import { useParams } from '@/parameters';
+import {
+  FormatValidator,
+  DateValidator,
+  NumberValidator
+} from '@/db/validators';
+import { Required, Optional, withValidation } from '@/validation';
 
 
 const router = Router({ base: '/api/matchups' })
-  .all('*', useParams([
-    'format',
-    'archetype',
-    'min_date',
-    'max_date',
-    'limit'
-  ]))
-  .get('/', () => error(400, 'No format specified'))
-  .get('/:format', withPostgres,
+  .get('/:format?',
+    withValidation({
+      format:   Required(FormatValidator),
+      min_date: Optional(DateValidator),
+      max_date: Optional(DateValidator),
+      limit:    Optional(NumberValidator)
+    }),
+    withPostgres,
     async ({ proxy, archetype }, { sql }) => {
       const res = getMatchupMatrix(sql, proxy);
 
