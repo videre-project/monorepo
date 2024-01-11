@@ -10,7 +10,10 @@ import { FORMATS } from './constants';
 import type { FormatType } from './types';
 
 
-export const FormatValidator = (
+/**
+ * Verifies that a value is a valid FormatType.
+ */
+export const FormatTypeValidator = (
   params: any,
   key: string,
   value: any
@@ -22,6 +25,9 @@ export const FormatValidator = (
   params[key] = format;
 }
 
+/**
+ * Verifies that a value is a parsable date.
+ */
 export const DateValidator = (
   params: any,
   key: string,
@@ -34,6 +40,9 @@ export const DateValidator = (
   params[key] = date;
 }
 
+/**
+ * Verufues that a value is a parsable 64-bit float number.
+ */
 export const NumberValidator = (
   params: any,
   key: string,
@@ -44,4 +53,23 @@ export const NumberValidator = (
     return error(400, `Invalid ${key} specified: '${value}'`);
 
   params[key] = number;
+}
+
+/**
+ * Verifies that a value is well formed string without any exotic characters.
+ */
+export const StringValidator = (
+  params: any,
+  key: string,
+  value: any
+): Response | void => {
+  const string = String(value);
+  // \p{L}  - matches any kind of letter from any language.
+  // \p{Nd} - matches a decimal digit character.
+  // \p{P}  - matches any kind of punctuation character.
+  // \s     - matches any kind of whitespace character.
+  if (!/^[\p{L}\p{Nd}\p{P}\s]+$/u.test(string))
+    return error(400, `Invalid ${key} specified: '${value}'`);
+
+  params[key] = string;
 }

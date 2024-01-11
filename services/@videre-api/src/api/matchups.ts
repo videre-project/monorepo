@@ -8,9 +8,10 @@ import { error, Router } from 'itty-router';
 import { withPostgres } from '@/db/postgres';
 import { getMatchupMatrix } from '@/db/queries';
 import {
-  FormatValidator,
+  FormatTypeValidator,
   DateValidator,
-  NumberValidator
+  NumberValidator,
+  StringValidator
 } from '@/db/validators';
 import { Required, Optional, withValidation } from '@/validation';
 
@@ -18,10 +19,13 @@ import { Required, Optional, withValidation } from '@/validation';
 const router = Router({ base: '/api/matchups' })
   .get('/:format?',
     withValidation({
-      format:   Required(FormatValidator),
-      min_date: Optional(DateValidator),
-      max_date: Optional(DateValidator),
-      limit:    Optional(NumberValidator)
+      // Parameters
+      format:     Required(FormatTypeValidator),
+      // Query args
+      min_date:   Optional(DateValidator),
+      max_date:   Optional(DateValidator),
+      limit:      Optional(NumberValidator),
+      archetype:  Optional(StringValidator),
     }),
     withPostgres,
     async ({ proxy, archetype }, { sql }) => {
