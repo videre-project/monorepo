@@ -12,7 +12,7 @@ import { Percentage, CI, fromMatches } from './statistics';
 import type { FormatType, EventType, RecordType, ResultType } from './types';
 
 
-export interface IMatch {
+interface IMatch {
   deck_id: Number,
   date: Date,
   format: FormatType,
@@ -24,7 +24,10 @@ export interface IMatch {
   archetype2: String
 };
 
-const getMatches = (sql: Sql, params: IProxy): PendingSql<IMatch[]> => {
+const getMatches = (
+  sql: Sql,
+  params: IProxy
+): PendingSql<IMatch[]> => {
   const { format, min_date, max_date } = params;
 
   return sql`
@@ -65,7 +68,7 @@ const getMatches = (sql: Sql, params: IProxy): PendingSql<IMatch[]> => {
   `;
 }
 
-export interface IMatchup {
+interface IMatchup {
   archetype1: String,
   archetype2: String,
   match_count: Number,
@@ -76,7 +79,10 @@ export interface IMatchup {
   game_ci: CI
 };
 
-const getMatchups = (sql: Sql, params: IProxy): PendingSql<IMatchup[]> => {
+const getMatchups = (
+  sql: Sql,
+  params: IProxy
+): PendingSql<IMatchup[]> => {
   const match_entries = getMatches(sql, params);
   const { matches, games } = fromMatches(sql);
 
@@ -87,11 +93,11 @@ const getMatchups = (sql: Sql, params: IProxy): PendingSql<IMatchup[]> => {
       archetype1,
       archetype2,
       ${matches.count} AS match_count,
-      TO_CHAR(${matches.mean}, 'FM90D00%') AS match_winrate,
-      TO_CHAR(${matches.ci}, '±FM90D00%') AS match_ci,
+      TO_CHAR(${matches.mean}, 'FM990.00%') AS match_winrate,
+      TO_CHAR(${matches.ci}, '±FM990.00%') AS match_ci,
       ${games.count} AS game_count,
-      TO_CHAR(${games.mean}, 'FM90D00%') AS game_winrate,
-      TO_CHAR(${games.ci}, '±FM90D00%') AS game_ci
+      TO_CHAR(${games.mean}, 'FM990.00%') AS game_winrate,
+      TO_CHAR(${games.ci}, '±FM990.00%') AS game_ci
     FROM match_entries
     WHERE
       archetype1 != archetype2
@@ -112,7 +118,10 @@ export interface IPresence {
   percentage: Percentage
 };
 
-export const getPresence = (sql: Sql, params: IProxy): PendingSql<IPresence[]> => {
+export const getPresence = (
+  sql: Sql,
+  params: IProxy
+): PendingSql<IPresence[]> => {
   const match_entries = getMatches(sql, params);
 
   const archetype_count = sql`COUNT(DISTINCT deck_id)::int`;
@@ -127,7 +136,7 @@ export const getPresence = (sql: Sql, params: IProxy): PendingSql<IPresence[]> =
     SELECT
       archetype1 AS archetype,
       ${archetype_count} AS count,
-      TO_CHAR(${archetype_presence}, 'FM90D00%') AS percentage
+      TO_CHAR(${archetype_presence}, 'FM990.00%') AS percentage
     FROM match_entries
     GROUP BY
       archetype1
@@ -136,7 +145,7 @@ export const getPresence = (sql: Sql, params: IProxy): PendingSql<IPresence[]> =
   `;
 }
 
-export interface IWinrate {
+interface IWinrate {
   archetype: String,
   match_count: Number,
   match_winrate: Percentage,
@@ -146,7 +155,10 @@ export interface IWinrate {
   game_ci: CI
 };
 
-export const getWinrates = (sql: Sql, params: IProxy): PendingSql<IWinrate[]> => {
+export const getWinrates = (
+  sql: Sql,
+  params: IProxy
+): PendingSql<IWinrate[]> => {
   const match_entries = getMatches(sql, params);
   const { matches, games } = fromMatches(sql);
 
@@ -156,11 +168,11 @@ export const getWinrates = (sql: Sql, params: IProxy): PendingSql<IWinrate[]> =>
     SELECT
       archetype1 AS archetype,
       ${matches.count} AS match_count,
-      TO_CHAR(${matches.mean}, 'FM90D00%') AS match_winrate,
-      TO_CHAR(${matches.ci}, '±FM90D00%') AS match_ci,
+      TO_CHAR(${matches.mean}, 'FM990.00%') AS match_winrate,
+      TO_CHAR(${matches.ci}, '±FM990.00%') AS match_ci,
       ${games.count} AS game_count,
-      TO_CHAR(${games.mean}, 'FM90D00%') AS game_winrate,
-      TO_CHAR(${games.ci}, '±FM90D00%') AS game_ci
+      TO_CHAR(${games.mean}, 'FM990.00%') AS game_winrate,
+      TO_CHAR(${games.ci}, '±FM990.00%') AS game_ci
     FROM match_entries
     WHERE
       archetype1 != archetype2
@@ -174,12 +186,15 @@ export const getWinrates = (sql: Sql, params: IProxy): PendingSql<IWinrate[]> =>
   `;
 }
 
-export interface IMatchupMatrix {
+interface IMatchupMatrix {
   archetype: String,
   matchups: IWinrate[]
 };
 
-export const getMatchupMatrix = (sql: Sql, params: IProxy): PendingSql<IMatchupMatrix[]> => {
+export const getMatchupMatrix = (
+  sql: Sql,
+  params: IProxy
+): PendingSql<IMatchupMatrix[]> => {
   const matchups = getMatchups(sql, params);
 
   return sql`
