@@ -1,9 +1,0 @@
-{
-  "name": "@videre/core",
-  "version": "1.0.0",
-  "repository": {
-    "type": "git",
-    "url": "ssh://git@github.com/videre-project/videre-project.git",
-    "directory": "services/@videre-core"
-  }
-}

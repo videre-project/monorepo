@@ -21,7 +21,8 @@ yarn-error.log*
 # Dependency directories
 node_modules/
 
-# dotenv environment variables file
+# environment variables file
+.dev.vars
 .env
 
 # Build output
