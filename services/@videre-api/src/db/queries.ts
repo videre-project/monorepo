@@ -8,10 +8,23 @@ import { toPascalCase } from '@videre/js';
 import type { IProxy } from '@/parameters';
 
 import type { PendingSql, Sql } from './postgres';
-import { fromMatches } from './statistics';
+import { Percentage, CI, fromMatches } from './statistics';
+import type { FormatType, EventType, RecordType, ResultType } from './types';
 
 
-const getMatches = (sql: Sql, params: IProxy): PendingSql => {
+export interface IMatch {
+  deck_id: Number,
+  date: Date,
+  format: FormatType,
+  event_id: Number,
+  event_type: EventType,
+  archetype1: String,
+  games: RecordType,
+  result: ResultType,
+  archetype2: String
+};
+
+const getMatches = (sql: Sql, params: IProxy): PendingSql<IMatch[]> => {
   const { format, min_date, max_date } = params;
 
   return sql`
@@ -52,7 +65,18 @@ const getMatches = (sql: Sql, params: IProxy): PendingSql => {
   `;
 }
 
-const getMatchups = (sql: Sql, params: IProxy): PendingSql => {
+export interface IMatchup {
+  archetype1: String,
+  archetype2: String,
+  match_count: Number,
+  match_winrate: Percentage,
+  match_ci: CI,
+  game_count: Number,
+  game_winrate: Percentage,
+  game_ci: CI
+};
+
+const getMatchups = (sql: Sql, params: IProxy): PendingSql<IMatchup[]> => {
   const match_entries = getMatches(sql, params);
   const { matches, games } = fromMatches(sql);
 
@@ -82,7 +106,13 @@ const getMatchups = (sql: Sql, params: IProxy): PendingSql => {
   `;
 }
 
-export const getPresence = (sql: Sql, params: IProxy): PendingSql => {
+export interface IPresence {
+  archetype: String,
+  count: Number,
+  percentage: Percentage
+};
+
+export const getPresence = (sql: Sql, params: IProxy): PendingSql<IPresence[]> => {
   const match_entries = getMatches(sql, params);
 
   const archetype_count = sql`COUNT(DISTINCT deck_id)::int`;
@@ -106,7 +136,17 @@ export const getPresence = (sql: Sql, params: IProxy): PendingSql => {
   `;
 }
 
-export const getWinrates = (sql: Sql, params: IProxy): PendingSql => {
+export interface IWinrate {
+  archetype: String,
+  match_count: Number,
+  match_winrate: Percentage,
+  match_ci: CI,
+  game_count: Number,
+  game_winrate: Percentage,
+  game_ci: CI
+};
+
+export const getWinrates = (sql: Sql, params: IProxy): PendingSql<IWinrate[]> => {
   const match_entries = getMatches(sql, params);
   const { matches, games } = fromMatches(sql);
 
@@ -115,7 +155,6 @@ export const getWinrates = (sql: Sql, params: IProxy): PendingSql => {
       match_entries AS (${match_entries})
     SELECT
       archetype1 AS archetype,
-      COUNT(DISTINCT deck_id)::int AS count,
       ${matches.count} AS match_count,
       TO_CHAR(${matches.mean}, 'FM90D00%') AS match_winrate,
       TO_CHAR(${matches.ci}, '±FM90D00%') AS match_ci,
@@ -135,7 +174,12 @@ export const getWinrates = (sql: Sql, params: IProxy): PendingSql => {
   `;
 }
 
-export const getMatchupMatrix = (sql: Sql, params: IProxy): PendingSql => {
+export interface IMatchupMatrix {
+  archetype: String,
+  matchups: IWinrate[]
+};
+
+export const getMatchupMatrix = (sql: Sql, params: IProxy): PendingSql<IMatchupMatrix[]> => {
   const matchups = getMatchups(sql, params);
 
   return sql`
@@ -160,8 +204,6 @@ export const getMatchupMatrix = (sql: Sql, params: IProxy): PendingSql => {
           game_winrate DESC
       ) AS matchups
     FROM matchups
-    WHERE match_winrate != '##.##%'
-      AND game_winrate != '##.##%'
     GROUP BY
       archetype1
     ORDER BY

@@ -11,7 +11,7 @@ import type { Context } from '@/handler';
 
 export type Sql = postgres.Sql<{}>;
 
-export type PendingSql = postgres.PendingQuery<postgres.Row[]>;
+export type PendingSql<T> = postgres.PendingQuery<postgres.Row[]>;
 
 export function withPostgres(req: any, ctx: Context, env: Env): void {
 	ctx.sql = postgres({

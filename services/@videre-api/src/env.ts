@@ -8,7 +8,7 @@ import { Url } from "url";
 
 export default interface Env {
 	PGHOST: Url;
-	PGDATABASE: string;
-	PGUSER: string;
-	PGPASSWORD: string;
+	PGDATABASE: String;
+	PGUSER: String;
+	PGPASSWORD: String;
 }

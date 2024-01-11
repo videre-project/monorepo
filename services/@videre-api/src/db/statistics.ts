@@ -6,17 +6,38 @@
 import { PendingSql, Sql } from "./postgres";
 
 
+export type Percentage = `${number}%`;
+export type CI = `±${number}%`;
+
+/**
+ * A row-wise query of wins, losses, ties used within an aggregate query.
+ */
 export type RecordQuery = {
-  wins: PendingSql,
-  losses: PendingSql,
-  draws: PendingSql
+  wins: PendingSql<Number>,
+  losses: PendingSql<Number>,
+  draws: PendingSql<Number>
 };
 
+/**
+ * Contains statistics for a collection of match or game entries.
+ */
 export type RecordStatistics = {
-  count: PendingSql,
-  mean: PendingSql,
-  stddev: PendingSql,
-  ci: PendingSql
+  /**
+   * The total number of matches or games played.
+   */
+  count: PendingSql<Number>,
+  /**
+   * The average winrate.
+   */
+  mean: PendingSql<Percentage>,
+  /**
+   * The standard deviation of the average winrate.
+   */
+  stddev: PendingSql<Percentage>,
+  /**
+   * The 95% confidence interval for the average winrate.
+   */
+  ci: PendingSql<CI>
 };
 
 /**
@@ -31,10 +52,10 @@ export function fromResults(
   { wins, losses, draws }: RecordQuery
 ): RecordStatistics {
   // 'n' represents the total number of games played in a single match.
-  const n: PendingSql = sql`((${wins}) + (${losses}) + (${draws}))`;
+  const n = sql`((${wins}) + (${losses}) + (${draws}))`;
 
   // The total number of games played across all match entries.
-  const count: PendingSql = sql`SUM(${n})::int`;
+  const count = sql`SUM(${n})::int`;
 
   // The mean winrate, including draws.
   //
@@ -42,7 +63,7 @@ export function fromResults(
   //   x_mean = ∑(n_wins / n_games) * 100% +
   //            ∑(n_losses / n_games) * 0% +
   //            ∑(n_draws  / n_games) * 50%
-  const mean: PendingSql = sql`
+  const mean = sql`
     AVG(
       (CASE
         WHEN ${losses} = ${n} THEN 0
@@ -55,21 +76,18 @@ export function fromResults(
   //
   // The standard deviation of a bernoulli distribution (of binary outcomes)
   // is given by:
-  //   σ = √(p * (1 - p))
+  //   σ = √(p_failure * (0% - p_mean)^2 + p_success * (100% - p_mean)^2)
   // where:
-  //   p = probability of success, or ∑(n_wins / n_games).
-  //
-  // The probability of success is the mean winrate, which can be expanded to:
-  //   p = ∑(n_wins / n_games) * 100% +
-  //       ∑(n_losses / n_games) * 0% +
-  //       ∑(n_draws  / n_games) * 50%
+  //   p_success = ∑(n_wins / n_games),
+  //   p_failure = ∑(n_losses / n_games),
+  //   p_mean = (p_success * 100%) + (p_failure * 0%)
   //
   // Therefore, the standard deviation of the mean winrate (including draws)
   // is given by:
   //   σ = √(∑(n_wins / n_games) * (100% - x_mean))^2 +
   //         ∑(n_losses / n_games) * (0% - x_mean))^2 +
-  //         ∑(n_draws  / n_games) * (50% - x_mean))^2)
-  const stddev: PendingSql = sql`
+  //         ∑(n_draws / n_games) * (50% - x_mean))^2)
+  const stddev = sql`
     SQRT(
       (SUM(${wins})::float / ${count})
         * POWER((100.0 - ${mean}), 2) +
@@ -88,13 +106,22 @@ export function fromResults(
   //   Z = 1.96 for 95% confidence
   //   σ = standard deviation
   //   n = count
-  const ci: PendingSql = sql`1.96 * (${stddev} / SQRT(${count}))`;
+  const ci = sql`1.96 * (${stddev} / SQRT(${count}))`;
 
   return { count, mean, stddev, ci };
 }
 
+/**
+ * Contains statistics for all matches and their associated games.
+ */
 export type MatchStatistics = {
+  /**
+   * The statistics for all match entries.
+   */
   matches: RecordStatistics,
+  /**
+   * The statistics for all game entries.
+   */
   games: RecordStatistics
 };
 
