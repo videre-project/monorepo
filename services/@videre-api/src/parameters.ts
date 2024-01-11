@@ -46,6 +46,17 @@ export const withParams = (req: IRequest, { params }: Context, ..._: any[]) => {
           DEFAULTS?.[prop];
         return params[prop];
       })(prop as string),
+    set: (obj, prop, value) => {
+      // Allow updating of parameters
+      if (prop in params)
+      {
+        params[prop as string] = value;
+        return true;
+      }
+      // Always set request properties
+      obj[prop] = value;
+      return true;
+    }
   })
 }
 

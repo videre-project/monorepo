@@ -35,6 +35,7 @@ const router = Router({ base: '/api/matchups' })
         const subquery = await sql`
           SELECT * FROM (${res})
           WHERE archetype = ${archetype}
+          LIMIT ${proxy.limit = 1}
         `;
         if (!subquery.length)
           return error(400, `No results found for archetype '${archetype}'`);
@@ -42,7 +43,10 @@ const router = Router({ base: '/api/matchups' })
         return subquery;
       }
 
-      return await sql`SELECT * FROM (${res}) LIMIT ${proxy.limit}`;
+      return await sql`
+        SELECT * FROM (${res})
+        LIMIT ${proxy.limit}
+      `;
     }
   );
 
