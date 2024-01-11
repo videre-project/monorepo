@@ -27,3 +27,12 @@ export type RecordType =
  * Represents a match result.
  */
 export type ResultType = 'win' | 'loss' | 'draw';
+
+/**
+ * Represents a card entry in a decklist.
+ */
+export type CardQuantityPair = {
+  id: number,
+  name: string,
+  quantity: number
+};

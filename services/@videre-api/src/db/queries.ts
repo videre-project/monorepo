@@ -9,10 +9,18 @@ import type { IProxy } from '@/parameters';
 
 import type { PendingSql, Sql } from './postgres';
 import { Percentage, CI, fromMatches } from './statistics';
-import type { FormatType, EventType, RecordType, ResultType } from './types';
+import type {
+  FormatType,
+  EventType,
+  RecordType,
+  ResultType,
+  CardQuantityPair
+} from './types';
 
 
 interface IMatch {
+  id1: Number,
+  id2: Number,
   deck_id: Number,
   date: Date,
   format: FormatType,
@@ -32,6 +40,8 @@ const getMatches = (
 
   return sql`
     SELECT
+      a1.archetype_id as id1,
+      a2.archetype_id as id2,
       a1.deck_id,
       e.date,
       e.format,
@@ -134,12 +144,14 @@ export const getPresence = (
     WITH
       match_entries AS (${match_entries})
     SELECT
+      id1 as id,
       archetype1 AS archetype,
       ${archetype_count} AS count,
       TO_CHAR(${archetype_presence}, 'FM990.00%') AS percentage
     FROM match_entries
     GROUP BY
-      archetype1
+      id,
+      archetype
     ORDER BY
       count DESC
   `;
@@ -224,5 +236,132 @@ export const getMatchupMatrix = (
     ORDER BY
       SUM(match_count) DESC,
       SUM(game_count) DESC
+  `;
+}
+
+interface IDeck {
+  id: Number,
+  name: String,
+  archetype: String,
+  archetype_id: Number,
+  mainboard: CardQuantityPair[],
+  sideboard: CardQuantityPair[]
+};
+
+const getDecks = (
+  sql: Sql,
+  params: IProxy
+): PendingSql<IDeck[]> => {
+  const { format, min_date, max_date } = params;
+
+  return sql`
+    SELECT
+      a.deck_id as id,
+      a.name,
+      a.archetype,
+      a.archetype_id,
+      d.mainboard,
+      d.sideboard
+    FROM Archetypes a
+    INNER JOIN Decks d ON d.id = a.deck_id
+    INNER JOIN Events e ON e.id = d.event_id
+    WHERE a.archetype_id IS NOT NULL
+      AND e.format = ${toPascalCase(format)}
+      AND e.date >= ${min_date}
+      AND e.date <= ${max_date}
+    ORDER BY
+      a.id DESC
+  `;
+}
+
+interface ICardStatistics {
+  card: String,
+  count: Number,
+  percentage: Percentage,
+  total: Number,
+  average: Number
+}
+
+interface IDeckStatistics {
+  archetype: String,
+  mainboard: ICardStatistics[],
+  sideboard: ICardStatistics[]
+}
+
+export const getDeckStatistics = (
+  sql: Sql,
+  params: IProxy
+): PendingSql<IDeckStatistics[]> => {
+  const deck_entries = getDecks(sql, params);
+  const presence = getPresence(sql, params);
+
+  const mapping: Record<string, PendingSql<IDeckStatistics[]>> = {};
+  for (const board of [ 'mainboard', 'sideboard' ]) {
+    const board_entries = sql`
+      WITH
+        entries AS (${deck_entries})
+      SELECT
+        e.archetype,
+        c.name as card,
+        COUNT(DISTINCT e.id)::int as count,
+        SUM(c.quantity)::int as total,
+        ROUND(
+          SUM(c.quantity) / (1.0 * COUNT(DISTINCT e.id)), 2
+        )::float AS average
+      FROM entries e, unnest(${sql('e.' + board)}) AS c (id, name, quantity)
+      GROUP BY
+        e.archetype, c.name
+      ORDER BY
+        archetype,
+        count DESC,
+        total DESC,
+        average DESC,
+        card ASC
+    `;
+
+    mapping[board] = sql`
+      WITH
+        presence AS (${presence}),
+        board_entries AS (${board_entries})
+      SELECT
+        p.archetype,
+        json_agg(
+          json_build_object(
+            'card', e.card,
+            'count', e.count,
+            'percentage', TO_CHAR(e.count * (100.0 / p.count), 'FM990.00%'),
+            'total', e.total,
+            'average', e.average
+          )
+          ORDER BY
+            e.count DESC,
+            e.total DESC,
+            e.average DESC
+        ) AS ${sql(board as string)}
+      FROM board_entries e
+      INNER JOIN presence p ON p.archetype = e.archetype
+      WHERE
+        e.count * (100.0 / p.count) >= 1.0
+      GROUP BY
+        p.archetype
+    `;
+  }
+
+  return sql`
+    WITH
+      presence AS (${presence}),
+      mainboard_entries AS (${mapping.mainboard}),
+      sideboard_entries AS (${mapping.sideboard})
+    SELECT
+      p.id,
+      p.archetype,
+      p.count,
+      m.mainboard,
+      s.sideboard
+    FROM presence p
+    INNER JOIN mainboard_entries m ON m.archetype = p.archetype
+    INNER JOIN sideboard_entries s ON s.archetype = p.archetype
+    ORDER BY
+      p.count DESC
   `;
 }
