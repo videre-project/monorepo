@@ -6,8 +6,8 @@
 import { error } from 'itty-router';
 import type { IRequest } from 'itty-router/Router';
 
-import { PARAMETERS } from './defaults';
 import type { Context } from './handler';
+import { getDefault } from './parameters';
 
 
 /**
@@ -38,7 +38,7 @@ export const Required = (obj: any): any => {
 export const Optional = (obj: any): any => {
   return new Proxy(obj, {
     apply: (target, thisArg, [params, key, value]) => {
-      if (value === undefined && PARAMETERS[key] === undefined)
+      if (value === undefined && getDefault(key) === undefined)
         return error(500, `Missing default for optional parameter: ${key}`);
 
       return target(params, key, value);
