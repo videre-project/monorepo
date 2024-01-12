@@ -27,11 +27,6 @@ export const DEFAULTS: { [key: string]: any } = {
 }
 
 /**
- * A proxy object wrapping the request returned from the withParams middleware.
- */
-export type IProxy = IRequest;
-
-/**
  * A middleware that hoists request parameters and query args, adding any
  * parameter defaults if they don't exist.
  */

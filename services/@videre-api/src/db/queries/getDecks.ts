@@ -3,8 +3,6 @@
  * SPDX-License-Identifier: Apache-2.0
 */
 
-import type { IProxy } from '@/parameters';
-
 import type { PendingSql, Sql } from '@/db/postgres';
 import type { CardQuantityPair } from '@/db/types';
 

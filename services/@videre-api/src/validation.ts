@@ -4,9 +4,10 @@
 */
 
 import { error } from 'itty-router';
+import type { IRequest } from 'itty-router/Router';
 
 import type { Context } from './handler';
-import { DEFAULTS, IProxy } from './parameters';
+import { DEFAULTS } from './parameters';
 
 
 /**
@@ -59,7 +60,7 @@ export const withValidation = (
     [key in string]: (params: any, key: string, value: any) => Response | void
   }
 ) => {
-  return ({ proxy }: IProxy, { params }: Context, ..._: any[]) => {
+  return ({ proxy }: IRequest, { params }: Context, ..._: any[]) => {
     for (const [key, validator] of Object.entries(map)) {
       // @ts-ignore - Validator is a proxy that extends the function type.
       if (validator?.required || proxy[key] !== undefined) {
