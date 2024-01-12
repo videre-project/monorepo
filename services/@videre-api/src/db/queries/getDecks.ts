@@ -26,7 +26,7 @@ export const getDecks = (
 
   return sql`
     WITH
-      event_entries AS (${event_entries}),
+      event_entries AS (${event_entries})
     SELECT
       a.deck_id as id,
       a.name,
