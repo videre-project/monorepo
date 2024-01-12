@@ -13,7 +13,7 @@ import matchups from './matchups';
 import metagame from './metagame';
 
 
-const router = Router({ base: '/api' })
+const router = Router()
   // Add middleware for mapping request parameters
   .all('*', withParams)
   // Add API routes

@@ -15,7 +15,7 @@ import {
 import { Required, Optional, withValidation } from '@/validation';
 
 
-const router = Router({ base: '/api/metagame' })
+const router = Router({ base: '/metagame' })
   .get('/:format?',
     withValidation({
       // Parameters

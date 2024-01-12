@@ -15,7 +15,7 @@ import {
 import { Optional, withValidation } from '@/validation';
 
 
-const router = Router({ base: '/api/events' })
+const router = Router({ base: '/events' })
   .get('/:format?',
     withValidation({
       // Parameters

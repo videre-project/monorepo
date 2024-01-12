@@ -16,7 +16,7 @@ import {
 import { Required, Optional, withValidation } from '@/validation';
 
 
-const router = Router({ base: '/api/matchups' })
+const router = Router({ base: '/matchups' })
   .get('/:format?',
     withValidation({
       // Parameters

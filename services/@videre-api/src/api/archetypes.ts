@@ -16,7 +16,7 @@ import {
 import { Required, Optional, withValidation } from '@/validation';
 
 
-const router = Router({ base: '/api/archetypes' })
+const router = Router({ base: '/archetypes' })
   .get('/:format?',
     withValidation({
       // Parameters
