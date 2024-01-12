@@ -3,8 +3,6 @@
  * SPDX-License-Identifier: Apache-2.0
 */
 
-import type { IProxy } from '@/parameters';
-
 import type { PendingSql, Sql } from '@/db/postgres';
 
 import getMatchups from './getMatchups';
@@ -19,7 +17,7 @@ export interface IMatchupMatrix {
 
 export const getMatchupMatrix = (
   sql: Sql,
-  params: IProxy
+  params: { [key: string]: any }
 ): PendingSql<IMatchupMatrix[]> => {
   const matchups = getMatchups(sql, params);
 

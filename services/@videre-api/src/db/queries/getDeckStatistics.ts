@@ -3,8 +3,6 @@
  * SPDX-License-Identifier: Apache-2.0
 */
 
-import type { IProxy } from '@/parameters';
-
 import type { PendingSql, Sql } from '@/db/postgres';
 import { Percentage } from '@/db/statistics';
 
@@ -28,7 +26,7 @@ export interface IDeckStatistics {
 
 export const getDeckStatistics = (
   sql: Sql,
-  params: IProxy
+  params: { [key: string]: any }
 ): PendingSql<IDeckStatistics[]> => {
   const deck_entries = getDecks(sql, params);
   const presence = getPresence(sql, params);

@@ -3,8 +3,6 @@
  * SPDX-License-Identifier: Apache-2.0
 */
 
-import type { IProxy } from '@/parameters';
-
 import type { PendingSql, Sql } from '@/db/postgres';
 import { Percentage, CI, fromMatches } from '@/db/statistics';
 
@@ -23,7 +21,7 @@ export interface IWinrate {
 
 export const getWinrates = (
   sql: Sql,
-  params: IProxy
+  params: { [key: string]: any }
 ): PendingSql<IWinrate[]> => {
   const match_entries = getMatches(sql, params);
   const { matches, games } = fromMatches(sql);

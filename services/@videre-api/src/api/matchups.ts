@@ -28,14 +28,14 @@ const router = Router({ base: '/api/matchups' })
       archetype:  Optional(StringValidator),
     }),
     withPostgres,
-    async ({ proxy, archetype }, { sql }) => {
-      const res = getMatchupMatrix(sql, proxy);
+    async ({ archetype }, { sql, params }) => {
+      const res = getMatchupMatrix(sql, params);
 
       if (archetype) {
         const subquery = await sql`
           SELECT * FROM (${res})
           WHERE archetype = ${archetype}
-          LIMIT ${proxy.limit = 1}
+          LIMIT ${params.limit = 1}
         `;
         if (!subquery.length)
           return error(400, `No results found for archetype '${archetype}'`);
@@ -45,7 +45,7 @@ const router = Router({ base: '/api/matchups' })
 
       return await sql`
         SELECT * FROM (${res})
-        LIMIT ${proxy.limit}
+        LIMIT ${params.limit}
       `;
     }
   );

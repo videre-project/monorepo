@@ -26,9 +26,9 @@ const router = Router({ base: '/api/metagame' })
       limit:      Optional(NumberValidator),
     }),
     withPostgres,
-    async ({ proxy }, { sql }) => {
-      const presence = getPresence(sql, proxy);
-      const winrates = getWinrates(sql, proxy);
+    async (req, { sql, params }) => {
+      const presence = getPresence(sql, params);
+      const winrates = getWinrates(sql, params);
 
       const res = await sql`
         WITH
@@ -44,7 +44,7 @@ const router = Router({ base: '/api/metagame' })
           w.match_winrate DESC,
           w.game_count DESC,
           w.game_winrate DESC
-        LIMIT ${proxy.limit}
+        LIMIT ${params.limit}
       `;
 
       return res;

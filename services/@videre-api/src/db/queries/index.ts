@@ -5,6 +5,7 @@
 
 export * from './getDecks';
 export * from './getDeckStatistics';
+export * from './getEvents';
 export * from './getMatches';
 export * from './getMatchupMatrix';
 export * from './getMatchups';

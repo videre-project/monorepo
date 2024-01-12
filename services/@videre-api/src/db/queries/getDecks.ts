@@ -8,6 +8,8 @@ import type { IProxy } from '@/parameters';
 import type { PendingSql, Sql } from '@/db/postgres';
 import type { CardQuantityPair } from '@/db/types';
 
+import getEvents from './getEvents';
+
 
 export interface IDeck {
   id: Number,
@@ -20,11 +22,13 @@ export interface IDeck {
 
 export const getDecks = (
   sql: Sql,
-  params: IProxy
+  params: { [key: string]: any }
 ): PendingSql<IDeck[]> => {
-  const { format, min_date, max_date } = params;
+  const event_entries = getEvents(sql, params);
 
   return sql`
+    WITH
+      event_entries AS (${event_entries}),
     SELECT
       a.deck_id as id,
       a.name,
@@ -34,11 +38,9 @@ export const getDecks = (
       d.sideboard
     FROM Archetypes a
     INNER JOIN Decks d ON d.id = a.deck_id
-    INNER JOIN Events e ON e.id = d.event_id
+    INNER JOIN event_entries e ON e.id = d.event_id
     WHERE a.archetype_id IS NOT NULL
-      AND e.format = ${format}
-      AND e.date >= ${min_date}
-      AND e.date <= ${max_date}
+      AND e.id IS NOT NULL
     ORDER BY
       a.id DESC
   `;

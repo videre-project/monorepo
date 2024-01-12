@@ -3,20 +3,19 @@
  * SPDX-License-Identifier: Apache-2.0
 */
 
-import { error, Router } from 'itty-router';
+import { Router } from 'itty-router';
 
 import { withPostgres } from '@/db/postgres';
-import { getDeckStatistics } from '@/db/queries';
+import { getEvents } from '@/db/queries';
 import {
   FormatTypeValidator,
   DateValidator,
-  NumberValidator,
-  StringValidator
+  NumberValidator
 } from '@/db/validators';
 import { Required, Optional, withValidation } from '@/validation';
 
 
-const router = Router({ base: '/api/archetypes' })
+const router = Router({ base: '/api/events' })
   .get('/:format?',
     withValidation({
       // Parameters
@@ -25,23 +24,10 @@ const router = Router({ base: '/api/archetypes' })
       min_date:   Optional(DateValidator),
       max_date:   Optional(DateValidator),
       limit:      Optional(NumberValidator),
-      archetype:  Optional(StringValidator),
     }),
     withPostgres,
-    async ({ archetype }, { sql, params }) => {
-      const res = getDeckStatistics(sql, params);
-
-      if (archetype) {
-        const subquery = await sql`
-          SELECT * FROM (${res})
-          WHERE archetype = ${archetype}
-          LIMIT ${params.limit = 1}
-        `;
-        if (!subquery.length)
-          return error(400, `No results found for archetype '${archetype}'`);
-
-        return subquery;
-      }
+    async (req, { sql, params }) => {
+      const res = getEvents(sql, params as any);
 
       return await sql`
         SELECT * FROM (${res})

@@ -3,8 +3,6 @@
  * SPDX-License-Identifier: Apache-2.0
 */
 
-import type { IProxy } from '@/parameters';
-
 import type { PendingSql, Sql } from '@/db/postgres';
 import type {
   FormatType,
@@ -12,6 +10,8 @@ import type {
   RecordType,
   ResultType
 } from '@/db/types';
+
+import getEvents from './getEvents';
 
 
 export interface IMatch {
@@ -30,11 +30,13 @@ export interface IMatch {
 
 export const getMatches = (
   sql: Sql,
-  params: IProxy
+  params: { [key: string]: any }
 ): PendingSql<IMatch[]> => {
-  const { format, min_date, max_date } = params;
+  const event_entries = getEvents(sql, params as any);
 
   return sql`
+    WITH
+      event_entries AS (${event_entries})
     SELECT
       a1.archetype_id as id1,
       a2.archetype_id as id2,
@@ -54,19 +56,17 @@ export const getMatches = (
       m.result,
       a2.archetype AS archetype2
     FROM Matches m
-    INNER JOIN Events e ON e.id = m.event_id
     INNER JOIN Decks d1 ON d1.event_id = m.event_id
                         AND d1.player = m.player
     INNER JOIN Decks d2 ON d2.event_id = m.event_id
                         AND d2.player = m.opponent
     INNER JOIN Archetypes a1 ON a1.deck_id = d1.id
     INNER JOIN Archetypes a2 ON a2.deck_id = d2.id
+    INNER JOIN event_entries e ON e.id = m.event_id
     WHERE m.isBye = FALSE
       AND a1.archetype_id IS NOT NULL
       AND a2.archetype_id IS NOT NULL
-      AND e.format = ${format}
-      AND e.date >= ${min_date}
-      AND e.date <= ${max_date}
+      AND e.id IS NOT NULL
     ORDER BY
       m.event_id,
       m.round,
