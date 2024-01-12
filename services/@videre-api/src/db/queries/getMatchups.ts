@@ -9,7 +9,9 @@ import { Percentage, CI, fromMatches } from '@/db/statistics';
 import getMatches from './getMatches';
 
 
-interface IMatchup {
+export interface IMatchup {
+  id1: string,
+  id2: string,
   archetype1: String,
   archetype2: String,
   match_count: Number,
@@ -31,6 +33,8 @@ export const getMatchups = (
     WITH
       match_entries AS (${match_entries})
     SELECT
+      id1,
+      id2,
       archetype1,
       archetype2,
       ${matches.count} AS match_count,
@@ -43,6 +47,8 @@ export const getMatchups = (
     WHERE
       archetype1 != archetype2
     GROUP BY
+      id1,
+      id2,
       archetype1,
       archetype2
     ORDER BY

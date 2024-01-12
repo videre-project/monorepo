@@ -11,8 +11,9 @@ import type { IWinrate } from './getWinrates';
 
 
 export interface IMatchupMatrix {
+  id: string,
   archetype: String,
-  matchups: IWinrate[]
+  matchups: IWinrate[] & { id: string }[]
 };
 
 export const getMatchupMatrix = (
@@ -25,9 +26,11 @@ export const getMatchupMatrix = (
     WITH
       matchups AS (${matchups})
     SELECT
+      id1 as id,
       archetype1 AS archetype,
       json_agg(
         json_build_object(
+          'id', id2,
           'archetype', archetype2,
           'match_count', match_count,
           'match_winrate', match_winrate,
@@ -44,6 +47,7 @@ export const getMatchupMatrix = (
       ) AS matchups
     FROM matchups
     GROUP BY
+      id1,
       archetype1
     ORDER BY
       SUM(match_count) DESC,
