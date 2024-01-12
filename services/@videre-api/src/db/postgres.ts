@@ -14,8 +14,9 @@ export type Sql = postgres.Sql<{}>;
 export type PendingSql<T> = postgres.PendingQuery<postgres.Row[]>;
 
 export function withPostgres(req: any, ctx: Context, env: Env): void {
+  // @ts-expect-error - Input vars must have implicit string operators
 	ctx.sql = postgres({
-		host:			env.PGHOST.toString(),
+		host:			env.PGHOST,
 		database: env.PGDATABASE,
 		username: env.PGUSER,
 		password: env.PGPASSWORD,
