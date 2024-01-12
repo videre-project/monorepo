@@ -12,14 +12,14 @@ import {
   DateValidator,
   NumberValidator
 } from '@/db/validators';
-import { Required, Optional, withValidation } from '@/validation';
+import { Optional, withValidation } from '@/validation';
 
 
 const router = Router({ base: '/api/events' })
   .get('/:format?',
     withValidation({
       // Parameters
-      format:     Required(FormatTypeValidator),
+      format:     Optional(FormatTypeValidator),
       // Query args
       min_date:   Optional(DateValidator),
       max_date:   Optional(DateValidator),
@@ -27,7 +27,7 @@ const router = Router({ base: '/api/events' })
     }),
     withPostgres,
     async (req, { sql, params }) => {
-      const res = getEvents(sql, params as any);
+      const res = getEvents(sql, params);
 
       return await sql`
         SELECT * FROM (${res})
