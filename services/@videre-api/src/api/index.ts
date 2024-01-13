@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
 */
 
-import { Router } from 'itty-router';
+import { error, Router } from 'itty-router';
 
 import { withParams } from '@/parameters';
 
@@ -11,15 +11,20 @@ import archetypes from './archetypes';
 import events from './events';
 import matchups from './matchups';
 import metagame from './metagame';
+import { useCache } from '@/cache';
 
 
 const router = Router()
+  // Add middleware for caching
+  .get('*', useCache)
   // Add middleware for mapping request parameters
   .all('*', withParams)
   // Add API routes
   .all('/archetypes/*', archetypes.handle)
   .all('/events/*', events.handle)
   .all('/matchups/*', matchups.handle)
-  .all('/metagame/*', metagame.handle);
+  .all('/metagame/*', metagame.handle)
+  // Catch-all for any other requests
+  .all('*', () => error(404));
 
 export default router;
