@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
 */
 
+import { MAX_DB_QUERY_EXECUTION } from '@/handler';
 import { Error } from '@/responses';
 
 import type { PendingSql, RowList, Sql } from "./postgres";
@@ -37,15 +38,28 @@ export async function Execute(
   query: PendingSql<any[]>,
   parameters: { [key: string]: any } = {}
 ) {
+  let data: RowList<any[]> = null!;
   try {
-    const data = await query as RowList<any[]>;
-    if (!data.length)
-      return Error(400, 'No results found.', { parameters, data });
-
-    return { parameters, data };
+    data = await new Promise<typeof data>((resolve, reject) => {
+      // Set a maximum timeout for the query.
+      setTimeout(() =>
+        reject(Error(500, 'Database query timed out.')),
+        MAX_DB_QUERY_EXECUTION
+      );
+      // Execute the query.
+      query
+        .then(resolve)
+        .catch(reject);
+    });
   } catch (err) {
     return Error(500, 'Encountered a fatal error while executing the query.');
   }
+
+  const output = { parameters, data };
+  if (!data?.length)
+    return Error(400, 'No results found.', output);
+
+  return output;
 }
 
 export async function Analyze(sql: Sql, query: PendingSql<any>): Promise<any> {

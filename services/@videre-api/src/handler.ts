@@ -16,6 +16,11 @@ import { Error, asJSON } from './responses';
 export const MAX_TIMEOUT = 10_000; // 10 seconds
 
 /**
+ * Maximum database query execution time in milliseconds
+ */
+export const MAX_DB_QUERY_EXECUTION = 8_000; // 8 seconds
+
+/**
  * The request context passed through the handler
  */
 export interface Context {
