@@ -18,6 +18,9 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
+# Cloudflare Wrangler CLI
+.wrangler
+
 # Dependency directories
 node_modules/
 
