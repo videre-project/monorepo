@@ -1,17 +1,8 @@
 {
-	"compilerOptions": {
-		"noEmit": true,
-		"module": "esnext",
-		"target": "esnext",
-		"lib": ["esnext"],
-		"strict": true,
-		"allowSyntheticDefaultImports": true,
-		"moduleResolution": "node",
+  "extends": "../../config/tsc/tsconfig.edge.json",
+  "compilerOptions": {
     "baseUrl": ".",
-    "paths": {
-      "@/*": ["./src/*"]
-    },
 		"types": ["@cloudflare/workers-types"]
-	},
+  },
 	"exclude": ["node_modules", "dist", "test"]
 }

@@ -31,11 +31,13 @@ const router = Router({ base: '/archetypes' })
     withPostgres,
     async ({ archetype }, { sql, params }) => {
       let query = getDeckStatistics(sql, params);
-      if (archetype)
+      if (archetype) {
+        params.limit = 1;
         query = sql`
           SELECT * FROM (${query})
           WHERE archetype = ${archetype}
         `;
+      }
 
       return await Execute(sql`
         SELECT * FROM (${query})

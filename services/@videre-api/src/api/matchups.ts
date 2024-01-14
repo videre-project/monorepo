@@ -31,11 +31,13 @@ const router = Router({ base: '/matchups' })
     withPostgres,
     async ({ archetype }, { sql, params }) => {
       let query = getMatchupMatrix(sql, params);
-      if (archetype)
+      if (archetype) {
+        params.limit = 1;
         query = sql`
           SELECT * FROM (${query})
           WHERE archetype = ${archetype}
         `;
+      }
 
       return await Execute(sql`
         SELECT * FROM (${query})
