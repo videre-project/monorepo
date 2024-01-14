@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
 */
 
-import { error, Router } from 'itty-router';
+import { Router } from 'itty-router';
 
 import { withPostgres } from '@/db/postgres';
 import { getMatchupMatrix } from '@/db/queries';
@@ -13,6 +13,7 @@ import {
   NumberValidator,
   StringValidator
 } from '@/db/validators';
+import { Execute } from '@/db/helpers';
 import { Required, Optional, withValidation } from '@/validation';
 
 
@@ -29,24 +30,17 @@ const router = Router({ base: '/matchups' })
     }),
     withPostgres,
     async ({ archetype }, { sql, params }) => {
-      const res = getMatchupMatrix(sql, params);
-
-      if (archetype) {
-        const subquery = await sql`
-          SELECT * FROM (${res})
+      let query = getMatchupMatrix(sql, params);
+      if (archetype)
+        query = sql`
+          SELECT * FROM (${query})
           WHERE archetype = ${archetype}
-          LIMIT ${params.limit = 1}
         `;
-        if (!subquery.length)
-          return error(400, `No results found for archetype '${archetype}'`);
 
-        return subquery;
-      }
-
-      return await sql`
-        SELECT * FROM (${res})
+      return await Execute(sql`
+        SELECT * FROM (${query})
         LIMIT ${params.limit}
-      `;
+      `, params);
     }
   );
 

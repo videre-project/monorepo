@@ -9,5 +9,6 @@ export * from './getEvents';
 export * from './getMatches';
 export * from './getMatchupMatrix';
 export * from './getMatchups';
+export * from './getMetagame';
 export * from './getPresence';
 export * from './getWinrates';

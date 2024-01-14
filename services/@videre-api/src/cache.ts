@@ -3,13 +3,13 @@
  * SPDX-License-Identifier: Apache-2.0
 */
 
-import { Context } from "./handler";
+import { MAX_TIMEOUT, Context } from "./handler";
 
 
 /**
  * The default cache policy used by the Cloudflare CDN.
  */
-export const CACHE_POLICY = 'public, max-age=3600, s-maxage=300';
+export const CACHE_POLICY = `max-age=3600, s-maxage=${MAX_TIMEOUT / 1e3}`;
 
 /**
  * Represents a handler for caching operations.

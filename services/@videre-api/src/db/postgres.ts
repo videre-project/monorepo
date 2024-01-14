@@ -11,7 +11,9 @@ import type { Context } from '@/handler';
 
 export type Sql = postgres.Sql<{}>;
 
-export type PendingSql<T> = postgres.PendingQuery<postgres.Row[]>;
+export type PendingSql<T extends readonly any[]> = postgres.PendingQuery<T>;
+
+export type RowList<T extends readonly any[]> = postgres.RowList<T>;
 
 export function withPostgres(req: any, ctx: Context, env: Env): void {
   // @ts-expect-error - Input vars must have implicit string operators

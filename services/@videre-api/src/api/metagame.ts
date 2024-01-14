@@ -6,12 +6,13 @@
 import { Router } from 'itty-router';
 
 import { withPostgres } from '@/db/postgres';
-import { getPresence, getWinrates } from '@/db/queries';
+import { getMetagame } from '@/db/queries';
 import {
   FormatTypeValidator,
   DateValidator,
   NumberValidator
 } from '@/db/validators';
+import { Execute } from '@/db/helpers';
 import { Required, Optional, withValidation } from '@/validation';
 
 
@@ -27,27 +28,12 @@ const router = Router({ base: '/metagame' })
     }),
     withPostgres,
     async (req, { sql, params }) => {
-      const presence = getPresence(sql, params);
-      const winrates = getWinrates(sql, params);
+      let query = getMetagame(sql, params);
 
-      const res = await sql`
-        WITH
-          presence AS (${presence}),
-          winrates AS (${winrates})
-        SELECT *
-        FROM presence p
-        INNER JOIN winrates w ON
-          w.archetype = p.archetype
-        ORDER BY
-          p.count DESC,
-          w.match_count DESC,
-          w.match_winrate DESC,
-          w.game_count DESC,
-          w.game_winrate DESC
+      return await Execute(sql`
+        SELECT * FROM (${query})
         LIMIT ${params.limit}
-      `;
-
-      return res;
+      `, params);
     }
   );
 

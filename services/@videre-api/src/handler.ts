@@ -3,12 +3,11 @@
  * SPDX-License-Identifier: Apache-2.0
 */
 
-import { error, json } from 'itty-router';
-
 import router from './api';
 import { CacheHandler, updateCache } from './cache';
 import type { Sql } from './db/postgres';
 import type Env from './env';
+import { Error, asJSON } from './responses';
 
 
 /**
@@ -29,20 +28,14 @@ export interface Context {
 export default (req: Request, ctx: Context, env: Env): Promise<Response> =>
   new Promise((resolve) => {
     // Set a request timeout to prevent hanging requests
-    setTimeout(() => resolve(error(408, 'Request timed out')), MAX_TIMEOUT);
+    setTimeout(() => resolve(Error(408, 'Request timed out')), MAX_TIMEOUT);
 
     router
       // Pass Cloudflare provided arguments to the router
       .handle(req, ctx, env)
       // Handle any response transformations
-      .then((data) => {
-        if (data instanceof Response) return data;
-        return json({
-          parameters: ctx.params,
-          data
-        });
-      })
-      .catch(error)
+      .then(asJSON)
+      .catch(() => Error(500, 'Encountered a fatal error.'))
       // Update the cache if provided a cache handler
       .then((res) => ctx.cache ? updateCache(res, ctx) : res)
       .then(resolve);

@@ -3,15 +3,16 @@
  * SPDX-License-Identifier: Apache-2.0
 */
 
-import { error, Router } from 'itty-router';
+import { Router } from 'itty-router';
 
+import { useCache } from '@/cache';
 import { withParams } from '@/parameters';
+import { Error } from '@/responses';
 
 import archetypes from './archetypes';
 import events from './events';
 import matchups from './matchups';
 import metagame from './metagame';
-import { useCache } from '@/cache';
 
 
 const router = Router()
@@ -25,6 +26,6 @@ const router = Router()
   .all('/matchups/*', matchups.handle)
   .all('/metagame/*', metagame.handle)
   // Catch-all for any other requests
-  .all('*', () => error(404));
+  .all('*', () => Error(404, 'Could not find the requested resource.'));
 
 export default router;

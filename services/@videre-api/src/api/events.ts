@@ -12,6 +12,7 @@ import {
   DateValidator,
   NumberValidator
 } from '@/db/validators';
+import { Execute } from '@/db/helpers';
 import { Optional, withValidation } from '@/validation';
 
 
@@ -27,12 +28,12 @@ const router = Router({ base: '/events' })
     }),
     withPostgres,
     async (req, { sql, params }) => {
-      const res = getEvents(sql, params);
+      let query = getEvents(sql, params);
 
-      return await sql`
-        SELECT * FROM (${res})
+      return await Execute(sql`
+        SELECT * FROM (${query})
         LIMIT ${params.limit}
-      `;
+      `, params);
     }
   );
 
