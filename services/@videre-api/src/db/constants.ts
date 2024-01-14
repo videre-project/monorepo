@@ -20,3 +20,9 @@ export const EVENTS = [
   'Showcase',
   'Qualifier',
 ] as const;
+
+export const RESULTS = [
+  'win',
+  'loss',
+  'draw',
+] as const;
