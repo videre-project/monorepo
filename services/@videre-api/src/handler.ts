@@ -26,8 +26,8 @@ export const MAX_DB_QUERY_EXECUTION = 8_000; // 8 seconds
  */
 export interface Context {
   cf: ExecutionContext;
-  cache: CacheHandler;
   params: { [key: string]: any };
+  cache: CacheHandler;
   sql: Sql;
 }
 

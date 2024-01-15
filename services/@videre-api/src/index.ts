@@ -10,5 +10,5 @@ import handler, { Context } from './handler';
 
 export default {
   fetch: (req: Request, env: Env, cf: ExecutionContext): Promise<Response> =>
-    handler(req, { cf, cache: null!, params: {}, sql: null! } as Context, env),
+    handler(req, { cf, params: {} } as Context, env),
 }

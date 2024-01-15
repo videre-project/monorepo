@@ -7,13 +7,17 @@ import { Router } from 'itty-router';
 
 import { withPostgres } from '@/db/postgres';
 import { getMetagame } from '@/db/queries';
+import { FormatTypeValidator } from '@/db/validators';
 import { Execute } from '@/db/helpers';
-import { All, withValidation } from '@/validation';
+import { All, Required, withValidation } from '@/validation';
 
 import { args as eventArgs } from './events';
 
 
-export const args = All(eventArgs);
+export const args = All(eventArgs, {
+  // Parameters
+  format:     Required(FormatTypeValidator),
+});
 
 export default Router({ base: '/metagame' })
   .get('/:format?',
