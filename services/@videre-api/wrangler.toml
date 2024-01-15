@@ -3,5 +3,6 @@ main = "./src/index.ts"
 compatibility_date = "2023-12-18"
 compatibility_flags = [ "nodejs_compat" ]
 routes = [
-	{ pattern = "api.videreproject.com", custom_domain = true }
+  { pattern = "api.videreproject.com", custom_domain = true },
+  { pattern = "bot.videreproject.com", custom_domain = true }
 ]

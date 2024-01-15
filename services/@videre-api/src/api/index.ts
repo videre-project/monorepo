@@ -15,9 +15,9 @@ import matchups from './matchups';
 import metagame from './metagame';
 
 
-const router = Router()
   // Add middleware for caching
   .get('*', useCache)
+export default Router()
   // Add middleware for mapping request parameters
   .all('*', withParams)
   // Add API routes
@@ -27,5 +27,3 @@ const router = Router()
   .all('/metagame/*', metagame.handle)
   // Catch-all for any other requests
   .all('*', () => Error(404, 'Could not find the requested resource.'));
-
-export default router;
