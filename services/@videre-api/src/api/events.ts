@@ -16,16 +16,19 @@ import { Execute } from '@/db/helpers';
 import { Optional, withValidation } from '@/validation';
 
 
-const router = Router({ base: '/events' })
+export const args = {
+  // Parameters
+  format:     Optional(FormatTypeValidator),
+  // Query args
+  event_id:   Optional(NumberValidator),
+  min_date:   Optional(DateValidator),
+  max_date:   Optional(DateValidator),
+  limit:      Optional(NumberValidator),
+};
+
+export default Router({ base: '/events' })
   .get('/:format?',
-    withValidation({
-      // Parameters
-      format:     Optional(FormatTypeValidator),
-      // Query args
-      min_date:   Optional(DateValidator),
-      max_date:   Optional(DateValidator),
-      limit:      Optional(NumberValidator),
-    }),
+    withValidation(args),
     withPostgres,
     async (req, { sql, params }) => {
       let query = getEvents(sql, params);
@@ -36,5 +39,3 @@ const router = Router({ base: '/events' })
       `, params);
     }
   );
-
-export default router;

@@ -22,12 +22,19 @@ export const getEvents = (
   sql: Sql,
   params: { [key: string]: any }
 ): PendingSql<IEvent[]> => {
-  const { format, min_date, max_date } = params;
+  const {
+    format,
+    event_id,
+    min_date,
+    max_date
+  } = params;
 
   return sql`
     SELECT *
     FROM Events
-    WHERE ${Join(sql, [
+    WHERE ${Join(sql,
+      event_id ? [sql`id = ${event_id}`] :
+    [
       format   && sql`format = ${format}`,
       min_date && sql`date >= ${min_date}`,
       max_date && sql`date <= ${max_date}`

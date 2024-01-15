@@ -7,27 +7,23 @@ import { Router } from 'itty-router';
 
 import { withPostgres } from '@/db/postgres';
 import { getMatchupMatrix } from '@/db/queries';
-import {
-  FormatTypeValidator,
-  DateValidator,
-  NumberValidator,
-  StringValidator
-} from '@/db/validators';
+import { FormatTypeValidator, StringValidator } from '@/db/validators';
 import { Execute } from '@/db/helpers';
-import { Required, Optional, withValidation } from '@/validation';
+import { All, Required, Optional, withValidation } from '@/validation';
+
+import { args as eventArgs } from './events';
 
 
-const router = Router({ base: '/matchups' })
+export const args = All(eventArgs, {
+  // Parameters
+  format:     Required(FormatTypeValidator),
+  // Query args
+  archetype:  Optional(StringValidator),
+});
+
+export default Router({ base: '/matchups' })
   .get('/:format?',
-    withValidation({
-      // Parameters
-      format:     Required(FormatTypeValidator),
-      // Query args
-      min_date:   Optional(DateValidator),
-      max_date:   Optional(DateValidator),
-      limit:      Optional(NumberValidator),
-      archetype:  Optional(StringValidator),
-    }),
+    withValidation(args),
     withPostgres,
     async ({ archetype }, { sql, params }) => {
       let query = getMatchupMatrix(sql, params);
@@ -45,5 +41,3 @@ const router = Router({ base: '/matchups' })
       `, params);
     }
   );
-
-export default router;

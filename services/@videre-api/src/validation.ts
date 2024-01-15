@@ -11,6 +11,13 @@ import { getDefault } from './parameters';
 
 
 /**
+ * Merges multiple validation objects into one.
+ * @param sources The objects to merge.
+ * @returns The merged object.
+ */
+export const All = (...sources: object[]) => Object.assign({}, ...sources);
+
+/**
  * Marks a parameter as required.
  * @param obj The parameter to mark as required.
  * @returns The parameter validator function.

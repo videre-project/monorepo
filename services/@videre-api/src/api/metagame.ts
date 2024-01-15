@@ -7,25 +7,17 @@ import { Router } from 'itty-router';
 
 import { withPostgres } from '@/db/postgres';
 import { getMetagame } from '@/db/queries';
-import {
-  FormatTypeValidator,
-  DateValidator,
-  NumberValidator
-} from '@/db/validators';
 import { Execute } from '@/db/helpers';
-import { Required, Optional, withValidation } from '@/validation';
+import { All, withValidation } from '@/validation';
+
+import { args as eventArgs } from './events';
 
 
-const router = Router({ base: '/metagame' })
+export const args = All(eventArgs);
+
+export default Router({ base: '/metagame' })
   .get('/:format?',
-    withValidation({
-      // Parameters
-      format:     Required(FormatTypeValidator),
-      // Query args
-      min_date:   Optional(DateValidator),
-      max_date:   Optional(DateValidator),
-      limit:      Optional(NumberValidator),
-    }),
+    withValidation(args),
     withPostgres,
     async (req, { sql, params }) => {
       let query = getMetagame(sql, params);
@@ -36,5 +28,3 @@ const router = Router({ base: '/metagame' })
       `, params);
     }
   );
-
-export default router;
