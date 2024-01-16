@@ -15,9 +15,9 @@ import matchups from './matchups';
 import metagame from './metagame';
 
 
+export default Router()
   // Add middleware for caching
   .get('*', useCache)
-export default Router()
   // Add middleware for mapping request parameters
   .all('*', withParams)
   // Add API routes

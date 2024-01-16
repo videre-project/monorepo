@@ -34,13 +34,7 @@ export const withParams = (req: IRequest, { params }: Context, ..._: any[]) => {
   req.proxy = new Proxy(req.proxy || req, {
     get: (obj, prop) => obj[prop] !== undefined
       ? obj[prop].bind?.(req) || obj[prop]
-      : ((prop: string) => {
-        params[prop] ??=
-          obj?.params?.[prop] ??
-          obj?.query?.[prop] ??
-          getDefault(prop);
-        return params[prop];
-      })(prop as string),
+      : obj?.params?.[prop] ?? obj?.query?.[prop],
     set: (obj, prop, value) => {
       // Allow updating of parameters
       if (prop in params)
@@ -61,12 +55,13 @@ export const withParams = (req: IRequest, { params }: Context, ..._: any[]) => {
  * @returns A middleware that filters the request parameters.
  */
 export const useParams = (params: string[]) => {
-  return (req: Request, ctx: Context, ..._: any[]) => {
+  return ({ proxy }: IRequest, ctx: Context, ..._: any[]) => {
     ctx.params = new Proxy(ctx.params, {
-      get: (obj, prop) =>
-        params.includes(prop as string)
-          ? obj[prop as string]
-          : undefined,
+      get: (obj, prop) => {
+        return (obj[prop as string] ??= params.includes(prop as string)
+          ? obj[prop as string] || proxy[prop as string]
+          : undefined);
+      },
       set: (obj, prop, value) =>
         params.includes(prop as string)
         ? obj[prop as string] = value
