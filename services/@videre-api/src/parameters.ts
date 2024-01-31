@@ -12,10 +12,10 @@ import type { Context } from './handler';
  * Default query parameter values.
  */
 export const getDefault = (key: string) => (({
-  /**
-   * Defaults to 3 weeks ago
+    /**
+   * Defaults to 31 days ago
    */
-  min_date: new Date(new Date().setDate(new Date().getDate() - (7 * 3))),
+    min_date: new Date(new Date().setDate(new Date().getDate() - 31)),
   /**
    * Defaults to today
    */
@@ -34,7 +34,12 @@ export const withParams = (req: IRequest, { params }: Context, ..._: any[]) => {
   req.proxy = new Proxy(req.proxy || req, {
     get: (obj, prop) => obj[prop] !== undefined
       ? obj[prop].bind?.(req) || obj[prop]
-      : obj?.params?.[prop] ?? obj?.query?.[prop],
+      : (
+        params[prop as string] ??=
+          obj?.params?.[prop] ??
+          obj?.query?.[prop] ??
+          getDefault(prop as string)
+      ),
     set: (obj, prop, value) => {
       // Allow updating of parameters
       if (prop in params)
@@ -57,11 +62,11 @@ export const withParams = (req: IRequest, { params }: Context, ..._: any[]) => {
 export const useParams = (params: string[]) => {
   return ({ proxy }: IRequest, ctx: Context, ..._: any[]) => {
     ctx.params = new Proxy(ctx.params, {
-      get: (obj, prop) => {
-        return (obj[prop as string] ??= params.includes(prop as string)
+      get: (obj, prop) => (
+        obj[prop as string] ??= params.includes(prop as string)
           ? obj[prop as string] || proxy[prop as string]
-          : undefined);
-      },
+          : undefined
+      ),
       set: (obj, prop, value) =>
         params.includes(prop as string)
         ? obj[prop as string] = value
