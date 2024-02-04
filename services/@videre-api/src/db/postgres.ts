@@ -11,7 +11,13 @@ import type { Context } from '@/handler';
 
 export type Sql = postgres.Sql<{}>;
 
-export type PendingSql<T extends readonly any[]> = postgres.PendingQuery<T>;
+//
+// Unfortunately, TypeScript cannot deduce whether extensions of 'any' are
+// actually a superset of the original type. Refer to below for more details:
+// https://github.com/microsoft/TypeScript/wiki/Breaking-Changes#type-parameters-that-extend-any-no-longer-act-as-any
+//
+// export type PendingSql<T extends readonly any[]> = postgres.PendingQuery<T>;
+export type PendingSql<T extends any> = postgres.PendingQuery<any>;
 
 export type RowList<T extends readonly any[]> = postgres.RowList<T>;
 

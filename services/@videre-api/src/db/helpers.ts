@@ -42,12 +42,15 @@ export async function Execute(
   try {
     data = await new Promise<typeof data>((resolve, reject) => {
       // Set a maximum timeout for the query.
-      setTimeout(() =>
-        reject(Error(500, 'Database query timed out.')),
+      setTimeout(
+        () => {
+          query.cancel(); // Cancel any executing queries / fragments.
+          return reject(Error(500, 'Database query timed out.'))
+        },
         MAX_DB_QUERY_EXECUTION
       );
-      // Execute the query.
-      query
+      // Execute the query within the next tick.
+      query.execute()
         .then(resolve)
         .catch(reject);
     });
