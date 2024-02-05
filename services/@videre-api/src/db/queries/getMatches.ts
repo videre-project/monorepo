@@ -63,13 +63,10 @@ export const getMatches = (
     INNER JOIN Archetypes a1 ON a1.deck_id = d1.id
     INNER JOIN Archetypes a2 ON a2.deck_id = d2.id
     INNER JOIN event_entries e ON e.id = m.event_id
-    WHERE a1.archetype_id IS NOT NULL
-      AND a2.archetype_id IS NOT NULL
-      AND e.id IS NOT NULL
     ORDER BY
       m.event_id,
       m.round,
-    m.player
+      m.player
   `;
 }
 

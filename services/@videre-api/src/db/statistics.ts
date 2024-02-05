@@ -13,9 +13,9 @@ export type CI = `±${number}%`;
  * A row-wise query of wins, losses, ties used within an aggregate query.
  */
 export type RecordQuery = {
-  wins: PendingSql<Number>,
-  losses: PendingSql<Number>,
-  draws: PendingSql<Number>
+  wins: PendingSql<Number[]>,
+  losses: PendingSql<Number[]>,
+  draws: PendingSql<Number[]>
 };
 
 /**
