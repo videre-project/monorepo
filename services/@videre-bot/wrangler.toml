@@ -1,0 +1,10 @@
+name = "videre-bot"
+main = "./src/index.ts"
+compatibility_date = "2023-12-18"
+# compatibility_flags = [ "nodejs_compat" ]
+routes = [
+  { pattern = "bot.videreproject.com", custom_domain = true }
+]
+services = [
+  { binding = "VIDERE_API", service = "videre-api" }
+]

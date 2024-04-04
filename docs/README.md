@@ -73,6 +73,16 @@
       A real-time globally distributed API for Magic: The Gathering.
     </td>
   </tr>
+  <tr>
+    <td style="vertical-align: middle;">
+      <a href="/services/@videre-bot">
+        <img align="top" src="https://img.shields.io/badge/@videre/bot-F38020?style=for-the-badge&logo=Cloudflare&logoColor=white" />
+      </a>
+    </td>
+    <td>
+      A Discord Bot for Magic: The Gathering cards, deck building, and strategy.
+    </td>
+  </tr>
 </table>
 
 ## ✨ Getting Started
@@ -276,7 +286,7 @@ $ yarn g:config jest -d @videre/nodejs <...args?>
 > $ yarn g:workspace @videre/js -v jest --watch -- file.test.ts
 > $ yarn g:workspace config-jest -d @videre/js -v watch -- file.test.ts
 > ```
-> 
+>
 > For config scripts, run commands with `g:config`:
 > ```sh
 > # > videre-project/.../:
