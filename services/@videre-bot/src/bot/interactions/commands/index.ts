@@ -14,7 +14,6 @@ import type {
   ModalEdgeContext
 } from 'slash-create/web';
 
-
 /**
  * The configuration options for a command.
  */
@@ -65,7 +64,6 @@ export class CommandFactory extends SlashCommand {
     super(creator, options);
   }
 }
-
 
 /**
  * Represents a command that can be registered with the bot.

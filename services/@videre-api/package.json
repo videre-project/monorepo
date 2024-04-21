@@ -8,12 +8,12 @@
 	},
 	"dependencies": {
 		"@videre/js": "workspace:^",
-		"itty-router": "^4.0.26",
-		"postgres": "^3.4.3"
+		"itty-router": "^5.0.16",
+		"postgres": "^3.4.4"
 	},
 	"devDependencies": {
 		"@cloudflare/workers-types": "^4.20231025.0",
-		"wrangler": "^3.15.0"
+		"wrangler": "^3.51.2"
 	},
 	"repository": {
 		"type": "git",

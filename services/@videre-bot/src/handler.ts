@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
 */
 
-import { Error, asJSON } from '@videre-api/responses';
+import { Error } from '@videre-api/responses';
 
 import router from './bot';
 import { setBindings } from './bindings';
@@ -19,16 +19,13 @@ export interface Context {
 
 export default (req: Request, ctx: Context, env: Env): Promise<Response> =>
   new Promise((resolve) => {
-    // Set worker bindings
+    // Set API bindings for invoking other Cloudflare workers
     setBindings(env);
 
     // Execute the request
     router
       // Pass Cloudflare provided arguments to the router
-      .handle(req, ctx, env)
-      // Handle any response transformations
-      .then(asJSON)
+      .fetch(req, ctx, env)
       .catch(() => Error(500, 'Encountered a fatal error.'))
-      // .catch((err) => Error(500, err.stack || err.toString()))
       .then(resolve);
   });

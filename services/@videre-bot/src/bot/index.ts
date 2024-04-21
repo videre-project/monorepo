@@ -12,6 +12,6 @@ import discord from './interactions';
 
 export default Router()
   // Add API routes
-  .all('/discord/*', discord.handle)
+  .all('/discord/*', discord.fetch)
   // Catch-all for any other requests
   .all('*', () => Error(404, 'Could not find the requested resource.'));

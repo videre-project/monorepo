@@ -7,18 +7,18 @@ import router from './api';
 import { CacheHandler, updateCache } from './cache';
 import type { Sql } from './db/postgres';
 import type Env from './env';
-import { Error, asJSON } from './responses';
+import { Error } from './responses';
 
 
 /**
  * Maximum request execution time in milliseconds
  */
-export const MAX_TIMEOUT = 10_000; // 10 seconds
+export const MAX_TIMEOUT = 15_000; // 15 seconds
 
 /**
  * Maximum database query execution time in milliseconds
  */
-export const MAX_DB_QUERY_EXECUTION = 8_000; // 8 seconds
+export const MAX_DB_QUERY_EXECUTION = 10_000; // 10 seconds
 
 /**
  * The request context passed through the handler
@@ -38,9 +38,7 @@ export default (req: Request, ctx: Context, env: Env): Promise<Response> =>
     // Execute the request
     router
       // Pass Cloudflare provided arguments to the router
-      .handle(req, ctx, env)
-      // Handle any response transformations
-      .then(asJSON)
+      .fetch(req, ctx, env)
       .catch(() => Error(500, 'Encountered a fatal error.'))
       // Update the cache if provided a cache handler
       .then((res) => ctx.cache ? updateCache(res, ctx) : res)

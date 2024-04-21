@@ -3,11 +3,11 @@
  * SPDX-License-Identifier: Apache-2.0
 */
 
-import { Router } from 'itty-router';
+import { Router, cors } from 'itty-router';
 
 import { useCache } from '@/cache';
 import { withParams } from '@/parameters';
-import { Error } from '@/responses';
+import { Error, asJSON } from '@/responses';
 
 import archetypes from './archetypes';
 import events from './events';
@@ -15,15 +15,17 @@ import matchups from './matchups';
 import metagame from './metagame';
 
 
-export default Router()
+const { preflight, corsify } = cors();
+
+export default Router({ before: [preflight], finally: [asJSON, corsify] })
   // Add middleware for caching
   .get('*', useCache)
   // Add middleware for mapping request parameters
   .all('*', withParams)
   // Add API routes
-  .all('/archetypes/*', archetypes.handle)
-  .all('/events/*', events.handle)
-  .all('/matchups/*', matchups.handle)
-  .all('/metagame/*', metagame.handle)
+  .all('/archetypes/*', archetypes.fetch)
+  .all('/events/*', events.fetch)
+  .all('/matchups/*', matchups.fetch)
+  .all('/metagame/*', metagame.fetch)
   // Catch-all for any other requests
   .all('*', () => Error(404, 'Could not find the requested resource.'));

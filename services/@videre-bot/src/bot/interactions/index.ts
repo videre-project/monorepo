@@ -5,9 +5,10 @@
 
 import { Router } from 'itty-router';
 
-import type Env from "@/env";
 import type { Context } from '@videre-api/handler';
+import { asJSON } from '@videre-api/responses';
 
+import type Env from "@/env";
 import { DiscordHandler, registerServer, cfServer } from './server';
 
 /**
@@ -18,7 +19,7 @@ let instance: DiscordHandler;
 /**
  * Router for handling Discord API requests.
  */
-export default Router({ base: '/discord' })
+export default Router({ base: '/discord', finally: [asJSON] })
   .post('/',
     async (req: Request, { cf }: Context, env: Env): Promise<Response> => {
       // Register the server commands if not already registered
