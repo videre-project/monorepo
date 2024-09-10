@@ -100,7 +100,8 @@ Verify or check your installed NodeJS version by running the below command:
 node --version
 ```
 
-> **Note** If a project requires a specific version of NodeJS determined by the V8 version, use:
+> [!NOTE]
+> If a project requires a specific version of NodeJS determined by the V8 version, use:
 > ```sh
 > $ node
 > > process.versions.v8
@@ -111,7 +112,8 @@ node --version
 
 This project uses the [Yarn](https://yarnpkg.com) package manager to manage project dependencies and scripts. Yarn version 3.5.0+ is supported, though it's recommended to install Yarn through Corepack as detailed below.
 
-> **Note** If you're using Yarn <2.0, you can upgrade by running `yarn set version berry`.
+> [!NOTE]
+> If you're using Yarn <2.0, you can upgrade by running `yarn set version berry`.
 
 The recommended way to install or upgrade Yarn is through a NodeJS binary called [Corepack](https://nodejs.org/api/corepack.html). Corepack installs a proxy for Yarn or PNPM binaries that transparently intercepts Yarn or PNPM commands, installs them (if not already installed), and runs the command. This vastly simplifies installation and versioning of package managers across NodeJS projects without the fuss of OS-specific quirks.
 
@@ -152,7 +154,8 @@ $ yarn workspace <workspace> run <script>
 $ yarn workspace <workspace> <script>
 ```
 
-> **Note** You can also use `yarn run <script>` or `yarn run <script>` to run a script from your current working directory. This is the recommended way of running scripts if you're working on a specific project.
+> ![NOTE]
+> You can also use `yarn run <script>` or `yarn run <script>` to run a script from your current working directory. This is the recommended way of running scripts if you're working on a specific project.
 
 Additionally, to run scripts by name from all workspaces, use:
 ```sh
@@ -305,7 +308,8 @@ Optional flags include:
 - `(-q|--quiet)` Disables yarn runner output (perserves script output).
 - `(-v|--verbose)` Enables verbose yarn runner script tracing.
 
-> **Note** The `default` argument for `g:config` scripts must be the current working directory or the name/location of a workspace. This is done to allow for scripts to efficiently read and execute in the expected workspace location.
+> [!NOTE]
+> The `default` argument for `g:config` scripts must be the current working directory or the name/location of a workspace. This is done to allow for scripts to efficiently read and execute in the expected workspace location.
 
 ## 🔥 Contributing
 Contributions of any size to this project are always welcome!
