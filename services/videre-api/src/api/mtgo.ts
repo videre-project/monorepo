@@ -11,7 +11,7 @@ export interface AssemblyIdentity {
   version: string;
   file: string;
   size?: number;
-  publicKey?: string;
+  public_key?: string;
   hash?: { algorithm: string, value: string };
 }
 
@@ -19,7 +19,7 @@ export interface DeploymentManifest {
   version: string;
   codebase: string;
   date: string;
-  publicKey: string;
+  public_key: string;
   dependencies: AssemblyIdentity[];
 }
 
@@ -73,7 +73,7 @@ export default Router({ base: '/mtgo' })
 
         if (assembly.includes('publicKeyToken=')) {
           const publicKey = assembly.match(/(?<=publicKeyToken=")(.*?)(?=")/)![0];
-          entry['publicKey'] = publicKey.toLowerCase();
+          entry['public_key'] = publicKey.toLowerCase();
         }
 
         if (assembly.includes('urn:schemas-microsoft-com:HashTransforms.Identity')) {
@@ -90,7 +90,7 @@ export default Router({ base: '/mtgo' })
         dependencies.push(entry);
       }
 
-      const data = { version, codebase, date, publicKey, dependencies } as DeploymentManifest;
+      const data = { version, codebase, date, public_key: publicKey, dependencies } as DeploymentManifest;
 
       return data;
     }
