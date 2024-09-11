@@ -13,6 +13,7 @@ import archetypes from './archetypes';
 import events from './events';
 import matchups from './matchups';
 import metagame from './metagame';
+import mtgo from './mtgo';
 
 
 const { preflight, corsify } = cors();
@@ -27,5 +28,6 @@ export default Router({ before: [preflight], finally: [asJSON, corsify] })
   .all('/events/*', events.fetch)
   .all('/matchups/*', matchups.fetch)
   .all('/metagame/*', metagame.fetch)
+  .all('/mtgo/*', mtgo.fetch)
   // Catch-all for any other requests
   .all('*', () => Error(404, 'Could not find the requested resource.'));
