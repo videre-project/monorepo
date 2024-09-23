@@ -5,10 +5,10 @@
     "paths": {
       "@/*": ["./src/*"],
       "^/*": ["./src/bot/*"],
-      "@videre-api/*": ["../@videre-api/src/*"],
+      "@videre-api/*": ["../videre-api/src/*"],
     },
 		"types": ["@cloudflare/workers-types"]
   },
-  "include": ["src", "../@videre-api/src"],
+  "include": ["src", "../videre-api/src"],
 	"exclude": ["node_modules", "dist", "test"]
 }
