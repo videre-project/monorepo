@@ -37,7 +37,7 @@ export const getDeckStatistics = (
       WITH
         entries AS (${deck_entries})
       SELECT
-        e.archetype,
+        e.archetype_id,
         c.name as card,
         COUNT(DISTINCT e.id)::int as count,
         SUM(c.quantity)::int as total,
@@ -45,8 +45,11 @@ export const getDeckStatistics = (
           SUM(c.quantity) / (1.0 * COUNT(DISTINCT e.id)), 2
         )::float AS average
       FROM entries e, unnest(${sql('e.' + board)}) AS c (id, name, quantity)
+      WHERE
+        e.archetype_id is not null
       GROUP BY
-        e.archetype, c.name
+        e.archetype_id, c.name,
+        e.archetype
       ORDER BY
         archetype,
         count DESC,
@@ -60,12 +63,12 @@ export const getDeckStatistics = (
         presence AS (${presence}),
         board_entries AS (${board_entries})
       SELECT
-        p.archetype,
+        p.id as archetype_id,
         json_agg(
           json_build_object(
             'card', e.card,
-            'count', e.count,
-            'percentage', TO_CHAR(e.count * (100.0 / p.count), 'FM990.00%'),
+            'count', LEAST(e.count, p.count),
+            'percentage', TO_CHAR(LEAST(e.count, p.count) * (100.0 / p.count), 'FM990.00%'),
             'total', e.total,
             'average', e.average
           )
@@ -75,11 +78,11 @@ export const getDeckStatistics = (
             e.average DESC
         ) AS ${sql(board as string)}
       FROM board_entries e
-      INNER JOIN presence p ON p.archetype = e.archetype
+      INNER JOIN presence p ON p.id = e.archetype_id
       WHERE
         e.count * (100.0 / p.count) >= 1.0
       GROUP BY
-        p.archetype
+        p.id
     `;
   }
 
@@ -95,8 +98,8 @@ export const getDeckStatistics = (
       m.mainboard,
       s.sideboard
     FROM presence p
-    INNER JOIN mainboard_entries m ON m.archetype = p.archetype
-    INNER JOIN sideboard_entries s ON s.archetype = p.archetype
+    INNER JOIN mainboard_entries m ON m.archetype_id = p.id
+    INNER JOIN sideboard_entries s ON s.archetype_id = p.id
     ORDER BY
       p.count DESC
   `;
