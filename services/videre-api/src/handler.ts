@@ -40,6 +40,10 @@ export default (req: Request, ctx: Context, env: Env): Promise<Response> =>
       // Pass Cloudflare provided arguments to the router
       .fetch(req, ctx, env)
       .catch(() => Error(500, 'Encountered a fatal error.'))
+      // .catch((err) => {
+      //   console.error(err);
+      //   return Error(500, 'Encountered a fatal error.');
+      // })
       // Update the cache if provided a cache handler
       .then((res) => ctx.cache ? updateCache(res, ctx) : res)
       .then(resolve);

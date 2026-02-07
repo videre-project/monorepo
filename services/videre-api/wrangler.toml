@@ -5,3 +5,12 @@ compatibility_flags = [ "nodejs_compat" ]
 routes = [
   { pattern = "api.videreproject.com", custom_domain = true }
 ]
+
+[vars]
+PGHOST = "db1.videreproject.com"
+PGPORT = "5432"
+PGDATABASE = "mtgo"
+PGUSER = "api"
+PGSSL = "true"
+CF_CLIENT_ID = ""
+CF_CLIENT_SECRET = ""

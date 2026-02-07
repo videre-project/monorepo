@@ -7,8 +7,12 @@ import { Url } from "url";
 
 
 export default interface Env {
-	PGHOST: Url;
-	PGDATABASE: String;
-	PGUSER: String;
-	PGPASSWORD: String;
+  PGHOST: Url;
+  PGDATABASE: String;
+  PGUSER: String;
+  PGPASSWORD: String;
+  PGPORT?: string;
+  PGSSL?: string | boolean;
+  CF_CLIENT_ID?: string;
+  CF_CLIENT_SECRET?: string;
 }
