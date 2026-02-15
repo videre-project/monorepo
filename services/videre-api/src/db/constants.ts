@@ -11,6 +11,7 @@ export const FORMATS = [
   'Vintage',
   'Legacy',
   'Pauper',
+  'Premodern',
 ] as const;
 
 export const EVENTS = [
