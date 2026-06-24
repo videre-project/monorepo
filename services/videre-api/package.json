@@ -7,17 +7,11 @@
 		"deploy": "wrangler deploy src/index.ts"
 	},
 	"dependencies": {
-		"@videre/js": "workspace:^",
 		"itty-router": "^5.0.16",
 		"postgres": "^3.4.4"
 	},
 	"devDependencies": {
 		"@cloudflare/workers-types": "^4.20231025.0",
 		"wrangler": "^3.51.2"
-	},
-	"repository": {
-		"type": "git",
-		"url": "ssh://git@github.com/videre-project/videre-project.git",
-		"directory": "services/@videre-api"
 	}
 }

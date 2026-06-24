@@ -4,10 +4,12 @@
 */
 
 import { error } from 'itty-router';
-import { toPascalCase } from '@videre/js';
 
 import { FORMATS } from '@/db/constants';
 import type { FormatType } from '@/db/types';
+
+const toPascalCase = (text: string): string =>
+  text.replace(/(?:^|[_\s-])(\w)/g, (_, c) => c.toUpperCase());
 
 
 /**

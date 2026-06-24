@@ -1,8 +1,15 @@
 {
-  "extends": "../../config/tsc/tsconfig.edge.json",
+  "extends": "../../tsconfig.base.json",
   "compilerOptions": {
     "baseUrl": ".",
-		"types": ["@cloudflare/workers-types"]
+    "types": [
+      "@cloudflare/workers-types",
+      "node"
+    ]
   },
-	"exclude": ["node_modules", "dist", "test"]
+  "exclude": [
+    "node_modules",
+    "dist",
+    "test"
+  ]
 }

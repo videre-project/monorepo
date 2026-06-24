@@ -19,10 +19,5 @@
 		"dotenv": "^16.4.5",
 		"slash-up": "^1.4.2",
 		"wrangler": "^3.51.2"
-	},
-	"repository": {
-		"type": "git",
-		"url": "ssh://git@github.com/videre-project/videre-project.git",
-		"directory": "services/@videre-bot"
 	}
 }
