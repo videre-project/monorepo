@@ -5,7 +5,16 @@
 
 import type { PendingSql, Sql } from '../../postgres.ts';
 
-import type { EventQueryParams, IDeck, IEvent, IMatch } from './types.ts';
+import {
+  DECK_SUMMARY_ARCHETYPE_FIELDS,
+  DECK_SUMMARY_DECK_FIELDS,
+  EVENT_DATE_FORMAT_FIELDS,
+  EVENT_FIELDS,
+  type EventQueryParams,
+  type IDeck,
+  type IEvent,
+  type IMatch,
+} from './types.ts';
 export type { EventQueryParams, IDeck, IEvent, IMatch } from './types.ts';
 
 export const getEvents = (
@@ -13,14 +22,7 @@ export const getEvents = (
   params: EventQueryParams
 ): PendingSql<IEvent[]> => {
   return sql`
-    SELECT
-      e.id,
-      e.name,
-      e.date,
-      e.format,
-      e.kind,
-      e.rounds,
-      e.players
+    SELECT ${eventSelectFields(sql)}
     FROM Events e
     WHERE ${eventPredicates(sql, params)}
     ORDER BY
@@ -40,11 +42,8 @@ export const getDecks = (
       event_entries AS (${eventEntries})
     SELECT
       a.deck_id AS id,
-      a.name,
-      a.archetype,
-      a.archetype_id,
-      d.mainboard,
-      d.sideboard
+      ${tableFields(sql, 'a', DECK_SUMMARY_ARCHETYPE_FIELDS)},
+      ${tableFields(sql, 'd', DECK_SUMMARY_DECK_FIELDS)}
     FROM Archetypes a
     INNER JOIN Decks d ON d.id = a.deck_id
     INNER JOIN event_entries e ON e.id = d.event_id
@@ -67,8 +66,7 @@ export const getMatches = (
       a1.archetype_id AS id1,
       a2.archetype_id AS id2,
       a1.deck_id,
-      e.date,
-      e.format,
+      ${tableFields(sql, 'e', EVENT_DATE_FORMAT_FIELDS)},
       m.event_id,
       e.kind AS event_type,
       a1.archetype AS archetype1,
@@ -107,4 +105,16 @@ function eventPredicates(sql: Sql, params: EventQueryParams): PendingSql<unknown
     AND (${params.min_date ?? null}::date IS NULL OR e.date >= ${params.min_date ?? null}::date)
     AND (${params.max_date ?? null}::date IS NULL OR e.date <= ${params.max_date ?? null}::date)
   `;
+}
+
+function eventSelectFields(sql: Sql): PendingSql<unknown[]> {
+  return tableFields(sql, 'e', EVENT_FIELDS);
+}
+
+function tableFields(
+  sql: Sql,
+  alias: string,
+  fields: readonly string[]
+): PendingSql<unknown[]> {
+  return sql.unsafe(fields.map((field) => `${alias}.${field}`).join(', '));
 }

@@ -3,10 +3,16 @@
  * SPDX-License-Identifier: Apache-2.0
 */
 
+import { compile, jsonBuildObjectFromColumns } from '@videre/sql-builder';
+
 import type { PendingSql, Sql } from '../../postgres.ts';
 
 import getMatchups from './getMatchups.ts';
-import type { IMatchupMatrix } from './types.ts';
+import { MATCHUP_SUMMARY_FIELDS, type IMatchupMatrix } from './types.ts';
+
+const matchupSummaryJsonObject = compile(
+  jsonBuildObjectFromColumns('m', MATCHUP_SUMMARY_FIELDS)
+);
 
 export const getMatchupMatrix = (
   sql: Sql,
@@ -18,32 +24,34 @@ export const getMatchupMatrix = (
     WITH
       matchups AS (${matchups})
     SELECT
-      id1 as id,
-      archetype1 AS archetype,
+      source.id1 as id,
+      source.archetype1 AS archetype,
       json_agg(
-        json_build_object(
-          'id', id2,
-          'archetype', archetype2,
-          'match_count', match_count,
-          'match_winrate', match_winrate,
-          'match_ci', match_ci,
-          'game_count', game_count,
-          'game_winrate', game_winrate,
-          'game_ci', game_ci
-        )
+        ${sql.unsafe(matchupSummaryJsonObject.text, [...matchupSummaryJsonObject.values])}
         ORDER BY
-          match_count DESC,
-          match_winrate DESC,
-          game_count DESC,
-          game_winrate DESC
+          source.match_count DESC,
+          source.match_winrate DESC,
+          source.game_count DESC,
+          source.game_winrate DESC
       ) AS matchups
-    FROM matchups
+    FROM matchups source
+    CROSS JOIN LATERAL (
+      SELECT
+        source.id2 AS id,
+        source.archetype2 AS archetype,
+        source.match_count,
+        source.match_winrate,
+        source.match_ci,
+        source.game_count,
+        source.game_winrate,
+        source.game_ci
+    ) m
     GROUP BY
-      id1,
-      archetype1
+      source.id1,
+      source.archetype1
     ORDER BY
-      SUM(match_count) DESC,
-      SUM(game_count) DESC
+      SUM(source.match_count) DESC,
+      SUM(source.game_count) DESC
   `;
 }
 

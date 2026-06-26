@@ -12,7 +12,7 @@ import { Execute } from '@/db/helpers';
 import { clampListLimit } from '@/queryPolicy';
 import { All, Required, withValidation } from '@/validation';
 
-import { args as eventArgs } from './events';
+import { eventFilterArgs as eventArgs } from './events';
 
 
 export const args = All(eventArgs, {

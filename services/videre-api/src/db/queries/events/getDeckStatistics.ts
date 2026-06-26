@@ -3,12 +3,33 @@
  * SPDX-License-Identifier: Apache-2.0
 */
 
+import {
+  compile,
+  jsonBuildObject,
+  raw,
+  type SqlFragment,
+} from '@videre/sql-builder';
+
 import type { PendingSql, Sql } from '../../postgres.ts';
 
 import { getDecks, getMatches } from './getEvents.ts';
-import type { IDeckStatistics } from './types.ts';
+import type { ICardStatistics, IDeckStatistics } from './types.ts';
 
 type DeckBoard = 'mainboard' | 'sideboard';
+
+const cardStatisticsJsonFields = {
+  card: raw('e.card'),
+  count: raw('LEAST(e.count, p.count)'),
+  percentage: raw(
+    "TO_CHAR(LEAST(e.count, p.count) * (100.0 / p.count), 'FM990.00%')"
+  ),
+  total: raw('e.total'),
+  average: raw('e.average'),
+} satisfies Record<keyof ICardStatistics, SqlFragment>;
+
+const cardStatisticsJsonObject = compile(
+  jsonBuildObject(cardStatisticsJsonFields)
+);
 
 export const getDeckStatistics = (
   sql: Sql,
@@ -82,13 +103,7 @@ function buildBoardStats(
     SELECT
       p.id as archetype_id,
       json_agg(
-        json_build_object(
-          'card', e.card,
-          'count', LEAST(e.count, p.count),
-          'percentage', TO_CHAR(LEAST(e.count, p.count) * (100.0 / p.count), 'FM990.00%'),
-          'total', e.total,
-          'average', e.average
-        )
+        ${sql.unsafe(cardStatisticsJsonObject.text, [...cardStatisticsJsonObject.values])}
         ORDER BY
           e.count DESC,
           e.total DESC,

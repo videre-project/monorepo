@@ -1,16 +1,17 @@
 /* @file
- * Copyright (c) 2024, The Videre Project Authors. All rights reserved.
+ * Copyright (c) 2026, The Videre Project Authors. All rights reserved.
  * SPDX-License-Identifier: Apache-2.0
 */
 
 import { Router } from 'itty-router';
 
 import { withPostgres } from '@/db/postgres';
-import { getEvents } from '@/db/queries';
+import { getEventDecks } from '@/db/queries';
 import {
-  FormatTypeValidator,
   DateValidator,
-  NumberValidator
+  FormatTypeValidator,
+  NumberValidator,
+  StringValidator
 } from '@/db/validators';
 import {
   buildListResponse,
@@ -21,27 +22,24 @@ import {
 } from '@/responses';
 import { Optional, withValidation } from '@/validation';
 
-
-export const eventFilterArgs = {
-  format:     Optional(FormatTypeValidator),
-  event_id:   Optional(NumberValidator),
-  min_date:   Optional(DateValidator),
-  max_date:   Optional(DateValidator),
-  limit:      Optional(NumberValidator),
-};
-
 export const args = {
-  ...eventFilterArgs,
-  offset:     Optional(NumberValidator),
+  format:    Optional(FormatTypeValidator),
+  event_id:  Optional(NumberValidator),
+  min_date:  Optional(DateValidator),
+  max_date:  Optional(DateValidator),
+  player:    Optional(StringValidator),
+  archetype: Optional(StringValidator),
+  limit:     Optional(NumberValidator),
+  offset:    Optional(NumberValidator),
 };
 
-export default Router({ base: '/events' })
+export default Router({ base: '/decks' })
   .get('/:format?',
     withValidation(args),
     withPostgres,
     async (req, { sql, params }) => {
       const start = performance.now();
-      const query = getEvents(sql, params);
+      const query = getEventDecks(sql, params);
       const limit = getListLimit(params);
       const offset = getListOffset(params);
       const rows = await sql`

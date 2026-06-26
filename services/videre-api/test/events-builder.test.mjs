@@ -8,6 +8,11 @@ import {
   buildEventsQuery,
   buildMatchesQuery,
 } from '../src/db/queries/events/buildEventQueries.ts';
+import {
+  getEventDecks,
+  getEventMatches,
+  getEventStandings,
+} from '../src/db/queries/events/getEventData.ts';
 import { getDeckStatistics } from '../src/db/queries/events/getDeckStatistics.ts';
 import { getMatchupMatrix } from '../src/db/queries/events/getMatchupMatrix.ts';
 import { getMetagame } from '../src/db/queries/events/getMetagame.ts';
@@ -16,8 +21,8 @@ const sql = postgres({
   host: process.env.PGHOST ?? '127.0.0.1',
   port: Number(process.env.PGPORT ?? 6432),
   database: process.env.PGDATABASE ?? 'mtgo',
-  username: process.env.PGUSER ?? 'api',
-  password: process.env.PGPASSWORD ?? 'replace_with_a_strong_password',
+  username: process.env.PGUSER ?? 'public_api',
+  password: process.env.PGPASSWORD || undefined,
   ssl: process.env.PGSSL === 'true' ? 'require' : false,
   transform: {
     undefined: null,
@@ -43,6 +48,11 @@ test('event builders return events, decks, and matches for a real event', async 
       SELECT 1
       FROM Matches m
       WHERE m.event_id = e.id
+    )
+      AND EXISTS (
+      SELECT 1
+      FROM Standings s
+      WHERE s.event_id = e.id
     )
       AND EXISTS (
         SELECT 1
@@ -83,6 +93,22 @@ test('event builders return events, decks, and matches for a real event', async 
   assert.ok(matches.length > 0);
   assert.ok(matches.every((match) => match.event_id === candidate.id));
   assert.ok(matches.every((match) => typeof match.games === 'string'));
+
+
+  const eventDecks = await getEventDecks(sql, { event_id: candidate.id });
+  assert.ok(eventDecks.length > 0);
+  assert.ok(eventDecks.every((deck) => deck.event_id === candidate.id));
+  assert.ok(Array.isArray(eventDecks[0].mainboard));
+
+  const eventMatches = await getEventMatches(sql, { event_id: candidate.id });
+  assert.ok(eventMatches.length > 0);
+  assert.ok(eventMatches.every((match) => match.event_id === candidate.id));
+  assert.ok(Array.isArray(eventMatches[0].games));
+
+  const eventStandings = await getEventStandings(sql, { event_id: candidate.id });
+  assert.ok(eventStandings.length > 0);
+  assert.ok(eventStandings.every((standing) => standing.event_id === candidate.id));
+  assert.ok('points' in eventStandings[0]);
 
   const metagame = await getMetagame(sql, { event_id: candidate.id });
   assert.ok(metagame.length > 0);

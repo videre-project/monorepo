@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
 */
 
-import { ident, join, param, sql, toFragment } from './fragments.ts';
+import { ident, join, raw, sql, toFragment } from './fragments.ts';
 import type { JsonObjectFields, SelectFields, SqlFragment } from './types.ts';
 
 export const jsonBuildObject = <const TKey extends string>(
@@ -11,10 +11,13 @@ export const jsonBuildObject = <const TKey extends string>(
 ): SqlFragment => {
   const entries = Object.entries(fields) as [TKey, SqlFragment | string][];
   return sql`json_build_object(${join(entries.flatMap(([key, value]) => [
-    param(key),
+    stringLiteral(key),
     toFragment(value),
   ]))})`;
 };
+
+const stringLiteral = (value: string): SqlFragment =>
+  raw(`'${value.replaceAll("'", "''")}'`);
 
 export const jsonBuildObjectFromColumns = <const TColumnName extends string>(
   alias: string,

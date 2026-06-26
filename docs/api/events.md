@@ -23,12 +23,15 @@ window used by the API.
 /events?event_id=12345
 ```
 
-Supported query parameters are `format`, `event_id`, `min_date`, `max_date`, and `limit`.
+Supported query parameters are `format`, `event_id`, `min_date`, `max_date`, `limit`, and `offset`.
 
 `min_date` and `max_date` use calendar dates in `YYYY-MM-DD` form. `limit`
 controls how many event rows are returned after sorting by newest event first.
-Use `event_id` when linking from another endpoint back to the exact source
-event.
+Use `offset` with `limit` to page through event history. Use `event_id` when
+linking from another endpoint back to the exact source event.
+
+Responses use the standard list envelope with `meta.limit`, `meta.offset`,
+`meta.has_more`, and `meta.next_offset`.
 
 ## Response Shape
 

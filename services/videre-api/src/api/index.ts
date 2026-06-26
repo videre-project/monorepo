@@ -11,12 +11,15 @@ import { Error, asJSON } from '@/responses';
 
 import archetypes from './archetypes';
 import cards from './cards';
+import decks from './decks';
 import events from './events';
 import matchups from './matchups';
+import matches from './matches';
 import metagame from './metagame';
 import mtgo from './mtgo';
 import products from './products';
 import sets from './sets';
+import standings from './standings';
 
 
 const { preflight, corsify } = cors();
@@ -28,10 +31,14 @@ export default Router({ before: [preflight], finally: [asJSON, corsify] })
   .all('/archetypes/*', archetypes.fetch)
   .all('/cards', cards.fetch)
   .all('/cards/*', cards.fetch)
+  .all('/decks', decks.fetch)
+  .all('/decks/*', decks.fetch)
   .all('/events', events.fetch)
   .all('/events/*', events.fetch)
   .all('/matchups', matchups.fetch)
   .all('/matchups/*', matchups.fetch)
+  .all('/matches', matches.fetch)
+  .all('/matches/*', matches.fetch)
   .all('/metagame', metagame.fetch)
   .all('/metagame/*', metagame.fetch)
   .all('/mtgo', mtgo.fetch)
@@ -40,4 +47,6 @@ export default Router({ before: [preflight], finally: [asJSON, corsify] })
   .all('/products/*', products.fetch)
   .all('/sets', sets.fetch)
   .all('/sets/*', sets.fetch)
+  .all('/standings', standings.fetch)
+  .all('/standings/*', standings.fetch)
   .all('*', () => Error(404, 'Could not find the requested resource.'));

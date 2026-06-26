@@ -13,8 +13,8 @@ const sql = postgres({
   host: process.env.PGHOST ?? '127.0.0.1',
   port: Number(process.env.PGPORT ?? 6432),
   database: process.env.PGDATABASE ?? 'mtgo',
-  username: process.env.PGUSER ?? 'api',
-  password: process.env.PGPASSWORD ?? 'replace_with_a_strong_password',
+  username: process.env.PGUSER ?? 'public_api',
+  password: process.env.PGPASSWORD || undefined,
   ssl: process.env.PGSSL === 'true' ? 'require' : false,
   transform: {
     undefined: null,

@@ -143,17 +143,17 @@ test("builds JSON objects from keyed SQL expressions", () => {
     name: raw("c.name"),
   }));
 
-  assert.equal(query.text, "json_build_object($1, c.id, $2, c.name)");
-  assert.deepEqual(query.values, ["id", "name"]);
+  assert.equal(query.text, "json_build_object('id', c.id, 'name', c.name)");
+  assert.deepEqual(query.values, []);
 });
 
 test("builds JSON objects from aliased column names", () => {
   const query = compile(jsonBuildObjectFromColumns("c", ["id", "name"] as const));
 
   assert.equal(query.text, [
-    "json_build_object($1, \"c\".\"id\", $2, \"c\".\"name\")",
+    "json_build_object('id', \"c\".\"id\", 'name', \"c\".\"name\")",
   ].join("\n"));
-  assert.deepEqual(query.values, ["id", "name"]);
+  assert.deepEqual(query.values, []);
 });
 
 test("builds declarative typed filter sets", () => {

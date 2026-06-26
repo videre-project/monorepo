@@ -16,7 +16,7 @@ const sql = postgres({
   port: Number(process.env.PGPORT || 5432),
   database: requireEnv('PGDATABASE'),
   username: requireEnv('PGUSER'),
-  password: requireEnv('PGPASSWORD'),
+  password: optionalEnv('PGPASSWORD'),
   ssl: parseSsl(process.env.PGSSL),
   max: 1,
   transform: {
@@ -386,6 +386,11 @@ function requireEnv(name) {
     throw new Error(`Missing required environment variable: ${name}`);
   }
   return value;
+}
+
+function optionalEnv(name) {
+  const value = process.env[name];
+  return value === '' ? undefined : value;
 }
 
 function loadDevVars(filePath) {
