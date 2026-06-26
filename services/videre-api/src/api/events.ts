@@ -13,13 +13,12 @@ import {
   NumberValidator
 } from '@/db/validators';
 import { Execute } from '@/db/helpers';
+import { clampListLimit } from '@/queryPolicy';
 import { Optional, withValidation } from '@/validation';
 
 
 export const args = {
-  // Parameters
   format:     Optional(FormatTypeValidator),
-  // Query args
   event_id:   Optional(NumberValidator),
   min_date:   Optional(DateValidator),
   max_date:   Optional(DateValidator),
@@ -32,10 +31,11 @@ export default Router({ base: '/events' })
     withPostgres,
     async (req, { sql, params }) => {
       let query = getEvents(sql, params);
+      const limit = clampListLimit(params.limit);
 
       return await Execute(sql`
         SELECT * FROM (${query})
-        LIMIT ${params.limit}
+        LIMIT ${limit}
       `, params);
     }
   );

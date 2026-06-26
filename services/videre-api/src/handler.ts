@@ -32,19 +32,25 @@ export interface Context {
 
 export default (req: Request, ctx: Context, env: Env): Promise<Response> =>
   new Promise((resolve) => {
-    // Set a request timeout to prevent hanging requests
-    setTimeout(() => resolve(Error(408, 'Request timed out')), MAX_TIMEOUT);
+    const timeout = setTimeout(
+      () => resolve(Error(408, 'Request timed out')),
+      MAX_TIMEOUT
+    );
 
-    // Execute the request
     router
-      // Pass Cloudflare provided arguments to the router
       .fetch(req, ctx, env)
       .catch(() => Error(500, 'Encountered a fatal error.'))
-      // .catch((err) => {
-      //   console.error(err);
-      //   return Error(500, 'Encountered a fatal error.');
-      // })
-      // Update the cache if provided a cache handler
       .then((res) => ctx.cache ? updateCache(res, ctx) : res)
-      .then(resolve);
+      .then((res) => {
+        clearTimeout(timeout);
+        resolve(res);
+      })
+      .finally(() => {
+        if (ctx.sql) {
+          ctx.cf.waitUntil(
+            ctx.sql.end({ timeout: 1 })
+              .catch((err) => console.error('[Postgres] Failed to close client:', err))
+          );
+        }
+      });
   });

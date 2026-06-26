@@ -1,37 +1,27 @@
 /* @file
- * Copyright (c) 2024, The Videre Project Authors. All rights reserved.
+ * Copyright (c) 2026, The Videre Project Authors. All rights reserved.
  * SPDX-License-Identifier: Apache-2.0
 */
 
-import type { PendingSql, Sql } from '@/db/postgres';
-import { Percentage, CI, fromMatches } from '@/db/statistics';
+import type { PendingSql, Sql } from '../../postgres.ts';
+import { fromMatches } from '../../statistics.ts';
 
-import getMatches from './getMatches';
-
-
-export interface IMatchup {
-  id1: string,
-  id2: string,
-  archetype1: String,
-  archetype2: String,
-  match_count: Number,
-  match_winrate: Percentage,
-  match_ci: CI,
-  game_count: Number,
-  game_winrate: Percentage,
-  game_ci: CI
-};
+import { getMatches } from './getEvents.ts';
+import type { IMatchup } from './types.ts';
 
 export const getMatchups = (
   sql: Sql,
   params: { [key: string]: any }
 ): PendingSql<IMatchup[]> => {
-  const match_entries = getMatches(sql, params);
+  const matchEntries = getMatches(sql, params);
+  const archetypeFilter = params.archetype
+    ? sql`AND archetype1 = ${params.archetype}`
+    : sql``;
   const { matches, games } = fromMatches(sql);
 
   return sql`
     WITH
-      match_entries AS (${match_entries})
+      match_entries AS (${matchEntries})
     SELECT
       id1,
       id2,
@@ -46,16 +36,12 @@ export const getMatchups = (
     FROM match_entries
     WHERE
       archetype1 != archetype2
+      ${archetypeFilter}
     GROUP BY
       id1,
       id2,
       archetype1,
       archetype2
-    ORDER BY
-      match_count DESC,
-      match_winrate DESC,
-      game_count DESC,
-      game_winrate DESC
   `;
 }
 

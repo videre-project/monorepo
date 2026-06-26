@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
 */
 
-import { PendingSql, Sql } from "./postgres";
+import type { PendingSql, Sql } from "./postgres.ts";
 
 
 export type Percentage = `${number}%`;

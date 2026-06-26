@@ -9,13 +9,13 @@ import { withPostgres } from '@/db/postgres';
 import { getMetagame } from '@/db/queries';
 import { FormatTypeValidator } from '@/db/validators';
 import { Execute } from '@/db/helpers';
+import { clampListLimit } from '@/queryPolicy';
 import { All, Required, withValidation } from '@/validation';
 
 import { args as eventArgs } from './events';
 
 
 export const args = All(eventArgs, {
-  // Parameters
   format:     Required(FormatTypeValidator),
 });
 
@@ -25,10 +25,11 @@ export default Router({ base: '/metagame' })
     withPostgres,
     async (req, { sql, params }) => {
       let query = getMetagame(sql, params);
+      const limit = clampListLimit(params.limit);
 
       return await Execute(sql`
         SELECT * FROM (${query})
-        LIMIT ${params.limit}
+        LIMIT ${limit}
       `, params);
     }
   );

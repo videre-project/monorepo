@@ -1,20 +1,12 @@
 /* @file
- * Copyright (c) 2024, The Videre Project Authors. All rights reserved.
+ * Copyright (c) 2026, The Videre Project Authors. All rights reserved.
  * SPDX-License-Identifier: Apache-2.0
 */
 
-import type { PendingSql, Sql } from '@/db/postgres';
+import type { PendingSql, Sql } from '../../postgres.ts';
 
-import getMatchups from './getMatchups';
-import type { IWinrate } from './getWinrates';
-
-
-
-export interface IMatchupMatrix {
-  id: string,
-  archetype: String,
-  matchups: IWinrate[] & { id: string }[]
-};
+import getMatchups from './getMatchups.ts';
+import type { IMatchupMatrix } from './types.ts';
 
 export const getMatchupMatrix = (
   sql: Sql,

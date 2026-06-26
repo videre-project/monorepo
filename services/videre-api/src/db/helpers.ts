@@ -8,32 +8,6 @@ import { Error } from '@/responses';
 
 import type { PendingSql, RowList, Sql } from "./postgres";
 
-
-/**
- * Joins a list of SQL statements together with a separator.
- * @param sql The SQL template tag.
- * @param statements The list of SQL statements to join.
- * @param separator The separator to use between statements.
- * @returns The joined SQL statement.
- */
-export function Join(
-  sql: Sql,
-  statements: PendingSql<any>[],
-  separator: 'AND' | 'OR' = 'AND'
-): PendingSql<any> {
-  return statements
-    .filter(Boolean)
-    .reduce((acc, cur, i) =>
-      acc = !i ? cur : sql`${acc} ${sql.unsafe(separator)} ${cur}`, null!
-    );
-}
-
-/**
- * Executes a SQL query to use for a response.
- * @param query The query to execute.
- * @param parameters The parameters used by the query.
- * @returns The results of the query.
- */
 export async function Execute(
   query: PendingSql<any[]>,
   parameters: { [key: string]: any } = {}
@@ -42,23 +16,21 @@ export async function Execute(
   let data: RowList<any[]> = null!;
   try {
     data = await new Promise<typeof data>((resolve, reject) => {
-      // Set a maximum timeout for the query.
-      setTimeout(
-        () => {
-          query.cancel(); // Cancel any executing queries / fragments.
-          return reject(Error(500, 'Database query timed out.'))
-        },
-        MAX_DB_QUERY_EXECUTION
-      );
-      // Execute the query within the next tick.
+      const timeout = setTimeout(() => {
+        query.cancel();
+        return reject(Error(500, 'Database query timed out.'))
+      }, MAX_DB_QUERY_EXECUTION);
+
       query
         .then(resolve)
-        .catch(reject);
+        .catch(reject)
+        .finally(() => clearTimeout(timeout));
     });
   } catch (err: any) {
     console.error('[Execute] Fatal error:', err);
 
-    // Be extremely aggressive about capturing the error detail
+    // Workers can stringify opaque thrown values poorly, so copy what we can
+    // before returning a sanitized API error.
     const errorDetail: any = {};
     if (err instanceof globalThis.Error) {
       errorDetail.message = (err as any).message;
@@ -66,7 +38,6 @@ export async function Execute(
       errorDetail.stack = (err as any).stack;
     }
 
-    // Copy all enumerable properties
     for (const key in err) {
       try {
         errorDetail[key] = (err as any)[key];
@@ -75,13 +46,9 @@ export async function Execute(
       }
     }
 
-    const finalMessage = errorDetail.message || String(err);
     console.error('[Execute] Serialized error:', JSON.stringify(errorDetail));
 
-    return Error(500, 'Encountered a fatal error while executing the query.', {
-      error: finalMessage,
-      details: errorDetail
-    });
+    return Error(500, 'Encountered a fatal error while executing the query.');
   }
 
   const { host, backend, ...params } = parameters;

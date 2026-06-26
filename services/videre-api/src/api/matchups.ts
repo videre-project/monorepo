@@ -9,15 +9,14 @@ import { withPostgres } from '@/db/postgres';
 import { getMatchupMatrix } from '@/db/queries';
 import { FormatTypeValidator, StringValidator } from '@/db/validators';
 import { Execute } from '@/db/helpers';
+import { clampListLimit } from '@/queryPolicy';
 import { All, Required, Optional, withValidation } from '@/validation';
 
 import { args as eventArgs } from './events';
 
 
 export const args = All(eventArgs, {
-  // Parameters
   format:     Required(FormatTypeValidator),
-  // Query args
   archetype:  Optional(StringValidator),
 });
 
@@ -26,18 +25,15 @@ export default Router({ base: '/matchups' })
     withValidation(args),
     withPostgres,
     async ({ archetype }, { sql, params }) => {
-      let query = getMatchupMatrix(sql, params);
       if (archetype) {
         params.limit = 1;
-        query = sql`
-          SELECT * FROM (${query})
-          WHERE archetype = ${archetype}
-        `;
       }
+      const query = getMatchupMatrix(sql, params);
+      const limit = clampListLimit(params.limit);
 
       return await Execute(sql`
         SELECT * FROM (${query})
-        LIMIT ${params.limit}
+        LIMIT ${limit}
       `, params);
     }
   );

@@ -1,8 +1,9 @@
 /* @file
- * Copyright (c) 2024, The Videre Project Authors. All rights reserved.
+ * Copyright (c) 2026, The Videre Project Authors. All rights reserved.
  * SPDX-License-Identifier: Apache-2.0
 */
 
+import { clampListLimit, clampOffset } from './queryPolicy';
 
 export interface ErrorResponse {
   object: 'error',
@@ -12,13 +13,6 @@ export interface ErrorResponse {
   body?: any
 };
 
-/**
- * Creates an error response with the specified status, message, and optional body.
- * @param status The HTTP status code of the error response.
- * @param message The error message.
- * @param body The optional body of the error response.
- * @returns The error response.
- */
 export function Error(status = 500, message: string, body?: any): Response {
   const statusText = ({
     400: 'Bad Request',
@@ -40,14 +34,7 @@ export function Error(status = 500, message: string, body?: any): Response {
   return asJSON(error, { status, statusText });
 }
 
-/**
- * Converts the specified body to a JSON response with the specified options.
- * @param body The body to convert to JSON.
- * @param options The options for the JSON response.
- * @returns The JSON response.
- */
 export function asJSON(body: any, { headers = {}, ...rest }: ResponseInit = {}) {
-  // Guard against invalid inputs.
   if (body === undefined || body instanceof Response) return body;
 
   return new Response(JSON.stringify(body), {
@@ -59,4 +46,73 @@ export function asJSON(body: any, { headers = {}, ...rest }: ResponseInit = {}) 
     },
     ...rest
   });
+}
+
+export interface ListPagination {
+  has_more?: boolean,
+  next_offset?: number | null
+};
+
+export const getListLimit = (params: { [key: string]: any }): number =>
+  clampListLimit(params.limit);
+
+export const getListOffset = (params: { [key: string]: any }): number =>
+  clampOffset(params.offset);
+
+export const getListPagination = (
+  params: { [key: string]: any },
+  dataLength: number,
+  total: number
+): Required<ListPagination> => {
+  const limit = getListLimit(params);
+  const offset = getListOffset(params);
+  const hasMore = offset + dataLength < total;
+
+  return {
+    has_more: hasMore,
+    next_offset: hasMore ? offset + limit : null,
+  };
+}
+
+export const getProbePagination = (
+  params: { [key: string]: any },
+  fetchedLength: number
+): Required<ListPagination> => {
+  const limit = getListLimit(params);
+  const offset = getListOffset(params);
+  const hasMore = fetchedLength > limit;
+
+  return {
+    has_more: hasMore,
+    next_offset: hasMore ? offset + limit : null,
+  };
+}
+
+export const buildListResponse = (
+  params: { [key: string]: any },
+  data: any[],
+  total: number | null,
+  start: number,
+  pagination: ListPagination = {}
+) => {
+  const { host, backend, __empty, ...outputParams } = params;
+  const limit = getListLimit(params);
+  const offset = getListOffset(params);
+
+  return {
+    object: 'list',
+    parameters: outputParams,
+    meta: {
+      database: host,
+      backend,
+      exec_ms: Number((performance.now() - start).toFixed(3)),
+      row_count: data.length,
+      total,
+      limit,
+      offset,
+      has_more: pagination.has_more ?? false,
+      next_offset: pagination.next_offset ?? null,
+    },
+    data
+  };
 }

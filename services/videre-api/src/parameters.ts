@@ -3,32 +3,24 @@
  * SPDX-License-Identifier: Apache-2.0
 */
 
-import type { IRequest } from 'itty-router/Router';
+import type { IRequest } from 'itty-router';
 
 import type { Context } from './handler';
+import { DEFAULT_LIST_LIMIT } from './queryPolicy';
 
 
 /**
  * Default query parameter values.
  */
 export const getDefault = (key: string) => (({
-    /**
-   * Defaults to 31 days ago
-   */
-    min_date: new Date(new Date().setDate(new Date().getDate() - 31)),
-  /**
-   * Defaults to today
-   */
+  min_date: new Date(new Date().setDate(new Date().getDate() - 31)),
   max_date: new Date(),
-  /**
-   * Defaults to 100 results
-   */
-  limit: 100,
+  limit: DEFAULT_LIST_LIMIT,
 })[key]);
 
 /**
- * A middleware that hoists request parameters and query args, adding any
- * parameter defaults if they don't exist.
+ * Exposes path params, query params, and route defaults through one request
+ * proxy so validators and handlers read from the same source.
  */
 export const withParams = (req: IRequest, { params }: Context, ..._: any[]) => {
   req.proxy = new Proxy(req.proxy || req, {
@@ -41,13 +33,12 @@ export const withParams = (req: IRequest, { params }: Context, ..._: any[]) => {
           getDefault(prop as string)
       ),
     set: (obj, prop, value) => {
-      // Allow updating of parameters
       if (prop in params)
       {
         params[prop as string] = value;
         return true;
       }
-      // Always set request properties
+
       obj[prop] = value;
       return true;
     }
