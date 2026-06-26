@@ -15,4 +15,5 @@ export default interface Env {
   PGSSL?: string | boolean;
   CF_CLIENT_ID?: string;
   CF_CLIENT_SECRET?: string;
+  CACHE_VERSION?: string;
 }

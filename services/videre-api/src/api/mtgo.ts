@@ -26,8 +26,12 @@ export interface DeploymentManifest {
 export default Router({ base: '/mtgo' })
   .get('/manifest',
     async (req, { params }) => {
-      // Fetch the MTGO.application deployment manifest
-      let response = await fetch('http://mtgo.patch.daybreakgames.com/patch/mtg/live/client/MTGO.application');
+      // The deployment manifest names the active client version; the
+      // application manifest lists the assemblies that make up that version.
+      let response = await fetch([
+        'http://mtgo.patch.daybreakgames.com/patch',
+        'mtg/live/client/MTGO.application',
+      ].join('/'));
       if (!response.ok) {
         return Error('Failed to fetch the MTGO deployment manifest.');
       }
@@ -38,18 +42,24 @@ export default Router({ base: '/mtgo' })
       const publicKey = text.match(/(?<=publicKeyToken=")([^"]+)(?=")/)![0];
 
       const dateCode = codebase.match(/(?<=\d{4}.)\d+/g)![0];
-      const date = `${dateCode.slice(0, 4)}-${dateCode.slice(4, 6)}-${dateCode.slice(6, 8)}T${dateCode.slice(8, 10)}:${dateCode.slice(10, 12)}:${dateCode.slice(12, 14)}`;
+      const date = [
+        `${dateCode.slice(0, 4)}-${dateCode.slice(4, 6)}-${dateCode.slice(6, 8)}`,
+        `${dateCode.slice(8, 10)}:${dateCode.slice(10, 12)}:${dateCode.slice(12, 14)}`,
+      ].join('T');
 
-      // Fetch the application manifest
-      response = await fetch(`http://mtgo.patch.daybreakgames.com/patch/mtg/live/client/${codebase}/MTGO.exe.manifest`);
+      response = await fetch([
+        'http://mtgo.patch.daybreakgames.com/patch',
+        `mtg/live/client/${codebase}/MTGO.exe.manifest`,
+      ].join('/'));
       if (!response.ok) {
         return Error('Failed to fetch the MTGO application manifest.');
       }
       text = await response.text();
 
-      // Extract all dependent assemblies from the application manifest
       const dependencies = [] as AssemblyIdentity[];
-      const assemblyIdentities = text.match(/(?<=dependentAssembly\s)(.*?)(?=<\/dependentAssembly)/sg)!;
+      const assemblyIdentities = text.match(
+        /(?<=dependentAssembly\s)(.*?)(?=<\/dependentAssembly)/sg
+      )!;
       for (const idx in assemblyIdentities) {
         const assembly = assemblyIdentities[idx];
 
@@ -60,7 +70,9 @@ export default Router({ base: '/mtgo' })
 
         const entry = {} as any;
 
-        const [name, version] = assembly.match(/(?<=name=")(.*?)(?=").*?(?<=version=")(.*?)(?=")/)!.slice(1);
+        const [name, version] = assembly.match(
+          /(?<=name=")(.*?)(?=").*?(?<=version=")(.*?)(?=")/
+        )!.slice(1);
         const file = assembly.match(/(?<=codebase=")(.*?)(?=")/g)![0];
         entry['name'] = name;
         entry['file'] = file;
@@ -90,7 +102,13 @@ export default Router({ base: '/mtgo' })
         dependencies.push(entry);
       }
 
-      const data = { version, codebase, date, public_key: publicKey, dependencies } as DeploymentManifest;
+      const data = {
+        version,
+        codebase,
+        date,
+        public_key: publicKey,
+        dependencies,
+      } as DeploymentManifest;
 
       return data;
     }
