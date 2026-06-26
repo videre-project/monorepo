@@ -1,28 +1,26 @@
 /* @file
- * Copyright (c) 2024, The Videre Project Authors. All rights reserved.
+ * Copyright (c) 2026, The Videre Project Authors. All rights reserved.
  * SPDX-License-Identifier: Apache-2.0
 */
 
 import { error } from 'itty-router';
 
-import { FORMATS } from '@/db/constants';
-import type { FormatType } from '@/db/types';
+import { FORMATS } from '../schema.g.ts';
+import type { FormatType } from '../types.ts';
+
+type ValidationParams = Record<string, unknown>;
 
 const toPascalCase = (text: string): string =>
   text.replace(/(?:^|[_\s-])(\w)/g, (_, c) => c.toUpperCase());
 
-
-/**
- * Verifies that a value is a valid FormatType.
- */
 export const FormatTypeValidator = (
-  params: any,
+  params: ValidationParams,
   key: string,
-  value: any
+  value: unknown
 ): Response | void => {
-  const format = toPascalCase(value) as FormatType;
+  const format = toPascalCase(String(value)) as FormatType;
   if (!FORMATS.includes(format))
     return error(400, `Invalid ${key} specified: '${format}'`);
 
   params[key] = format;
-}
+};
