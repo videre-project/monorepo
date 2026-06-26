@@ -17,7 +17,6 @@
 		"@cloudflare/workers-types": "^4.20240419.0",
 		"discord-api-types": "^0.37.79",
 		"dotenv": "^16.4.5",
-		"slash-up": "^1.4.2",
-		"wrangler": "^3.51.2"
+		"slash-up": "^1.4.2"
 	}
 }

@@ -3,12 +3,13 @@
   "private": true,
   "scripts": {
     "dev": "pnpm --parallel -r run dev",
-    "build": "pnpm --parallel -r run build",
-    "deploy": "pnpm --parallel -r run deploy"
+    "deploy": "pnpm --parallel -r run deploy",
+    "test": "pnpm -r run test"
   },
   "devDependencies": {
     "@types/node": "^20.2.3",
-    "typescript": "^5.0.4"
+    "typescript": "^5.0.4",
+    "wrangler": "^4.105.0"
   },
   "repository": {
     "type": "git",
