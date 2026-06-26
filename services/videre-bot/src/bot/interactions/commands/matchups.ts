@@ -6,7 +6,7 @@
 import { EmbedBuilder } from '@discordjs/builders';
 import { CommandOptionType } from 'slash-create/web';
 
-import { FORMATS } from '@videre-api/db/constants';
+import { FORMATS } from '@videre-api/db/schema.g';
 import type { IMatchupMatrix, IMetagame } from '@videre-api/db/queries';
 
 import { Timestamp } from '@/utils/formatters/date';

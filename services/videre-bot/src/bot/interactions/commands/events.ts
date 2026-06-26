@@ -7,7 +7,7 @@ import { EmbedBuilder } from '@discordjs/builders';
 import { type APISelectMenuOption, ButtonStyle } from 'discord-api-types/v10';
 import { CommandOptionType } from 'slash-create/web';
 
-import { FORMATS } from '@videre-api/db/constants';
+import { FORMATS } from '@videre-api/db/schema.g';
 import type { IEvent } from '@videre-api/db/queries';
 
 import { toUSLocale, Timestamp } from '@/utils/formatters/date';
