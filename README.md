@@ -1,13 +1,13 @@
-# Videre Monorepo
+# api-services
 
-This repository contains Videre's two active TypeScript services:
+This repository contains Videre's API-facing TypeScript services:
 
 | Service | Purpose |
 |---|---|
 | `services/videre-api` | Cloudflare Worker API for Magic: The Gathering data. |
 | `services/videre-bot` | Cloudflare Worker Discord bot and interaction handler. |
 
-The old shared packages and config workspaces have been removed. The repo is now a small pnpm workspace over `services/*`, with shared TypeScript defaults in `tsconfig.base.json`.
+The repo is a small pnpm workspace over `services/*`, with shared TypeScript defaults in `tsconfig.base.json`.
 
 ## Setup
 
@@ -41,7 +41,24 @@ pnpm --filter videre-bot run sync
 pnpm --filter videre-bot run sync:dev
 ```
 
+Run the API regression tests:
+
+```sh
+pnpm --filter videre-api test
+```
+
 The root `dev` and `deploy` scripts run the matching script across every workspace.
+
+## API Docs
+
+- [Cards API](docs/api/cards.md)
+- [Sets API](docs/api/sets.md)
+- [Products API](docs/api/products.md)
+- [Events API](docs/api/events.md)
+- [Metagame API](docs/api/metagame.md)
+- [Archetypes API](docs/api/archetypes.md)
+- [Matchups API](docs/api/matchups.md)
+- [MTGO Manifest API](docs/api/mtgo.md)
 
 ## License
 
