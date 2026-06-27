@@ -17,7 +17,6 @@ import {
   buildListResponse,
   Error,
   getListLimit,
-  getListOffset,
   getProbePagination
 } from '@/responses';
 import { Optional, withValidation } from '@/validation';
@@ -39,14 +38,8 @@ export default Router({ base: '/decks' })
     withPostgres,
     async (req, { sql, params }) => {
       const start = performance.now();
-      const query = getEventDecks(sql, params);
       const limit = getListLimit(params);
-      const offset = getListOffset(params);
-      const rows = await sql`
-        SELECT * FROM (${query})
-        LIMIT ${limit + 1}
-        OFFSET ${offset}
-      `;
+      const rows = await getEventDecks(sql, params);
       const data = rows.slice(0, limit);
 
       if (!data.length) {

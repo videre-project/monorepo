@@ -39,7 +39,10 @@ export default (req: Request, ctx: Context, env: Env): Promise<Response> =>
 
     router
       .fetch(req, ctx, env)
-      .catch(() => Error(500, 'Encountered a fatal error.'))
+      .catch((err) => {
+        console.error('[Handler] Fatal route error:', err);
+        return Error(500, 'Encountered a fatal error.');
+      })
       .then((res) => ctx.cache ? updateCache(res, ctx) : res)
       .then((res) => {
         clearTimeout(timeout);

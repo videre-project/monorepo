@@ -15,6 +15,7 @@ import {
   type CompiledSql,
   type SqlFragment
 } from '@videre/sql-builder';
+import { clampListLimit, clampOffset } from '../../../queryPolicy.ts';
 import { table } from '../../schema.g.ts';
 import { fromCompiledQuery } from '../compiledQuery.ts';
 import type {
@@ -87,6 +88,8 @@ export const buildEventDecksQuery = (params: EventDataQueryParams): CompiledSql 
       archetypePredicates(params, archetypes),
     ])}
     ORDER BY ${eventDataOrderBy([decks.column('player')])}
+    LIMIT ${eventDataProbeLimit(params)}::int
+    OFFSET ${eventDataOffset(params)}::int
   `);
 
 export const buildEventMatchesQuery = (params: EventDataQueryParams): CompiledSql =>
@@ -109,6 +112,8 @@ export const buildEventMatchesQuery = (params: EventDataQueryParams): CompiledSq
       matches.column('round'),
       matches.column('player'),
     ])}
+    LIMIT ${eventDataProbeLimit(params)}::int
+    OFFSET ${eventDataOffset(params)}::int
   `);
 
 export const buildEventStandingsQuery = (params: EventDataQueryParams): CompiledSql =>
@@ -125,6 +130,8 @@ export const buildEventStandingsQuery = (params: EventDataQueryParams): Compiled
       archetypePredicates(params, archetypes),
     ])}
     ORDER BY ${eventDataOrderBy([standings.column('rank')])}
+    LIMIT ${eventDataProbeLimit(params)}::int
+    OFFSET ${eventDataOffset(params)}::int
   `);
 
 export const getEventDecks = fromCompiledQuery<IEventDeck>(buildEventDecksQuery);
@@ -181,4 +188,12 @@ function eventDataOrderBy(tiebreakers: readonly SqlFragment[]): SqlFragment {
     sql`${events.column('id')} DESC`,
     ...tiebreakers,
   ]);
+}
+
+function eventDataProbeLimit(params: EventDataQueryParams): number {
+  return clampListLimit(params.limit) + 1;
+}
+
+function eventDataOffset(params: EventDataQueryParams): number {
+  return clampOffset(params.offset);
 }
