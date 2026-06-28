@@ -1,7 +1,15 @@
+# Local development defaults use mtgo-db's internal Pgpool service.
 PGHOST=127.0.0.1
-PGPORT=5432
+PGPORT=6432
 PGDATABASE=mtgo
 PGUSER=api
 PGPASSWORD=replace_with_a_strong_password
 PGSSL=false
 CACHE_VERSION=1
+
+# Required only when PGHOST points at worker-db.videreproject.com.
+#
+# You can optionally point to public-db.videreproject.com or to your own
+# deployment and omit these instead.
+CF_CLIENT_ID=
+CF_CLIENT_SECRET=

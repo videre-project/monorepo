@@ -7,11 +7,12 @@ routes = [
 ]
 
 [vars]
-PGHOST = "db1.videreproject.com"
+PGHOST = "worker-db.videreproject.com"
 PGPORT = "5432"
 PGDATABASE = "mtgo"
 PGUSER = "api"
 PGSSL = "true"
-CF_CLIENT_ID = ""
-CF_CLIENT_SECRET = ""
 CACHE_VERSION = "1"
+
+[secrets]
+required = [ "PGPASSWORD", "CF_CLIENT_ID", "CF_CLIENT_SECRET" ]
