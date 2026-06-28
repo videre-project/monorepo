@@ -6,13 +6,14 @@ The main card endpoint is:
 
 ```text
 GET /cards
+POST /cards/search
 GET /cards/named
 GET /cards/autocomplete
 GET /cards/random
 GET /cards/:id
 ```
 
-`/cards` returns a paginated list. `/cards/named` returns one card by exact or fuzzy card name lookup. `/cards/autocomplete` returns matching card-name suggestions. `/cards/random` returns one random card from the same filtered search space as `/cards`. `/cards/:id` returns one searchable card object by MTGO catalog ID, including card faces when the object has multiple faces or subcard data.
+`/cards` returns a paginated list. `/cards/search` accepts the same filters with an optional request-local collection for personalized search. `/cards/named` returns one card by exact or fuzzy card name lookup. `/cards/autocomplete` returns matching card-name suggestions. `/cards/random` returns one random card from the same filtered search space as `/cards`. `/cards/:id` returns one searchable card object by MTGO catalog ID, including card faces when the object has multiple faces or subcard data.
 
 ## Query Text
 
@@ -170,6 +171,56 @@ The `unique` option controls print collapsing:
 `cards` returns one representative per oracle card. `prints` returns each MTGO printing.
 
 MTGO foil clones are preserved in the database as catalog variants rather than independent card rows. They do not appear as separate `/cards` results, and ordinary foil clone catalog IDs do not imply separate CDN images.
+
+## Collection-Aware Search
+
+Use `POST /cards/search` when a client wants to personalize search against a caller-provided MTGO collection. The query string accepts the same filters, sorting, and pagination controls as `GET /cards`; the JSON body adds a `collection` object.
+
+```http
+POST /cards/search?q=lightning%20bolt&unique=prints
+Content-Type: application/json
+```
+
+```json
+{
+  "collection": {
+    "ids": [605, 1195],
+    "mode": "rank",
+    "match": "prints"
+  }
+}
+```
+
+`collection.ids` must contain positive integer MTGO catalog IDs. The inline pool is capped at 10,000 IDs, and duplicate IDs are ignored.
+
+Collection modes:
+
+| Mode | Meaning |
+|---|---|
+| `only` | Return matching cards from the collection only. |
+| `exclude` | Return matching cards outside the collection only. |
+| `rank` | Return all matching cards, ranking collection matches first. |
+
+Collection matching:
+
+| Match | Meaning |
+|---|---|
+| `prints` | Match exact MTGO catalog IDs. |
+| `oracle` | Treat owned print IDs as ownership of every card with the same oracle ID. |
+
+When omitted, `mode` defaults to `only` and `match` defaults to `prints`.
+
+Collection-backed responses include `in_collection` on each returned card and summarize the collection in `parameters.collection` by mode, match, and size. They do not echo the full ID list. `GET /cards` remains the cacheable public search path; collection-backed POST responses are private and not cached.
+
+`POST /cards/search` is rate limited because each request is personalized and cannot be shared through the public GET cache. The current public limit is 20 requests per 10 seconds per client IP and Cloudflare colo. Clients that expect sustained collection search traffic should debounce interactive search requests and prefer narrow queries when sending large collections.
+
+Examples:
+
+```text
+/cards/search?q=type:creature&unique=cards
+/cards/search?exact=Lightning%20Bolt&unique=prints
+/cards/search?q=dragon&order=rank
+```
 
 ## Route Tests
 

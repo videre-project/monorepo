@@ -224,6 +224,22 @@ test('builder SQL stays parameterized', () => {
   assert.ok(query.values.includes("Dizzying Swoop' OR TRUE --"));
 });
 
+test('builder SQL keeps collection IDs parameterized', () => {
+  const query = buildCardsQuery({
+    exact: 'Lightning Bolt',
+    unique: 'prints',
+    collection: {
+      ids: [605, 1195],
+      mode: 'only',
+      match: 'prints',
+    },
+  });
+
+  assert.match(query.text, /jsonb_array_elements_text\(\(\$\d+\)::text::jsonb\)/);
+  assert.doesNotMatch(query.text, /1195/);
+  assert.ok(query.values.includes('[605,1195]'));
+});
+
 test('builder count SQL stays parameterized', () => {
   const query = buildCardCountQuery({
     exact: "Dizzying Swoop' OR TRUE --",
@@ -234,6 +250,22 @@ test('builder count SQL stays parameterized', () => {
   assert.match(query.text, /\$\d+/);
   assert.doesNotMatch(query.text, /Dizzying Swoop/);
   assert.ok(query.values.includes("Dizzying Swoop' OR TRUE --"));
+});
+
+test('builder count SQL keeps collection IDs parameterized', () => {
+  const query = buildCardCountQuery({
+    exact: 'Lightning Bolt',
+    unique: 'prints',
+    collection: {
+      ids: [605, 1195],
+      mode: 'only',
+      match: 'prints',
+    },
+  });
+
+  assert.match(query.text, /jsonb_array_elements_text\(\(\$\d+\)::text::jsonb\)/);
+  assert.doesNotMatch(query.text, /1195/);
+  assert.ok(query.values.includes('[605,1195]'));
 });
 
 async function builderCards(params: CardQueryParams): Promise<Record<string, unknown>[]> {

@@ -13,6 +13,7 @@ import {
   type SqlFragment
 } from '@videre/sql-builder';
 import { table } from '../../schema.g.ts';
+import { collectionCtes } from './collection.ts';
 import { normalizeUniqueMode } from './modes.ts';
 import {
   cardPredicates,
@@ -29,9 +30,12 @@ const oracleCards = table('oracle_cards', 'oc');
 const sets = table('sets', 's');
 
 export const buildCardCountQuery = (params: CardQueryParams): CompiledSql => {
-  const uniqueMode = normalizeUniqueMode(params.unique);
-  if (usesSimpleCountPath(params)) {
-    return compile(simpleCardCountQuery(params, uniqueMode));
+  const countParams = params.collection?.mode === 'rank'
+    ? { ...params, collection: null }
+    : params;
+  const uniqueMode = normalizeUniqueMode(countParams.unique);
+  if (usesSimpleCountPath(countParams)) {
+    return compile(simpleCardCountQuery(countParams, uniqueMode));
   }
 
   const countExpression = uniqueMode === 'cards'
@@ -39,10 +43,16 @@ export const buildCardCountQuery = (params: CardQueryParams): CompiledSql => {
     : raw('count(*)::bigint');
 
   return compile(sql`
-    SELECT ${countExpression} AS count
-    FROM ${cards.source}
-    LEFT JOIN ${sets.source} ON ${sets.column('code')} = ${cards.column('set_code')}
-    WHERE ${cardPredicates(params)}
+    WITH
+    ${collectionCtes(countParams)}
+    card_count AS (
+      SELECT ${countExpression} AS count
+      FROM ${cards.source}
+      LEFT JOIN ${sets.source} ON ${sets.column('code')} = ${cards.column('set_code')}
+      WHERE ${cardPredicates(countParams)}
+    )
+    SELECT count
+    FROM card_count
   `);
 };
 

@@ -31,6 +31,10 @@ import {
   comparisonPredicate,
   rarityPredicate
 } from './filters.ts';
+import {
+  collectionPredicate,
+  hasCollection
+} from './collection.ts';
 import { isUnset } from './modes.ts';
 import { table } from '../../schema.g.ts';
 import type { CardOrderMode, CardQueryParams, UniqueMode } from './types.ts';
@@ -178,6 +182,10 @@ const cardFilterDefinitions = [
   cardFilter(
     (params) => tokenPredicate(cards.alias, params)
   ),
+  cardFilter(
+    (params) => collectionPredicate(cards.alias, params),
+    genericSearchOnly
+  ),
 ] as const satisfies readonly CardFilterDefinition[];
 
 const cardFilters = defineFilters<CardQueryParams>(
@@ -193,6 +201,10 @@ export function usesUniqueNameFastPath(
   uniqueMode: UniqueMode,
   orderMode: CardOrderMode
 ): boolean {
+  if (hasCollection(params)) {
+    return false;
+  }
+
   if (uniqueMode !== 'cards' || orderMode !== 'name') {
     return false;
   }
@@ -201,6 +213,10 @@ export function usesUniqueNameFastPath(
 }
 
 export function usesSimpleCountPath(params: CardQueryParams): boolean {
+  if (hasCollection(params)) {
+    return false;
+  }
+
   return !hasOptimizationDisablingFilter(params, 'simpleCount');
 }
 

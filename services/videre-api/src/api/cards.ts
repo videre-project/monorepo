@@ -6,9 +6,10 @@
 import { Router } from 'itty-router';
 
 import { Execute } from '@/db/helpers';
-import { withPostgres } from '@/db/postgres';
+import { withPostgres, type Sql } from '@/db/postgres';
 import { getCard, getCardCount, getCardNameAutocomplete, getCards } from '@/db/queries';
 import {
+  asJSON,
   buildListResponse,
   Error,
   getListLimit,
@@ -30,6 +31,7 @@ import {
   StringValidator
 } from '@/db/validators';
 import { Optional, Required, withValidation } from '@/validation';
+import { readCardCollection } from './cardCollection';
 
 
 export const args = {
@@ -95,39 +97,33 @@ export default Router({ base: '/cards' })
     withValidation(args),
     withPostgres,
     async (req, { sql, params }) => {
-      const searchParams = applyCardSearchQuery(params);
-      if (searchParams.format && !searchParams.legality) {
-        searchParams.legality = 'legal';
+      return searchCards(sql, params);
+    }
+  )
+  .post('/search',
+    withValidation(args),
+    async (req, { params }) => {
+      const collection = await readCardCollection(req);
+      if (collection instanceof Response) {
+        collection.headers.set('Cache-Control', 'private, no-store');
+        return collection;
       }
-      const start = performance.now();
-      if (searchParams.__empty) {
-        return Error(400, 'No results found.', buildListResponse(searchParams, [], 0, start));
+
+      if (collection !== null) {
+        params.collection = collection;
+      }
+    },
+    withPostgres,
+    async (req, { sql, params }) => {
+      const response = await searchCards(sql, params);
+      if (response instanceof Response) {
+        // Avoid caching search results for POST requests since request bodies
+        // are user-defined and not unique to the request URL.
+        response.headers.set('Cache-Control', 'private, no-store');
+        return response;
       }
 
-      const limit = getListLimit(searchParams);
-      const includeTotal = searchParams.include_total === true || limit >= 500;
-      const cardParams = includeTotal
-        ? searchParams
-        : { ...searchParams, limit: limit + 1 };
-      const [fetchedData, countRows] = await Promise.all([
-        getCards(sql, cardParams).then(normalizeCards),
-        includeTotal ? getCardCount(sql, searchParams) : Promise.resolve([{ count: null }]),
-      ]);
-      const data = includeTotal ? fetchedData : fetchedData.slice(0, limit);
-      const exactTotal = includeTotal ? Number(countRows[0].count) : null;
-
-      if (!data.length)
-        return Error(400, 'No results found.', buildListResponse(searchParams, data, exactTotal, start));
-
-      return buildListResponse(
-        searchParams,
-        data,
-        exactTotal,
-        start,
-        exactTotal !== null
-          ? getListPagination(searchParams, data.length, exactTotal)
-          : getProbePagination(searchParams, fetchedData.length)
-      );
+      return asJSON(response, { headers: { 'Cache-Control': 'private, no-store' } });
     }
   )
   .get('/named',
@@ -244,6 +240,63 @@ export default Router({ base: '/cards' })
         : response;
     }
   );
+
+const searchCards = async (sql: Sql, params: any) => {
+  const searchParams = applyCardSearchQuery(params);
+  if (params.collection) {
+    searchParams.collection = params.collection;
+  }
+
+  if (searchParams.format && !searchParams.legality) {
+    searchParams.legality = 'legal';
+  }
+  const start = performance.now();
+  const responseParams = cardSearchResponseParams(searchParams);
+  if (searchParams.__empty) {
+    return Error(400, 'No results found.', buildListResponse(responseParams, [], 0, start));
+  }
+
+  const limit = getListLimit(searchParams);
+  const includeTotal = searchParams.include_total === true || limit >= 500;
+  const cardParams = includeTotal
+    ? searchParams
+    : { ...searchParams, limit: limit + 1 };
+  const [fetchedData, countRows] = await Promise.all([
+    getCards(sql, cardParams).then(normalizeCards),
+    includeTotal ? getCardCount(sql, searchParams) : Promise.resolve([{ count: null }]),
+  ]);
+  const data = includeTotal ? fetchedData : fetchedData.slice(0, limit);
+  const exactTotal = includeTotal ? Number(countRows[0].count) : null;
+
+  if (!data.length)
+    return Error(400, 'No results found.', buildListResponse(responseParams, data, exactTotal, start));
+
+  return buildListResponse(
+    responseParams,
+    data,
+    exactTotal,
+    start,
+    exactTotal !== null
+      ? getListPagination(searchParams, data.length, exactTotal)
+      : getProbePagination(searchParams, fetchedData.length)
+  );
+};
+
+const cardSearchResponseParams = (params: any) => {
+  if (!params.collection) {
+    return params;
+  }
+
+  const { collection, ...responseParams } = params;
+  return {
+    ...responseParams,
+    collection: {
+      mode: collection.mode,
+      match: collection.match,
+      size: Array.isArray(collection.ids) ? collection.ids.length : 0,
+    },
+  };
+};
 
 const normalizeCards = (cards: any[]) =>
   cards.map((card) => ({

@@ -5,6 +5,8 @@
 
 import { Buffer } from 'node:buffer';
 
+const MAX_WEBSOCKET_FRAME_BYTES = 8 * 1024;
+
 export class TcpOverWebSocket {
   private ws: WebSocket | null = null;
   private onData: ((data: Uint8Array) => void) | null = null;
@@ -124,8 +126,9 @@ export class TcpOverWebSocket {
     }
 
     try {
-      // console.log(`[Transport] >> Sending ${chunk.byteLength} bytes`);
-      this.ws.send(chunk);
+      for (let offset = 0; offset < chunk.byteLength; offset += MAX_WEBSOCKET_FRAME_BYTES) {
+        this.ws.send(chunk.slice(offset, offset + MAX_WEBSOCKET_FRAME_BYTES));
+      }
       if (cb) setTimeout(cb, 0);
       return true;
     } catch (err: any) {

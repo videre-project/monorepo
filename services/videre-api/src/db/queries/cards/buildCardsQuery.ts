@@ -16,6 +16,10 @@ import { clampListLimit, clampOffset } from '../../../queryPolicy.ts';
 import { table } from '../../schema.g.ts';
 import { buildCardCandidatesQuery } from './buildCardCandidatesQuery.ts';
 import {
+  collectionCardOrder,
+  hasCollection
+} from './collection.ts';
+import {
   cardOrder,
   normalizeOrderDirection,
   normalizeOrderMode,
@@ -48,7 +52,7 @@ export const buildCardsQuery = (params: CardQueryParams): CompiledSql => {
 
   const query = sql`
     ${candidateQuery}
-    SELECT ${selectFields(cardSelectFields)}
+    SELECT ${selectFields(cardSelectFields(params))}
     FROM candidate_cards cc
     INNER JOIN ${cards.source} ON ${cards.column('id')} = ${candidateColumn('id')}
     LEFT JOIN ${sets.source} ON ${sets.column('code')} = ${cards.column('set_code')}
@@ -61,13 +65,13 @@ export const buildCardsQuery = (params: CardQueryParams): CompiledSql => {
       FROM ${cardLegalities.source}
       WHERE ${cardLegalities.column('oracle_id')} = ${cards.column('oracle_id')}
     ) l ON TRUE
-    ORDER BY ${cardOrder(orderMode, orderDirection)}
+    ORDER BY ${collectionCardOrder(params, cardOrder(orderMode, orderDirection))}
   `;
 
   return compile(query);
 };
 
-const cardSelectFields = {
+const baseCardSelectFields = {
   ...tableColumnFields(cards, CARD_COLUMN_FIELDS),
   set_name: sets.column('name'),
   is_promo: sql`(coalesce(NULLIF(btrim(${cards.column('promo_label')}), ''), '') <> '')`,
@@ -88,6 +92,15 @@ const cardSelectFields = {
   image_url: sql`cdn_card_image_base_url() || ${cards.column('id')} || '-300px.png'`,
 } satisfies Record<keyof ICard, SqlFragment>;
 
-function candidateColumn(column: 'id'): SqlFragment {
+function cardSelectFields(params: CardQueryParams): Record<string, SqlFragment> {
+  return hasCollection(params)
+    ? {
+      ...baseCardSelectFields,
+      in_collection: candidateColumn('in_collection'),
+    }
+    : baseCardSelectFields;
+}
+
+function candidateColumn(column: 'id' | 'in_collection'): SqlFragment {
   return ident('cc', column);
 }

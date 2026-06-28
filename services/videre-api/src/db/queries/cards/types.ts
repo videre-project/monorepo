@@ -59,6 +59,17 @@ export type CardQueryParams = {
   readonly dir?: string | null,
   readonly limit?: number | null,
   readonly offset?: number | null,
+  readonly collection?: CardCollectionFilter | null,
+};
+
+export type CardCollectionMode = 'only' | 'exclude' | 'rank';
+
+export type CardCollectionMatchMode = 'prints' | 'oracle';
+
+export type CardCollectionFilter = {
+  readonly ids: readonly number[],
+  readonly mode: CardCollectionMode,
+  readonly match: CardCollectionMatchMode,
 };
 
 export type UniqueMode = CardUniqueMode;

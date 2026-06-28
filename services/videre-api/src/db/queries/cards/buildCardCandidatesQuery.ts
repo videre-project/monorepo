@@ -13,6 +13,12 @@ import {
   type SqlFragment
 } from '@videre/sql-builder';
 import { table } from '../../schema.g.ts';
+import {
+  collectionCandidateOrder,
+  collectionCtes,
+  collectionSelectExpression,
+  collectionUniqueRepresentativeOrder
+} from './collection.ts';
 import { candidateOrder } from './modes.ts';
 import {
   cardPredicates,
@@ -61,18 +67,26 @@ function genericCandidateQuery(options: CardCandidateQueryOptions): SqlFragment 
     ? sql`
       ORDER BY
         ${cards.column('oracle_id')},
+        ${collectionUniqueRepresentativeOrder(params)}
         ${sets.column('release_date')} DESC NULLS LAST,
         ${cards.column('id')} DESC
     `
     : raw('');
+  const order = collectionCandidateOrder(
+    params,
+    candidateOrder(orderMode, orderDirection)
+  );
 
   return sql`
-    WITH candidate_cards AS MATERIALIZED (
+    WITH
+    ${collectionCtes(params)}
+    candidate_cards AS MATERIALIZED (
       SELECT *
       FROM (
         SELECT ${uniqueMode === 'cards' ? sql`DISTINCT ON (${cards.column('oracle_id')})` : raw('')}
           ${cards.column('id')},
           ${cards.column('oracle_id')},
+          ${collectionSelectExpression(params)} AS in_collection,
           CASE
             WHEN ${params.q ?? null}::text IS NULL THEN 0::real
             ELSE similarity(${cards.column('name_normalized')}, lower(${params.q ?? null}::text))
@@ -87,7 +101,7 @@ function genericCandidateQuery(options: CardCandidateQueryOptions): SqlFragment 
         WHERE ${cardPredicates(params)}
         ${uniqueCardOrder}
       ) filtered_cards
-      ORDER BY ${candidateOrder(orderMode, orderDirection)}
+      ORDER BY ${order}
       LIMIT ${limit}::int
       OFFSET ${offset}::int
     )
@@ -102,12 +116,14 @@ function fastUniqueNameCandidateQuery(options: CardCandidateQueryOptions): SqlFr
     limit,
     offset,
   } = options;
+  const order = candidateOrder(orderMode, orderDirection);
 
   return sql`
     WITH candidate_cards AS MATERIALIZED (
       SELECT
         ${cards.column('id')},
         ${cards.column('oracle_id')},
+        ${collectionSelectExpression(params)} AS in_collection,
         0::real AS search_rank,
         ${cards.column('name')},
         ${cards.column('set_code')},
@@ -142,7 +158,7 @@ function fastUniqueNameCandidateQuery(options: CardCandidateQueryOptions): SqlFr
             )`,
           ]))),
       ])}
-      ORDER BY ${candidateOrder(orderMode, orderDirection)}
+      ORDER BY ${order}
       LIMIT ${limit}::int
       OFFSET ${offset}::int
     )

@@ -72,6 +72,7 @@ const defaults = {
   isPromo: null,
   isMultiface: null,
   isSplit: null,
+  collection: null,
 };
 
 const params = (overrides = {}) => ({ ...defaults, ...overrides });
@@ -136,6 +137,7 @@ const toCardQueryParams = (p) => ({
   is_promo: p.isPromo,
   is_multiface: p.isMultiface,
   is_split: p.isSplit,
+  collection: p.collection,
 });
 
 const apiCardNameAutocomplete = (overrides = {}) => {
@@ -360,6 +362,157 @@ test('token searches return token catalog rows explicitly', async () => {
   assert.ok(rows.every((row) => row.is_token === true));
 });
 
+test('collection-only search limits results to owned print IDs', async () => {
+  const rows = await apiCards({
+    exact: 'Lightning Bolt',
+    unique: 'prints',
+    limit: 10,
+    collection: {
+      ids: [605],
+      mode: 'only',
+      match: 'prints',
+    },
+  });
+
+  assert.deepEqual(rows.map((row) => row.id), [605]);
+  assert.ok(rows.every((row) => row.in_collection === true));
+});
+
+test('collection-exclude search removes owned print IDs', async () => {
+  const rows = await apiCards({
+    exact: 'Lightning Bolt',
+    unique: 'prints',
+    limit: 10,
+    collection: {
+      ids: [605],
+      mode: 'exclude',
+      match: 'prints',
+    },
+  });
+
+  assert.ok(rows.length > 0);
+  assert.ok(rows.every((row) => row.id !== 605));
+  assert.ok(rows.every((row) => row.in_collection === false));
+});
+
+test('collection-rank search orders owned print IDs first', async () => {
+  const rows = await apiCards({
+    exact: 'Lightning Bolt',
+    unique: 'prints',
+    order: 'name',
+    limit: 5,
+    collection: {
+      ids: [1195],
+      mode: 'rank',
+      match: 'prints',
+    },
+  });
+
+  assert.ok(rows.length > 1);
+  assert.equal(rows[0].id, 1195);
+  assert.equal(rows[0].in_collection, true);
+  assert.ok(rows.slice(1).some((row) => row.in_collection === false));
+});
+
+test('collection oracle matching includes alternate printings', async () => {
+  const rows = await apiCards({
+    exact: 'Lightning Bolt',
+    unique: 'prints',
+    limit: 10,
+    collection: {
+      ids: [605],
+      mode: 'only',
+      match: 'oracle',
+    },
+  });
+
+  assert.ok(rows.length > 1);
+  assert.ok(rows.every((row) => row.name === 'Lightning Bolt'));
+  assert.ok(rows.every((row) => row.in_collection === true));
+});
+
+test('collection counts use the filtered search universe', async () => {
+  const count = await apiCardCount({
+    exact: 'Lightning Bolt',
+    unique: 'prints',
+    collection: {
+      ids: [605, 1195],
+      mode: 'only',
+      match: 'prints',
+    },
+  });
+
+  assert.equal(count, 2);
+});
+
+test('high-volume collection searches run against deterministic 2K and 10K pools', {
+  timeout: 60_000,
+}, async () => {
+  const pool2k = await deterministicCardPool(2_000, 0);
+  const pool10k = await deterministicCardPool(10_000, 7_919);
+  const cases = [
+    {
+      name: 'exact prints',
+      params: {
+        exact: 'Lightning Bolt',
+        unique: 'prints',
+        limit: 10,
+      },
+    },
+    {
+      name: 'ranked name search',
+      params: {
+        q: 'dragon',
+        unique: 'cards',
+        order: 'rank',
+        limit: 10,
+      },
+    },
+    {
+      name: 'broad type search',
+      params: {
+        type: 'creature',
+        unique: 'prints',
+        limit: 10,
+      },
+    },
+    {
+      name: 'legality search',
+      params: {
+        format: 'modern',
+        legality: 'legal',
+        unique: 'cards',
+        limit: 10,
+      },
+    },
+  ];
+
+  for (const [label, ids] of [
+    ['2k', withKnownCard(pool2k, 605)],
+    ['10k', withKnownCard(pool10k, 605)],
+  ]) {
+    for (const mode of ['only', 'exclude', 'rank']) {
+      for (const testCase of cases) {
+        const start = performance.now();
+        const params = {
+          ...testCase.params,
+          collection: {
+            ids,
+            mode,
+            match: 'prints',
+          },
+        };
+        const rows = await apiCards(params);
+        const count = await apiCardCount(params);
+        const elapsed = Number((performance.now() - start).toFixed(3));
+
+        console.log(`collection ${label} ${mode} ${testCase.name}: ${elapsed}ms`);
+        assert.ok(count >= rows.length, JSON.stringify({ label, mode, case: testCase.name }));
+      }
+    }
+  }
+});
+
 test('normal card searches exclude tokens unless explicitly included', async () => {
   const defaultRows = await apiCards({
     q: 'token',
@@ -410,11 +563,55 @@ test('multi-face cards expose ordered face rows', async () => {
   );
 });
 
+async function deterministicCardPool(limit, salt) {
+  const rows = await sql`
+    SELECT id
+    FROM cards
+    WHERE coalesce(is_token, FALSE) = FALSE
+    ORDER BY md5((id + ${salt}::int)::text)
+    LIMIT ${limit}::int
+  `;
+
+  return rows.map((row) => Number(row.id));
+}
+
+function withKnownCard(ids, id) {
+  return [id, ...ids.filter((value) => value !== id)].slice(0, ids.length);
+}
+
 const fetchCardRoute = async (path) => {
   const response = await fetch(new URL(path, apiBaseUrl));
   const body = await response.json();
 
   assert.equal(response.status, 200, JSON.stringify(body));
+  return body;
+};
+
+const postCardRoute = async (path, payload) => {
+  const response = await fetch(new URL(path, apiBaseUrl), {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(payload),
+  });
+  const body = await response.json();
+
+  assert.equal(response.status, 200, JSON.stringify(body));
+  return body;
+};
+
+const postCardRouteStatus = async (path, payload, status) => {
+  const response = await fetch(new URL(path, apiBaseUrl), {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(payload),
+  });
+  const body = await response.json();
+
+  assert.equal(response.status, status, JSON.stringify(body));
   return body;
 };
 
@@ -435,6 +632,38 @@ test('HTTP /cards q parser applies catalog ID, artist, and art ID terms together
   assert.equal(body.data[0].name, 'Lightning Bolt');
   assert.equal(body.data[0].artist, 'Christopher Rush');
   assert.equal(body.data[0].art_id, 147);
+});
+
+test('HTTP POST /cards/search supports collection-only searches', { skip: !apiBaseUrl }, async () => {
+  const body = await postCardRoute(
+    `/cards/search?exact=${encodeURIComponent('Lightning Bolt')}&unique=prints&limit=5`,
+    {
+      collection: {
+        ids: [605],
+        mode: 'only',
+        match: 'prints',
+      },
+    }
+  );
+
+  assert.equal(body.object, 'list');
+  assert.deepEqual(body.data.map((card) => card.id), [605]);
+  assert.equal(body.data[0].in_collection, true);
+  assert.deepEqual(body.parameters.collection, {
+    mode: 'only',
+    match: 'prints',
+    size: 1,
+  });
+});
+
+test('HTTP POST /cards/search rejects invalid collection IDs', { skip: !apiBaseUrl }, async () => {
+  const body = await postCardRouteStatus('/cards/search', {
+    collection: {
+      ids: [605, -1],
+    },
+  }, 400);
+
+  assert.equal(body.message, 'collection.ids must contain positive integer MTGO catalog IDs.');
 });
 
 test('HTTP /cards q parser applies type inclusion and exclusion', { skip: !apiBaseUrl }, async () => {
