@@ -51,6 +51,7 @@ The root `dev` and `deploy` scripts run the matching script across every workspa
 
 ## API Docs
 
+- [API Overview](docs/api/index.md)
 - [Cards API](docs/api/cards.md)
 - [Sets API](docs/api/sets.md)
 - [Products API](docs/api/products.md)
@@ -62,6 +63,10 @@ The root `dev` and `deploy` scripts run the matching script across every workspa
 - [Archetypes API](docs/api/archetypes.md)
 - [Matchups API](docs/api/matchups.md)
 - [MTGO Manifest API](docs/api/mtgo.md)
+- [Card Search Syntax](docs/reference/card-search.md)
+- [Data Sources And Freshness](docs/reference/data-sources.md)
+- [Rate Limits](docs/reference/rate-limits.md)
+- [Responses And Errors](docs/reference/responses-and-errors.md)
 
 ## License
 

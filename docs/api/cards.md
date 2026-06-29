@@ -1,6 +1,15 @@
 # Cards API
 
-Videre's card search API adds additional metadata and search functionality on top of MTGO's catalog model. It searches MTGO card catalog entries from the same PostgreSQL database that backs the event API. Tokens can be searched explicitly, while sealed products and other MTGO catalog products are exposed separately through `/products`.
+For shared response, pagination, caching, and rate-limit behavior, see [API Overview](index.md).
+
+Videre's card search API adds additional metadata and search functionality on
+top of MTGO's catalog model. It searches MTGO card catalog entries from the
+same PostgreSQL database that backs the event API. Tokens can be searched
+explicitly, while sealed products and other MTGO catalog products are exposed
+separately through `/products`.
+
+For the full `q` parameter grammar, including aliases, comparison operators,
+and unsupported Scryfall terms, see [Card Search Syntax](../reference/card-search.md).
 
 The main card endpoint is:
 
@@ -13,11 +22,19 @@ GET /cards/random
 GET /cards/:id
 ```
 
-`/cards` returns a paginated list. `/cards/search` accepts the same filters with an optional request-local collection for personalized search. `/cards/named` returns one card by exact or fuzzy card name lookup. `/cards/autocomplete` returns matching card-name suggestions. `/cards/random` returns one random card from the same filtered search space as `/cards`. `/cards/:id` returns one searchable card object by MTGO catalog ID, including card faces when the object has multiple faces or subcard data.
+`/cards` returns a paginated list. `/cards/search` accepts the same filters
+with an optional request-local collection for personalized search.
+`/cards/named` returns one card by exact or fuzzy card name lookup.
+`/cards/autocomplete` returns matching card-name suggestions. `/cards/random`
+returns one random card from the same filtered search space as `/cards`.
+`/cards/:id` returns one searchable card object by MTGO catalog ID, including
+card faces when the object has multiple faces or subcard data.
 
 ## Query Text
 
-The `q` parameter accepts plain text plus a small set of tagged search terms. Untagged words search card names and oracle text.
+The `q` parameter accepts plain text plus tagged search terms. Untagged words
+search card names and oracle text. The dedicated syntax reference has the full
+operator list; this section shows the common forms used by the card routes.
 
 ```text
 /cards?q=lightning bolt
@@ -25,9 +42,13 @@ The `q` parameter accepts plain text plus a small set of tagged search terms. Un
 /cards?q=t:artifact -t:creature
 ```
 
-Quoted values keep spaces together. Explicit query parameters and tagged `q` terms use the same underlying filters; explicit parameters win when both are supplied.
+Quoted values keep spaces together. Explicit query parameters and tagged `q`
+terms use the same underlying filters; explicit parameters win when both are
+supplied.
 
-Use `q` for comparison operators such as `mv<=2`, `pow>=4`, `r>=rare`, `c<=U`, and `released>=2024-01-01`. The explicit query parameters are kept to straightforward exact filters and list controls.
+Use `q` for comparison operators such as `mv<=2`, `pow>=4`, `r>=rare`,
+`c<=U`, and `released>=2024-01-01`. The explicit query parameters are kept to
+straightforward exact filters and list controls.
 
 ## Named Lookup
 
@@ -38,7 +59,9 @@ For clients that want a single card from a name, `/cards/named` accepts exactly 
 /cards/named?fuzzy=lightnng%20bolt
 ```
 
-`exact` uses exact normalized card-name matching. `fuzzy` uses the same ranked card search as `/cards?q=...` and returns the best result. The response shape matches `/cards/:id`: a wrapper with a one-row `data` array.
+`exact` uses exact normalized card-name matching. `fuzzy` uses the same ranked
+card search as `/cards?q=...` and returns the best result. The response shape
+matches `/cards/:id`: a wrapper with a one-row `data` array.
 
 For search boxes, `/cards/autocomplete` returns unique card-name strings:
 
@@ -60,6 +83,8 @@ Autocomplete searches printed card names and face names. It excludes tokens by d
 ```
 
 The response shape matches `/cards/:id`: a wrapper with a one-row `data` array.
+This is still a cacheable `GET` route, so an identical random-card URL can
+return the same cached card until the public GET cache expires.
 
 ## Common Filters
 
@@ -83,7 +108,9 @@ Set and rarity:
 /cards?q=released>=2024-01-01
 ```
 
-Rarity comparisons use the normal rarity ladder: `common`, `uncommon`, `rare`, and `mythic`. MTGO-specific values such as `token`, `bonus`, and `promo` still work as exact rarity filters.
+Rarity comparisons use the normal rarity ladder: `common`, `uncommon`, `rare`,
+and `mythic`. MTGO-specific values such as `token`, `bonus`, and `promo` still
+work as exact rarity filters.
 
 Colors and color identity:
 
@@ -148,7 +175,9 @@ The response includes a `legalities` object keyed by format code.
 
 ## Tokens, Products, And Uniqueness
 
-Tokens are cards in the catalog, but normal searches hide them by default. Use `include_tokens=true` when token rows may appear alongside normal cards, or use a token-only filter when the result should contain only tokens.
+Tokens are cards in the catalog, but normal searches hide them by default. Use
+`include_tokens=true` when token rows may appear alongside normal cards, or use
+a token-only filter when the result should contain only tokens.
 
 ```text
 /cards?q=is:token
@@ -170,11 +199,16 @@ The `unique` option controls print collapsing:
 
 `cards` returns one representative per oracle card. `prints` returns each MTGO printing.
 
-MTGO foil clones are preserved in the database as catalog variants rather than independent card rows. They do not appear as separate `/cards` results, and ordinary foil clone catalog IDs do not imply separate CDN images.
+MTGO foil clones are preserved in the database as catalog variants rather than
+independent card rows. They do not appear as separate `/cards` results, and
+ordinary foil clone catalog IDs do not imply separate CDN images.
 
 ## Collection-Aware Search
 
-Use `POST /cards/search` when a client wants to personalize search against a caller-provided MTGO collection. The query string accepts the same filters, sorting, and pagination controls as `GET /cards`; the JSON body adds a `collection` object.
+Use `POST /cards/search` when a client wants to personalize search against a
+caller-provided MTGO collection. The query string accepts the same filters,
+sorting, and pagination controls as `GET /cards`; the JSON body adds a
+`collection` object.
 
 ```http
 POST /cards/search?q=lightning%20bolt&unique=prints
@@ -210,9 +244,15 @@ Collection matching:
 
 When omitted, `mode` defaults to `only` and `match` defaults to `prints`.
 
-Collection-backed responses include `in_collection` on each returned card and summarize the collection in `parameters.collection` by mode, match, and size. They do not echo the full ID list. `GET /cards` remains the cacheable public search path; collection-backed POST responses are private and not cached.
+Collection-backed responses include `in_collection` on each returned card and
+summarize the collection in `parameters.collection` by mode, match, and size.
+They do not echo the full ID list. `GET /cards` remains the cacheable public
+search path; collection-backed POST responses are private and not cached.
 
-`POST /cards/search` is rate limited because each request is personalized and cannot be shared through the public GET cache. The current public limit is 20 requests per 10 seconds per client IP and Cloudflare colo. Clients that expect sustained collection search traffic should debounce interactive search requests and prefer narrow queries when sending large collections.
+`POST /cards/search` is rate limited because each request is personalized and
+cannot be shared through the public GET cache. See
+[Rate Limits](../reference/rate-limits.md) for the current public threshold and
+client guidance.
 
 Examples:
 
@@ -224,7 +264,9 @@ Examples:
 
 ## Route Tests
 
-The database-level card tests run with the normal `videre-api` test suite. To also exercise the HTTP route and `q` parser against a running local Worker, start the API and pass its base URL:
+The database-level card tests run with the normal `videre-api` test suite. To
+also exercise the HTTP route and `q` parser against a running local Worker,
+start the API and pass its base URL:
 
 ```sh
 VIDERE_API_BASE_URL=http://localhost:8787 pnpm --filter videre-api test
@@ -265,9 +307,59 @@ is_multiface
 is_split
 legalities
 image_url
+in_collection
 ```
 
+`in_collection` is present only on `POST /cards/search` responses that include
+a collection.
+
 `/cards/:id` also includes ordered `faces` for split, modal, adventure, and other multi-face catalog entries.
+
+Example list response:
+
+```json
+{
+  "object": "list",
+  "parameters": {
+    "q": "lightning bolt",
+    "limit": 1
+  },
+  "meta": {
+    "row_count": 1,
+    "total": null,
+    "limit": 1,
+    "offset": 0,
+    "has_more": true,
+    "next_offset": 1
+  },
+  "data": [
+    {
+      "id": 605,
+      "oracle_id": "ca3eec5d-2acb-5278-a807-d694edd299ea",
+      "set_code": "1E",
+      "set_name": "Limited Edition Alpha",
+      "name": "Lightning Bolt",
+      "mana_cost": "{R}",
+      "mana_value": 1,
+      "type_line": "Instant",
+      "oracle_text": "Lightning Bolt deals 3 damage to any target.",
+      "colors": ["R"],
+      "color_identity": ["R"],
+      "rarity": "common",
+      "is_token": false,
+      "legalities": {
+        "modern": "legal",
+        "legacy": "legal",
+        "vintage": "legal"
+      },
+      "image_url": "https://r2.videreproject.com/cards/605-300px.png"
+    }
+  ]
+}
+```
+
+The example omits nullable fields for readability. Real responses include the
+full field set listed above.
 
 ## Sorting And Pagination
 
@@ -276,4 +368,8 @@ image_url
 /cards?q=dragon&order=name&include_total=true
 ```
 
-Supported sort keys are `rank`, `name`, `mana_value`, `set`, and `released`. Card search fetches one extra row by default, so `has_more` and `next_offset` are available without running a second exact-count query. `total` is `null` unless `include_total=true` is supplied; use that when a UI needs an exact result count rather than just pagination.
+Supported sort keys are `rank`, `name`, `mana_value`, `set`, and `released`.
+Card search fetches one extra row by default, so `has_more` and `next_offset`
+are available without running a second exact-count query. `total` is `null`
+unless `include_total=true` is supplied; use that when a UI needs an exact
+result count rather than just pagination.

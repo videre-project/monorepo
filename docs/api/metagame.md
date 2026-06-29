@@ -1,5 +1,7 @@
 # Metagame API
 
+For shared response, pagination, caching, and rate-limit behavior, see [API Overview](index.md).
+
 The metagame API summarizes archetype presence and non-mirror win rates for a
 format over the selected event window. It is the endpoint to use for standings-
 style metagame tables: share of field, match win rate, and game win rate.
@@ -50,3 +52,31 @@ as a share of all decks in the filtered event window. `match_count` and
 confidence intervals for the corresponding win-rate percentages. Win-rate
 fields exclude mirror matches because mirrors do not indicate relative
 archetype performance.
+
+Example response:
+
+```json
+{
+  "parameters": {
+    "format": "modern",
+    "limit": 1
+  },
+  "meta": {
+    "row_count": 1
+  },
+  "data": [
+    {
+      "id": 42,
+      "archetype": "Izzet Murktide",
+      "count": 18,
+      "percentage": "12.50%",
+      "match_count": 90,
+      "match_winrate": "53.33%",
+      "match_ci": "±10.31%",
+      "game_count": 210,
+      "game_winrate": "51.90%",
+      "game_ci": "±6.75%"
+    }
+  ]
+}
+```

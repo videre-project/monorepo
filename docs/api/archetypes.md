@@ -1,5 +1,7 @@
 # Archetypes API
 
+For shared response, pagination, caching, and rate-limit behavior, see [API Overview](index.md).
+
 The archetypes API summarizes card usage by archetype for a format over the
 selected event window. It answers questions like "what cards do Izzet Murktide
 lists normally play?" rather than "how popular is Izzet Murktide?"; use
@@ -55,3 +57,34 @@ Inside `mainboard` and `sideboard`, `count` is the number of decks containing
 the card, `percentage` is that count divided by archetype decks, `total` is the
 total copies seen across those decks, and `average` is the average copies per
 archetype deck.
+
+Example response:
+
+```json
+{
+  "parameters": {
+    "format": "modern",
+    "archetype": "Izzet Murktide"
+  },
+  "meta": {
+    "row_count": 1
+  },
+  "data": [
+    {
+      "id": 42,
+      "archetype": "Izzet Murktide",
+      "count": 18,
+      "mainboard": [
+        {
+          "card": "Lightning Bolt",
+          "count": 18,
+          "percentage": "100.00%",
+          "total": 72,
+          "average": 4
+        }
+      ],
+      "sideboard": []
+    }
+  ]
+}
+```

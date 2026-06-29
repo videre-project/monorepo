@@ -1,5 +1,7 @@
 # Decks API
 
+For shared response, pagination, caching, and rate-limit behavior, see [API Overview](index.md).
+
 The decks API returns raw decklists for players in MTGO events. It is intended
 for clients that want to run their own archetype classification or metagame
 pipeline from the underlying deck data rather than Videre's aggregate views.
@@ -55,3 +57,41 @@ sideboard
 from the original decklist. `deck_name`, `archetype`, and `archetype_id` are the
 current classification metadata; consumers that classify independently can
 ignore those fields.
+
+Example response:
+
+```json
+{
+  "object": "list",
+  "parameters": {
+    "format": "modern",
+    "event_id": 12345,
+    "limit": 1
+  },
+  "meta": {
+    "row_count": 1,
+    "total": null,
+    "limit": 1,
+    "offset": 0,
+    "has_more": true,
+    "next_offset": 1
+  },
+  "data": [
+    {
+      "id": 67890,
+      "event_id": 12345,
+      "event_name": "Modern Challenge 64",
+      "date": "2026-06-21",
+      "format": "modern",
+      "player": "ExamplePlayer",
+      "deck_name": "Izzet Murktide",
+      "archetype": "Izzet Murktide",
+      "archetype_id": 42,
+      "mainboard": [
+        { "id": 605, "name": "Lightning Bolt", "quantity": 4 }
+      ],
+      "sideboard": []
+    }
+  ]
+}
+```
